@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->uuid('id')->primary(); 
             $table->string('referral_code')->unique()->nullable();
-            $table->string('role_id')->default('1');
+            $table->unsignedBigInteger('role_id')->default(1);
             $table->enum('status', ['active', 'inactive', 'banned'])->default('active');
             $table->string('name');
             $table->string('avatar')->nullable();

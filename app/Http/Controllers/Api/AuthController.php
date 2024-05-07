@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Socialite\Facades\Socialite;
 use Tymon\JWTAuth\Exceptions\JWTException;
@@ -116,7 +117,7 @@ class AuthController extends Controller
             'refreshToken' => 'required|string'
         ])->validated()['refreshToken'];
 
-        
+
 
         try {
             $decoded = JWTAuth::getJWTProvider()->decode($refreshToken);
@@ -128,7 +129,7 @@ class AuthController extends Controller
                         "message" => "Refresh token expired",
                     ], 401);
                 } else {
-                    
+
                     $user = User::find($decoded['user_email']);
                     if (!$user) {
                         return response()->json([
@@ -160,10 +161,13 @@ class AuthController extends Controller
      */
     public function userProfile()
     {
+        $user = User::with('role')->find(auth()->user()->id);
+
+        // Trả về dữ liệu đã được định dạng lại thông qua Accessor
         return response()->json([
             "status" => true,
             "message" => "User profile fetched successfully",
-            "data" => auth()->user()
+            "data" => $user
         ]);
     }
 
@@ -227,7 +231,8 @@ class AuthController extends Controller
         ], 201);
     }
 
-    public function loginWithGoogle(Request $request) {
+    public function loginWithGoogle(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'idToken' => 'required|string',
         ]);
@@ -252,8 +257,34 @@ class AuthController extends Controller
         $user = User::where('email', $user_google->email)->first();
 
         if ($user) {
+            if (!$user->google_id) {
+                $user->update([
+                    'google_id' => $user_google->sub,
+                ]);
+            }
+            if (!$user->avatar) {
+                $user->update([
+                    'avatar' => $user_google->picture,
+                ]);
+            }
+            if (!$user->email_verified_at) {
+                $user->update([
+                    'email_verified_at' => now(),
+                ]);
+            }
             $token = auth()->login($user);
-            return $this->createNewToken($token, $user->refresh_token);
+            $data = [
+                'user_email' => auth()->user()->id,
+                'random' => rand() . time(),
+                'exp' => now()->addMinutes(config('jwt.refresh_ttl'))->timestamp,
+            ];
+
+            $refreshToken = JWTAuth::getJWTProvider()->encode($data);
+
+            User::where('id', auth()->user()->id)->update([
+                'refresh_token' => $refreshToken,
+            ]);
+            return $this->createNewToken($token, $refreshToken);
         } else {
             $user = User::create([
                 'avatar' => $user_google->picture,
@@ -270,7 +301,7 @@ class AuthController extends Controller
                 'random' => rand() . time(),
                 'exp' => now()->addMinutes(config('jwt.refresh_ttl'))->timestamp,
             ];
-    
+
             $refreshToken = JWTAuth::getJWTProvider()->encode($data);
 
             User::where('id', auth()->user()->id)->update([
@@ -287,4 +318,3 @@ class AuthController extends Controller
         ], 201);
     }
 }
-
