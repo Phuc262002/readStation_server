@@ -13,11 +13,29 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->uuid('id')->primary(); 
+            $table->string('referral_code')->unique()->nullable();
+            $table->string('role_id')->default('1');
+            $table->enum('status', ['active', 'inactive', 'banned'])->default('active');
             $table->string('name');
+            $table->string('avatar')->nullable();
+            $table->string('address')->nullable();
+            $table->string('city')->nullable();
+            $table->string('state')->nullable();
+            $table->string('street')->nullable();
+            $table->string('phone')->nullable();
             $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->timestamp('email_verified_at')->nullable();
+            $table->string('google_id')->unique()->nullable();
             $table->string('refresh_token')->nullable();
+            $table->string('remember_token')->nullable();
+            $table->timestamps();
+        });
+
+        Schema::create('roles', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('description')->nullable();
             $table->timestamps();
         });
 
@@ -37,12 +55,15 @@ return new class extends Migration
         });
     }
 
+
+
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
         Schema::dropIfExists('users');
+        Schema::dropIfExists('roles');
         Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
     }

@@ -8,6 +8,7 @@ Route::group([
     "prefix" => "auth"
 ], function () {
     Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/google', [AuthController::class, 'loginWithGoogle']);
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/refresh', [AuthController::class, 'refresh']);
     

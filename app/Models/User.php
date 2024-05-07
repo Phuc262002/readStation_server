@@ -25,6 +25,26 @@ class User extends Authenticatable implements JWTSubject
     ];
 
     /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
+    protected $attributes = [
+        'role_id' => '1',
+        'status' => 'active',
+    ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            // Thiết lập giá trị mặc định cho trường 'referral_code' khi tạo mới
+            $model->referral_code = strtoupper(substr(md5(uniqid()), 0, 10));
+        });
+    }
+
+    /**
      * The attributes that should be hidden for arrays.
      *
      * @var array
@@ -32,6 +52,7 @@ class User extends Authenticatable implements JWTSubject
     protected $hidden = [
         'password',
         'refresh_token',
+        'remember_token',
     ];
 
     /**
@@ -49,7 +70,8 @@ class User extends Authenticatable implements JWTSubject
      *
      * @return mixed
      */
-    public function getJWTIdentifier() {
+    public function getJWTIdentifier()
+    {
         return $this->getKey();
     }
 
@@ -58,7 +80,8 @@ class User extends Authenticatable implements JWTSubject
      *
      * @return array
      */
-    public function getJWTCustomClaims() {
+    public function getJWTCustomClaims()
+    {
         return [];
     }
 }

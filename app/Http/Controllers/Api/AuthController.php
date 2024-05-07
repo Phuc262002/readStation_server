@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
+use Laravel\Socialite\Facades\Socialite;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -161,7 +162,7 @@ class AuthController extends Controller
     {
         return response()->json([
             "status" => true,
-            "message" => "User profile",
+            "message" => "User profile fetched successfully",
             "data" => auth()->user()
         ]);
     }
@@ -202,8 +203,8 @@ class AuthController extends Controller
     public function changePassWord(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'old_password' => 'required|string|min:6',
-            'new_password' => 'required|string|confirmed|min:6',
+            'old_password' => 'required|string|min:8',
+            'new_password' => 'required|string|confirmed|min:8',
         ]);
 
         if ($validator->fails()) {
@@ -222,6 +223,28 @@ class AuthController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'User successfully changed password',
+            'user' => $user,
+        ], 201);
+    }
+
+    public function loginWithGoogle(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'idToken' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                "staus" => true,
+                "message" => "Validation error",
+                "errors" => $validator->errors()
+            ], 400);
+        }
+
+        $user = json_decode(file_get_contents("https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=" . $request->idToken));
+
+        return response()->json([
+            'status' => true,
+            'message' => 'User successfully logged in',
             'user' => $user,
         ], 201);
     }
