@@ -240,7 +240,45 @@ class AuthController extends Controller
             ], 400);
         }
 
-        $user = json_decode(file_get_contents("https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=" . $request->idToken));
+        $user_google = json_decode(file_get_contents("https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=" . $request->idToken));
+
+        if (!$user_google) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Invalid google token',
+            ], 401);
+        }
+
+        $user = User::where('email', $user_google->email)->first();
+
+        if ($user) {
+            $token = auth()->login($user);
+            return $this->createNewToken($token, $user->refresh_token);
+        } else {
+            $user = User::create([
+                'avatar' => $user_google->picture,
+                'name' => $user_google->name,
+                'email' => $user_google->email,
+                'password' => bcrypt($user_google->kid),
+                'google_id' => $user_google->sub,
+                'email_verified_at' => now(),
+            ]);
+
+            $token = auth()->login($user);
+            $data = [
+                'user_email' => auth()->user()->id,
+                'random' => rand() . time(),
+                'exp' => now()->addMinutes(config('jwt.refresh_ttl'))->timestamp,
+            ];
+    
+            $refreshToken = JWTAuth::getJWTProvider()->encode($data);
+
+            User::where('id', auth()->user()->id)->update([
+                'refresh_token' => $refreshToken,
+            ]);
+
+            return $this->createNewToken($token, $refreshToken);
+        }
 
         return response()->json([
             'status' => true,
