@@ -184,7 +184,7 @@ class AuthController extends Controller
             "status" => true,
             "message" => "Login successful",
             "data" => [
-                "user" => auth()->user(),
+                "user" => User::find(auth()->user()->id),
                 "token" => [
                     "accessToken" =>  $token,
                     "refreshToken" => $refreshToken
@@ -310,11 +310,5 @@ class AuthController extends Controller
 
             return $this->createNewToken($token, $refreshToken);
         }
-
-        return response()->json([
-            'status' => true,
-            'message' => 'User successfully logged in',
-            'user' => $user,
-        ], 201);
     }
 }
