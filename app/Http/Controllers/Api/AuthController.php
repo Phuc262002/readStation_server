@@ -36,11 +36,21 @@ class AuthController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation error',
+                'errors' => $validator->errors()
+            ], 400);
         }
 
         if (!$token = auth('api')->attempt($validator->validated())) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json([
+                'status' => false,
+                'message' => 'Unauthorized',
+                'errors' => [
+                    'email' => ['Email or password is incorrect']
+                ]
+            ], 401);
         }
 
         $data = [
@@ -68,12 +78,12 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|between:2,100',
             'email' => 'required|string|email|max:100|unique:users',
-            'password' => 'required|string|confirmed|min:6',
+            'password' => 'required|string|confirmed|min:8',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
-                "staus" => true,
+                "staus" => false,
                 "message" => "Validation error",
                 "errors" => $validator->errors()
             ], 400);
