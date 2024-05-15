@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignUuid('user_id')->nullable()->index();
             $table->foreignId('post_id')->index();
             $table->text('content');
-            $table->enum('status', ['published','banned'])->default('published');
+            $table->enum('status', ['published','banned', 'hidden', 'delete'])->default('published');
             $table->timestamps();
         });
     }
