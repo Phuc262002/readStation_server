@@ -15,20 +15,25 @@ return new class extends Migration
             $table->uuid('id')->primary(); 
             $table->string('referral_code')->unique()->nullable();
             $table->unsignedBigInteger('role_id')->default(1);
-            $table->enum('status', ['active', 'inactive', 'banned'])->default('active');
-            $table->string('name');
             $table->string('avatar')->nullable();
-            $table->string('address')->nullable();
-            $table->string('city')->nullable();
-            $table->string('state')->nullable();
-            $table->string('street')->nullable();
-            $table->string('phone')->nullable();
+            $table->string('fullname');
+            $table->string('job')->nullable();
+            $table->string('story')->nullable();
+            $table->enum('gender', ['male', 'female', 'other'])->nullable();
+            $table->date('dob')->nullable();
             $table->string('email')->unique();
             $table->string('password');
-            $table->timestamp('email_verified_at')->nullable();
             $table->string('google_id')->unique()->nullable();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->string('street')->nullable();
+            $table->string('province')->nullable();
+            $table->string('district')->nullable();
+            $table->string('ward')->nullable();
+            $table->string('address_detail')->nullable();
+            $table->string('phone')->nullable();
             $table->string('refresh_token')->nullable();
             $table->string('remember_token')->nullable();
+            $table->enum('status', ['active', 'inactive', 'banned', 'delete'])->default('active');
             $table->timestamps();
         });
 
@@ -36,6 +41,14 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('description')->nullable();
+            $table->timestamps();
+        });
+
+        Schema::create('referrals', function (Blueprint $table) {
+            $table->id();
+            $table->foreignUuid('referrer_user_id')->index();
+            $table->foreignUuid('referred_user_id')->index();
+            $table->date('referral_date')->nullable();
             $table->timestamps();
         });
 
