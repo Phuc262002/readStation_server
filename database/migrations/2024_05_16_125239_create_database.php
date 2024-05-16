@@ -20,7 +20,6 @@ return new class extends Migration
 
         Schema::create('users', function (Blueprint $table) {
             $table->uuid('id')->primary(); 
-            $table->string('referral_code')->unique()->nullable();
             $table->unsignedBigInteger('role_id')->default(1);
             $table->string('avatar')->nullable();
             $table->string('fullname');
@@ -41,7 +40,7 @@ return new class extends Migration
             $table->string('district')->nullable();
             $table->string('ward')->nullable();
             $table->string('address_detail')->nullable();
-            $table->string('phone')->nullable();
+            $table->string('phone')->unique()->nullable();
             $table->string('refresh_token')->nullable();
             $table->string('remember_token')->nullable();
             $table->enum('status', ['active', 'inactive', 'banned', 'delete'])->default('active');
@@ -80,7 +79,7 @@ return new class extends Migration
             $table->foreignUuid('user_handle_id');
             $table->enum('verification_card_type', ['student_id_card', 'id_card_number']);
             $table->string('verification_card_image');
-            $table->json('verification_card_info')->nullable();
+            $table->json('verification_card_info');
             $table->date('card_expired');
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->date('verification_date')->nullable();
@@ -186,14 +185,12 @@ return new class extends Migration
             $table->string('title');
             $table->string('original_title')->nullable();
             $table->string('description_summary')->nullable();
-            $table->string('images')->nullable();
             $table->enum('status', ['needUpdate', 'available', 'unavailable'])->default('needUpdate');
             $table->unsignedBigInteger('category_id');
             $table->unsignedBigInteger('shelve_id')->nullable();
             $table->string('description')->nullable();
             $table->string('slug')->unique();
             $table->timestamps();
-
             $table->foreign('author_id')->references('id')->on('authors')->onDelete('cascade');
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
             $table->foreign('shelve_id')->references('id')->on('shelves')->onDelete('set null');
@@ -202,6 +199,8 @@ return new class extends Migration
         Schema::create('book_details', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('book_id');
+            $table->string('poster');
+            $table->string('images')->nullable();
             $table->string('book_version')->nullable();
             $table->string('price')->nullable();
             $table->decimal('hire_percent', 8, 2)->nullable();
@@ -223,48 +222,52 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->string('order_code');
+            $table->date('return_date')->nullable();
+            $table->integer('max_extensions');
+            $table->integer('current_extensions');
+            $table->json('extension_dates')->nullable();
             $table->date('expired_date');
-            $table->foreignUuid('user_id');
+            $table->unsignedBigInteger('user_id');
             $table->enum('payment_method', ['wallet', 'cash']);
-            $table->foreignUuid('transaction_id')->nullable();
+            $table->unsignedBigInteger('transaction_id')->nullable();
             $table->enum('payment_shipping', ['library', 'shipper']);
             $table->string('phone');
             $table->string('address');
             $table->string('user_note')->nullable();
             $table->string('manager_note')->nullable();
-            $table->decimal('deposit_fee', 20, 8)->default(0);
-            $table->decimal('fine_fee', 20, 8)->default(0);
-            $table->decimal('total_fee', 20, 8)->default(0);
-            $table->enum('status', ['pending', 'hiring', 'completed', 'cancel', 'out_of_date'])->default('pending');
+            $table->decimal('deposit_fee', 20, 8);
+            $table->decimal('fine_fee', 20, 8);
+            $table->decimal('total_fee', 20, 8);
+            $table->enum('status', ['pending', 'hiring', 'completed', 'cancel', 'out_of_date']);
             $table->timestamps();
-
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
 
         Schema::create('order_details', function (Blueprint $table) {
+            $table->id();
             $table->unsignedBigInteger('order_id');
+            $table->integer('service_fee');
             $table->unsignedBigInteger('book_details_id');
-            $table->decimal('service_fee', 20, 8);
-            $table->date('hire_date');
-            $table->date('return_date');
-            $table->unsignedInteger('extension_count')->default(0);
-            $table->unsignedInteger('rate')->nullable();
-            $table->unsignedInteger('comment')->nullable();
-            $table->enum('status_rating', ['rating_yet', 'active', 'hide'])->default('rating_yet');
-            $table->enum('status', ['pending', 'hiring', 'completed', 'cancel', 'out_of_date'])->default('pending');
+            $table->date('return_date')->nullable();
+            $table->integer('max_extensions');
+            $table->integer('current_extensions');
+            $table->json('extension_dates')->nullable();
+            $table->date('expired_date');
+            $table->decimal('rate');
+            $table->integer('comment');
+            $table->enum('status_cmt', ['rating_yet', 'active', 'hide']);
+            $table->enum('status_od', ['pending', 'hiring', 'completed', 'cancel', 'out_of_date']);
             $table->decimal('deposit', 20, 8);
             $table->timestamps();
 
             $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
-            $table->foreign('book_details_id')->references('id')->on('book_details')->onDelete('cascade');
         });
 
         Schema::create('suppliers', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('address')->nullable();
-            $table->string('phone')->nullable();
-            $table->string('email')->nullable();
+            $table->string('address');
+            $table->string('phone');
+            $table->string('email');
             $table->timestamps();
         });
 

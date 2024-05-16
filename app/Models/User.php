@@ -20,7 +20,6 @@ class User extends Authenticatable implements JWTSubject
      */
     protected $fillable = [
         'role_id',
-        'referral_code',
         'avatar',
         'fullname',
         'job',
@@ -30,6 +29,11 @@ class User extends Authenticatable implements JWTSubject
         'password',
         'google_id',
         'email_verified_at',
+        'user_verified_at',
+        'user_verified_at',
+        'has_wallet',
+        'citizen_identity_card',
+        'student_id_card',
         'street',
         'province',
         'district',
@@ -51,15 +55,15 @@ class User extends Authenticatable implements JWTSubject
         'status' => 'active',
     ];
 
-    protected static function boot()
-    {
-        parent::boot();
+    // protected static function boot()
+    // {
+    //     parent::boot();
 
-        static::creating(function ($model) {
-            // Thiết lập giá trị mặc định cho trường 'referral_code' khi tạo mới
-            $model->referral_code = strtoupper(substr(md5(uniqid()), 0, 10));
-        });
-    }
+    //     static::creating(function ($model) {
+    //         // Thiết lập giá trị mặc định cho trường 'referral_code' khi tạo mới
+    //         $model->referral_code = strtoupper(substr(md5(uniqid()), 0, 10));
+    //     });
+    // }
 
     /**
      * The attributes that should be hidden for arrays.
@@ -81,6 +85,8 @@ class User extends Authenticatable implements JWTSubject
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'citizen_identity_card' => 'array',
+        'student_id_card' => 'array',
     ];
 
     /**
