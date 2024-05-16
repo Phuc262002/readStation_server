@@ -223,43 +223,47 @@ return new class extends Migration
             $table->id();
             $table->string('order_code');
             $table->date('return_date')->nullable();
-            $table->integer('max_extensions');
-            $table->integer('current_extensions');
+            $table->integer('max_extensions')->default(3);
+            $table->integer('current_extensions')->default(0);
             $table->json('extension_dates')->nullable();
-            $table->date('expired_date');
+            $table->date('expired_date')->nullable();
             $table->unsignedBigInteger('user_id');
             $table->enum('payment_method', ['wallet', 'cash']);
             $table->unsignedBigInteger('transaction_id')->nullable();
             $table->enum('payment_shipping', ['library', 'shipper']);
-            $table->string('phone');
-            $table->string('address');
+            $table->string('phone')->nullable();
+            $table->string('address')->nullable();
             $table->string('user_note')->nullable();
             $table->string('manager_note')->nullable();
-            $table->decimal('deposit_fee', 20, 8);
-            $table->decimal('fine_fee', 20, 8);
-            $table->decimal('total_fee', 20, 8);
+            $table->decimal('deposit_fee', 20, 8)->default(0);
+            $table->decimal('fine_fee', 20, 8)->default(0);
+            $table->decimal('total_fee', 20, 8)->default(0);
             $table->enum('status', ['pending', 'hiring', 'completed', 'cancel', 'out_of_date']);
             $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('transaction_id')->references('id')->on('transactions')->onDelete('set null');
         });
 
         Schema::create('order_details', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('order_id');
-            $table->integer('service_fee');
+            $table->decimal('service_fee', 20, 8)->default(0);
             $table->unsignedBigInteger('book_details_id');
             $table->date('return_date')->nullable();
-            $table->integer('max_extensions');
-            $table->integer('current_extensions');
+            $table->integer('max_extensions')->default(3);
+            $table->integer('current_extensions')->default(0);
             $table->json('extension_dates')->nullable();
-            $table->date('expired_date');
-            $table->decimal('rate');
-            $table->integer('comment');
+            $table->date('expired_date')->nullable();
+            $table->integer('rate')->default(0);
+            $table->text('comment')->nullable();
             $table->enum('status_cmt', ['rating_yet', 'active', 'hide']);
             $table->enum('status_od', ['pending', 'hiring', 'completed', 'cancel', 'out_of_date']);
-            $table->decimal('deposit', 20, 8);
+            $table->decimal('deposit', 20, 8)->default(0);
             $table->timestamps();
 
             $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
+            $table->foreign('book_details_id')->references('id')->on('book_details')->onDelete('cascade');
         });
 
         Schema::create('suppliers', function (Blueprint $table) {
