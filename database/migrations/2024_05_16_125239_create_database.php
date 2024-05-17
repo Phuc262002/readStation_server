@@ -109,6 +109,7 @@ return new class extends Migration
             $table->enum('type', ['book', 'post']);
             $table->string('name');
             $table->string('description')->nullable();
+            $table->enum('status', ['active', 'inactive', 'deleted'])->default('active');
             $table->timestamps();
         });
 
@@ -148,6 +149,7 @@ return new class extends Migration
             $table->string('avatar')->nullable();
             $table->date('dob')->nullable();
             $table->string('description')->nullable();
+            $table->enum('status', ['active', 'inactive', 'deleted'])->default('active');
             $table->timestamps();
         });
 
@@ -156,6 +158,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('logo_company')->nullable();
             $table->string('description')->nullable();
+            $table->enum('status', ['active', 'inactive', 'deleted'])->default('active');
             $table->timestamps();
         });
 
@@ -183,14 +186,15 @@ return new class extends Migration
             $table->string('sku');
             $table->unsignedBigInteger('author_id');
             $table->string('title');
-            $table->string('original_title')->nullable();
-            $table->string('description_summary')->nullable();
-            $table->enum('status', ['needUpdate', 'available', 'unavailable'])->default('needUpdate');
+            $table->string('original_title');
+            $table->string('description_summary');
+            $table->enum('status', ['active', 'inactive', 'deleted'])->default('active');
             $table->unsignedBigInteger('category_id');
             $table->unsignedBigInteger('shelve_id')->nullable();
-            $table->string('description')->nullable();
+            $table->string('description');
             $table->string('slug')->unique();
             $table->timestamps();
+            
             $table->foreign('author_id')->references('id')->on('authors')->onDelete('cascade');
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
             $table->foreign('shelve_id')->references('id')->on('shelves')->onDelete('set null');
@@ -227,9 +231,9 @@ return new class extends Migration
             $table->integer('current_extensions')->default(0);
             $table->json('extension_dates')->nullable();
             $table->date('expired_date')->nullable();
-            $table->unsignedBigInteger('user_id');
+            $table->foreignUuid('user_id');
             $table->enum('payment_method', ['wallet', 'cash']);
-            $table->unsignedBigInteger('transaction_id')->nullable();
+            $table->foreignUuid('transaction_id')->nullable();
             $table->enum('payment_shipping', ['library', 'shipper']);
             $table->string('phone')->nullable();
             $table->string('address')->nullable();
@@ -242,7 +246,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('transaction_id')->references('id')->on('transactions')->onDelete('set null');
+            $table->foreign('transaction_id')->references('id')->on('wallet_transactions')->onDelete('set null');
         });
 
         Schema::create('order_details', function (Blueprint $table) {
@@ -272,6 +276,7 @@ return new class extends Migration
             $table->string('address');
             $table->string('phone');
             $table->string('email');
+            $table->enum('status', ['active', 'inactive', 'deleted'])->default('active');
             $table->timestamps();
         });
 
