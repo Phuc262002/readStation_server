@@ -212,7 +212,7 @@ return new class extends Migration
             $table->date('publish_date')->nullable();
             $table->unsignedBigInteger('publishing_company_id')->nullable();
             $table->string('issuing_company')->nullable();
-            $table->enum('cardboard', ['soft', 'hard'])->nullable();
+            $table->enum('cardboard', ['soft', 'hard'])->default('soft');
             $table->unsignedInteger('total_page')->nullable();
             $table->string('translator')->nullable();
             $table->string('language')->nullable();

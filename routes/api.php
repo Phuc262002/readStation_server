@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\AuthorController;
 use App\Http\Controllers\Api\BookController;
+use App\Http\Controllers\Api\BookDetailController;
 use App\Http\Controllers\Api\CategoryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -45,6 +46,16 @@ Route::group([
         Route::post('/create', [BookController::class, 'store']);
         Route::put('/update/{id}', [BookController::class, 'update']);
         Route::delete('/delete/{id}', [BookController::class, 'destroy']);
+    });
+
+    Route::group([
+        "prefix" => "book-details"
+    ], function () {
+        Route::get('/', [BookDetailController::class, 'index']);
+        Route::get('/{id}', [BookDetailController::class, 'show']);
+        Route::post('/create', [BookDetailController::class, 'store']);
+        Route::put('/update/{id}', [BookDetailController::class, 'update']);
+        Route::delete('/delete/{id}', [BookDetailController::class, 'destroy']);
     });
 
     Route::group([

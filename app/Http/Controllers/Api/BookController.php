@@ -51,7 +51,7 @@ class BookController extends Controller
         $status = $request->input('status');
 
         // Tạo query ban đầu
-        $query = Book::query()->with('category', 'author');
+        $query = Book::query()->with('category', 'author', 'bookDetail');
         $totalItems = $query->count();
         $query = $query->filter($category_id, $status, $author_id);
 
@@ -173,7 +173,7 @@ class BookController extends Controller
             ], 400);
         }
 
-        $book = Book::with('category', 'author')->find($id);
+        $book = Book::with('category', 'author', 'bookDetail')->find($id);
 
         if (!$book) {
             return response()->json([

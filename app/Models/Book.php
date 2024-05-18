@@ -53,6 +53,11 @@ class Book extends Model
         return $this->belongsTo(Category::class);
     }
 
+    public function bookDetail()
+    {
+        return $this->hasMany(BookDetail::class);
+    }
+
     // public function shelve()
     // {
     //     return $this->belongsTo(Shelve::class);
