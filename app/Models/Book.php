@@ -23,6 +23,11 @@ class Book extends Model
         'slug',
     ];
 
+    protected $hidden = [
+        'category_id',
+        'author_id',
+    ];
+
     protected static function boot()
     {
         parent::boot();
@@ -30,12 +35,18 @@ class Book extends Model
         static::creating(function ($model) {
             $model->slug = Str::slug($model->title.'-'.Str::random(5));
         });
+
+        static::updating(function ($model) {
+            $model->slug = Str::slug($model->title.'-'.Str::random(5));
+        });
     }
 
-    // public function author()
-    // {
-    //     return $this->belongsTo(Author::class);
-    // }
+    public function author()
+    {
+        return $this->belongsTo(Author::class);
+    }
+
+    
 
     public function category()
     {
@@ -49,13 +60,17 @@ class Book extends Model
 
     public function scopeSearch($query, $search)
     {
-        return $query->where('title', 'like', '%' . $search . '%', 'or', 'original_title', 'like', '%' . $search . '%');
+        return $query->where('title', 'like', '%' . $search . '%');
     }
 
-    public function scopeFilter($query, $category, $status)
+    public function scopeFilter($query, $category_id, $status, $author_id)
     {
-        if ($category) {
-            $query->where('category_id', $category);
+        if ($category_id) {
+            $query->where('category_id', $category_id);
+        }
+
+        if ($author_id) {
+            $query->where('author_id', $author_id);
         }
 
         if ($status) {

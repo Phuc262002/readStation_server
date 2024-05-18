@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Category;
+use App\Models\Author;
 use Illuminate\Http\Request;
 
-class CategoryController extends Controller
+class AuthorController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -19,7 +19,7 @@ class CategoryController extends Controller
             'pageSize' => 'integer|min:1',
             'search' => 'string',
             'status' => 'string|in:active,inactive,deleted',
-            'type' => 'required|string|in:book,post'
+            'author' => 'string'
         ]);
 
         $customMessages = [
@@ -27,12 +27,10 @@ class CategoryController extends Controller
             'page.min' => 'Trang phải lớn hơn hoặc bằng 1.',
             'pageSize.integer' => 'Kích thước trang phải là số nguyên.',
             'pageSize.min' => 'Kích thước trang phải lớn hơn hoặc bằng 1.',
-            'type.required' => 'Trường type là bắt buộc.',
-            'type.string' => 'Type phải là một chuỗi.',
-            'type.in' => 'Type phải là book hoặc post.',
+            'author.string' => 'Tác giả phải là một chuỗi.',
             'status.in' => 'Status phải là active, inactive hoặc deleted'
         ];
-        
+
         $validator->setCustomMessages($customMessages);
 
         if ($validator->fails()) {
@@ -44,17 +42,17 @@ class CategoryController extends Controller
         }
 
         // Lấy giá trị page và pageSize từ query parameters
-        $page = $request->input('page', 1); 
-        $pageSize = $request->input('pageSize', 10); 
+        $page = $request->input('page', 1);
+        $pageSize = $request->input('pageSize', 10);
         $search = $request->input('search');
-        $type = $request->input('type');
+        $type = $request->input('author');
         $status = $request->input('status');
 
         // Tạo query ban đầu
-        $query = Category::query();
+        $query = Author::query();
 
         // Lấy tổng số mục trong DB trước khi áp dụng bộ lọc tìm kiếm
-        
+
         // Áp dụng bộ lọc theo type
         $totalItems = $query->count();
         $query = $query->filter($type, $status);
@@ -63,26 +61,27 @@ class CategoryController extends Controller
         $query = $query->search($search);
 
         // Thực hiện phân trang
-        $categories = $query->paginate($pageSize, ['*'], 'page', $page);
+        $authors = $query->paginate($pageSize, ['*'], 'page', $page);
 
         return response()->json([
             "status" => true,
-            "message" => "Get all categories successfully!",
+            "message" => "Get all authors successfully!",
             "data" => [
-                "categories" => $categories->items(),
-                "page" => $categories->currentPage(),
-                "pageSize" => $categories->perPage(),
-                "lastPage" => $categories->lastPage(),
-                "totalResults" => $categories->total(),
+                "authors" => $authors->items(),
+                "page" => $authors->currentPage(),
+                "pageSize" => $authors->perPage(),
+                "lastPage" => $authors->lastPage(),
+                "totalResults" => $authors->total(),
                 "total" => $totalItems
             ],
-        ], 200);
+        ]);
     }
+
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Request $request)
+    public function create()
     {
         //
     }
@@ -93,18 +92,18 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         $validator = validator($request->all(), [
-            'name' => 'required|string',
+            'author' => 'required|string',
+            'avatar' => 'nullable|string',
             'description' => 'nullable|string',
-            'type' => 'required|string|in:book,post'
+            'dob' => 'nullable|date',
         ]);
 
         $customMessages = [
-            'name.required' => 'Trường name là bắt buộc.',
-            'name.string' => 'Name phải là một chuỗi.',
-            'type.required' => 'Trường type là bắt buộc.',
-            'type.string' => 'Type phải là một chuỗi.',
-            'type.in' => 'Type phải là book hoặc post.',
-            'status.in' => 'Status phải là active, inactive hoặc deleted'
+            'author.required' => 'Tên tác giả không được để trống.',
+            'author.string' => 'Tên tác giả phải là một chuỗi.',
+            'avatar.string' => 'Avatar phải là một chuỗi.',
+            'description.string' => 'Mô tả phải là một chuỗi.',
+            'dob.date' => 'Ngày sinh phải là một ngày.'
         ];
 
         $validator->setCustomMessages($customMessages);
@@ -117,22 +116,21 @@ class CategoryController extends Controller
             ], 400);
         }
 
-        $category = Category::create(array_merge(
+        $author = Author::create(array_merge(
             $validator->validated(),
         ));
 
         return response()->json([
             "status" => true,
-            "message" => "Create category successfully!",
-            "data" => $category
+            "message" => "Create author successfully!",
+            "data" => $author
         ], 200);
-
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Request $request, Category $category)
+    public function show(Request $request, Author $author)
     {
         $id = $request->route('id');
 
@@ -156,18 +154,18 @@ class CategoryController extends Controller
             ], 400);
         }
 
-        $category = Category::find($id);
+        $category = Author::find($id);
 
         if (!$category) {
             return response()->json([
                 "status" => false,
-                "message" => "Category not found!"
+                "message" => "Author not found!"
             ], 404);
         }
 
         return response()->json([
             "status" => true,
-            "message" => "Get category successfully!",
+            "message" => "Get author successfully!",
             "data" => $category
         ], 200);
     }
@@ -175,7 +173,7 @@ class CategoryController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Category $category)
+    public function edit(Author $author)
     {
         //
     }
@@ -183,31 +181,23 @@ class CategoryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Category $category)
+    public function update(Request $request, Author $author)
     {
         $id = $request->route('id');
-
-        $validator = validator(array_merge(['id' => $id], $request->all()), [
-            'id' => 'required|integer|min:1',
-            'name' => 'required|string',
-            'type' => 'required|string|in:book,post',
+        
+        $validator = validator($request->all(), [
+            'author' => 'required|string',
+            'avatar' => 'nullable|string',
             'description' => 'nullable|string',
-            'status' => 'required|string|in:active,inactive,deleted',
+            'dob' => 'nullable|date',
         ]);
 
         $customMessages = [
-            'id.required' => 'Trường id là bắt buộc.',
-            'id.integer' => 'Id phải là một số nguyên.',
-            'id.min' => 'Id phải lớn hơn hoặc bằng 1.',
-            'name.required' => 'Trường name là bắt buộc.',
-            'name.string' => 'Name phải là một chuỗi.',
-            'type.required' => 'Trường type là bắt buộc.',
-            'type.string' => 'Type phải là một chuỗi.',
-            'type.in' => 'Type phải là book hoặc post.',
-            'status.in' => 'Status phải là active, inactive hoặc deleted',
-            'status.required' => 'Trường status là bắt buộc.',
-            'status.string' => 'Status phải là một chuỗi.',
-            'description.string' => 'Description phải là một chuỗi.'
+            'author.required' => 'Tên tác giả không được để trống.',
+            'author.string' => 'Tên tác giả phải là một chuỗi.',
+            'avatar.string' => 'Avatar phải là một chuỗi.',
+            'description.string' => 'Mô tả phải là một chuỗi.',
+            'dob.date' => 'Ngày sinh phải là một ngày.'
         ];
 
         $validator->setCustomMessages($customMessages);
@@ -220,12 +210,12 @@ class CategoryController extends Controller
             ], 400);
         }
 
-        $category = Category::find($id);
+        $author = Author::find($id);
 
-        if (!$category) {
+        if (!$author) {
             return response()->json([
                 "status" => false,
-                "message" => "Category not found!"
+                "message" => "Author not found!"
             ], 404);
         }
 
@@ -239,26 +229,25 @@ class CategoryController extends Controller
         }
 
         try {
-            $category->update($validator->validated());
+            $author->update($validator->validated());
 
             return response()->json([
                 "status" => true,
-                "message" => "Update category successfully!",
-                "data" => $category
+                "message" => "Update author successfully!",
+                "data" => $author
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
                 "status" => false,
-                "message" => "Update category failed!"
+                "message" => "Update author failed!"
             ], 500);
         }
-
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Request $request, Category $category)
+    public function destroy(Request $request, Author $author)
     {
         $id = $request->route('id');
 
@@ -282,27 +271,27 @@ class CategoryController extends Controller
             ], 400);
         }
 
-        $category = Category::find($id);
+        $author = Author::find($id);
 
-        if (!$category) {
+        if (!$author) {
             return response()->json([
                 "status" => false,
-                "message" => "Category not found!"
+                "message" => "Author not found!"
             ], 404);
         }
 
         try {
-            $category->delete();
+            $author->delete();
         } catch (\Throwable $th) {
             return response()->json([
                 "status" => false,
-                "message" => "Delete category failed!"
+                "message" => "Delete author failed!"
             ], 500);
         }
 
         return response()->json([
             "status" => true,
-            "message" => "Delete category successfully!",
+            "message" => "Delete author successfully!",
         ], 200);
     }
 }

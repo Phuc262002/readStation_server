@@ -39,23 +39,5 @@ class DatabaseSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
         ]]);
-
-        DB::table('categories')->insert([[
-            'id' => '1',
-            'name' => 'Chưa có danh mục',
-            'type' => 'book',
-            'description' => 'Chưa có danh mục',
-            'status' => 'active',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ], [
-            'id' => '2',
-            'name' => 'Chưa có danh mục',
-            'type' => 'post',
-            'description' => 'Chưa có danh mục',
-            'status' => 'active',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]]);
     }
 }

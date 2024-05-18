@@ -305,7 +305,7 @@ class AuthController extends Controller
             "status" => true,
             "message" => "Login successful",
             "data" => [
-                "user" => User::find(auth()->user()->id),
+                "user" => User::with('role')->find(auth()->user()->id),
                 "token" => [
                     "accessToken" =>  $token,
                     "refreshToken" => $refreshToken

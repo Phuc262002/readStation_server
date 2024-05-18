@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\AuthorController;
 use App\Http\Controllers\Api\BookController;
 use App\Http\Controllers\Api\CategoryController;
 use Illuminate\Http\Request;
@@ -44,5 +45,15 @@ Route::group([
         Route::post('/create', [BookController::class, 'store']);
         Route::put('/update/{id}', [BookController::class, 'update']);
         Route::delete('/delete/{id}', [BookController::class, 'destroy']);
+    });
+
+    Route::group([
+        "prefix" => "authors"
+    ], function () {
+        Route::get('/', [AuthorController::class, 'index']);
+        Route::get('/{id}', [AuthorController::class, 'show']);
+        Route::post('/create', [AuthorController::class, 'store']);
+        Route::put('/update/{id}', [AuthorController::class, 'update']);
+        Route::delete('/delete/{id}', [AuthorController::class, 'destroy']);
     });
 });

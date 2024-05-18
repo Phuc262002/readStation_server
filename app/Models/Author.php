@@ -5,21 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Category extends Model
+class Author extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'name',
-        'status',
+        'author',
+        'avatar',
+        'dob',
         'description',
-        'type'
+        'status'
     ];
-
-    // public function posts()
-    // {
-    //     return $this->hasMany(Post::class);
-    // }
 
     public function books()
     {
@@ -28,15 +24,11 @@ class Category extends Model
 
     public function scopeSearch($query, $search)
     {
-        return $query->where('name', 'like', '%' . $search . '%');
+        return $query->where('author', 'like', '%' . $search . '%');
     }
 
     public function scopeFilter($query, $type, $status)
     {
-        if ($type) {
-            $query->where('type', $type);
-        }
-
         if ($status) {
             $query->where('status', $status);
         } else {
