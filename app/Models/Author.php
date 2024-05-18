@@ -13,6 +13,7 @@ class Author extends Model
         'author',
         'avatar',
         'dob',
+        'is_featured',
         'description',
         'status'
     ];

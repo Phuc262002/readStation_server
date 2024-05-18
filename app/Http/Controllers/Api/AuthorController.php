@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Author;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class AuthorController extends Controller
 {
@@ -14,7 +15,7 @@ class AuthorController extends Controller
     public function index(Request $request)
     {
         // Validate request parameters
-        $validator = validator($request->all(), [
+        $validator = Validator::make($request->all(), [
             'page' => 'integer|min:1',
             'pageSize' => 'integer|min:1',
             'search' => 'string',
@@ -91,9 +92,10 @@ class AuthorController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = validator($request->all(), [
+        $validator = Validator::make($request->all(), [
             'author' => 'required|string',
             'avatar' => 'nullable|string',
+            'is_featured' => 'nullable|boolean',
             'description' => 'nullable|string',
             'dob' => 'nullable|date',
         ]);
@@ -102,6 +104,7 @@ class AuthorController extends Controller
             'author.required' => 'Tên tác giả không được để trống.',
             'author.string' => 'Tên tác giả phải là một chuỗi.',
             'avatar.string' => 'Avatar phải là một chuỗi.',
+            'is_featured.boolean' => 'Is featured phải là một boolean.',
             'description.string' => 'Mô tả phải là một chuỗi.',
             'dob.date' => 'Ngày sinh phải là một ngày.'
         ];
@@ -114,6 +117,12 @@ class AuthorController extends Controller
                 "message" => "Validation error",
                 "errors" => $validator->errors()
             ], 400);
+        }
+
+        if ($request->input('is_featured') == true) {
+            if ($request->boolean('is_featured')) {
+                Author::query()->update(['is_featured' => false]);
+            }
         }
 
         $author = Author::create(array_merge(
@@ -134,7 +143,7 @@ class AuthorController extends Controller
     {
         $id = $request->route('id');
 
-        $validator = validator(['id' => $id], [
+        $validator = Validator::make(['id' => $id], [
             'id' => 'required|integer|min:1'
         ]);
 
@@ -185,18 +194,24 @@ class AuthorController extends Controller
     {
         $id = $request->route('id');
         
-        $validator = validator($request->all(), [
+        $validator = Validator::make(array_merge(['id' => $id], $request->all()), [
+            'id' => 'required|integer|min:1',
             'author' => 'required|string',
             'avatar' => 'nullable|string',
             'description' => 'nullable|string',
+            'is_featured' => 'nullable|boolean',
             'dob' => 'nullable|date',
         ]);
 
         $customMessages = [
+            'id.required' => 'Trường id là bắt buộc.',
+            'id.integer' => 'Id phải là một số nguyên.',
+            'id.min' => 'Id phải lớn hơn hoặc bằng 1.',
             'author.required' => 'Tên tác giả không được để trống.',
             'author.string' => 'Tên tác giả phải là một chuỗi.',
             'avatar.string' => 'Avatar phải là một chuỗi.',
             'description.string' => 'Mô tả phải là một chuỗi.',
+            'is_featured.boolean' => 'Is featured phải là một boolean.',
             'dob.date' => 'Ngày sinh phải là một ngày.'
         ];
 
@@ -229,6 +244,12 @@ class AuthorController extends Controller
         }
 
         try {
+            if ($request->input('is_featured') == true) {
+                if ($request->boolean('is_featured')) {
+                    Author::query()->update(['is_featured' => false]);
+                }
+            }
+
             $author->update($validator->validated());
 
             return response()->json([
@@ -251,7 +272,7 @@ class AuthorController extends Controller
     {
         $id = $request->route('id');
 
-        $validator = validator(['id' => $id], [
+        $validator = Validator::make(['id' => $id], [
             'id' => 'required|integer|min:1'
         ]);
 

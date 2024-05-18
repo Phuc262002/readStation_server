@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Book;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class BookController extends Controller
 {
@@ -13,7 +14,7 @@ class BookController extends Controller
      */
     public function index(Request $request)
     {
-        $validator = validator($request->all(), [
+        $validator = Validator::make($request->all(), [
             'page' => 'integer|min:1',
             'pageSize' => 'integer|min:1',
             'search' => 'string',
@@ -31,7 +32,7 @@ class BookController extends Controller
             'author_id.integer' => 'Author_id phải là một số nguyên.',
             'status.in' => 'Status phải là active, inactive hoặc deleted.'
         ];
-        
+
         $validator->setCustomMessages($customMessages);
 
         if ($validator->fails()) {
@@ -43,15 +44,24 @@ class BookController extends Controller
         }
 
         // Lấy giá trị page và pageSize từ query parameters
-        $page = $request->input('page', 1); 
-        $pageSize = $request->input('pageSize', 10); 
+        $page = $request->input('page', 1);
+        $pageSize = $request->input('pageSize', 10);
         $search = $request->input('search');
         $category_id = $request->input('category_id');
         $author_id = $request->input('author_id');
         $status = $request->input('status');
 
         // Tạo query ban đầu
-        $query = Book::query()->with('category', 'author', 'bookDetail');
+        $query = Book::query()
+            ->with(['category', 'author', 'bookDetail' => function ($query) {
+                $query->where('status', '!=', 'deleted');
+            }])
+            ->whereHas('bookDetail', function ($q) {
+                $q->whereNotNull('id')
+                    ->whereNotNull('status')
+                    ->where('status', '=', 'active');
+            });
+
         $totalItems = $query->count();
         $query = $query->filter($category_id, $status, $author_id);
 
@@ -75,26 +85,16 @@ class BookController extends Controller
         ], 200);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        $validator = validator($request->all(), [
+        $validator = Validator::make($request->all(), [
             'sku' => "required|string",
             'author_id' => "required|string",
             'title' => "required|string",
             'original_title' => "required|string",
             'description_summary' => "required|string",
             'description' => "required|string",
+            'is_featured' => 'nullable|boolean',
             'category_id' => "required|string",
             'shelve_id' => "nullable|number",
         ]);
@@ -113,6 +113,7 @@ class BookController extends Controller
             'description.required' => 'Trường description là bắt buộc.',
             'description.string' => 'Description phải là một chuỗi.',
             'category_id.required' => 'Trường category_id là bắt buộc.',
+            'is_featured.boolean' => 'Is featured phải là một boolean.',
             'category_id.number' => 'Category_id phải là một số.',
             'shelve_id.number' => 'Shelve_id phải là một số.',
         ];
@@ -146,14 +147,11 @@ class BookController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Request $request, Book $book)
     {
         $id = $request->route('id');
 
-        $validator = validator(['id' => $id], [
+        $validator = Validator::make(['id' => $id], [
             'id' => 'required|integer|min:1'
         ]);
 
@@ -189,22 +187,12 @@ class BookController extends Controller
         ], 200);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Book $book)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Book $book)
     {
         $id = $request->route('id');
 
-        $validator = validator($request->all(), [
+        $validator = Validator::make(array_merge(['id' => $id], $request->all()), [
+            'id' => 'required|integer|min:1',
             'sku' => "required|string",
             'author_id' => "required|string",
             'title' => "required|string",
@@ -213,10 +201,14 @@ class BookController extends Controller
             'description' => "required|string",
             'category_id' => "required|string",
             'shelve_id' => "number",
+            'is_featured' => 'nullable|boolean',
             "status" => "required|string|in:active,inactive,deleted",
         ]);
 
         $customMessages = [
+            'id.required' => 'Trường id là bắt buộc.',
+            'id.integer' => 'Id phải là một số nguyên.',
+            'id.min' => 'Id phải lớn hơn hoặc bằng 1.',
             'sku.required' => 'Trường sku là bắt buộc.',
             'sku.string' => 'Sku phải là một chuỗi.',
             'author_id.required' => 'Trường author_id là bắt buộc.',
@@ -233,6 +225,7 @@ class BookController extends Controller
             'category_id.number' => 'Category_id phải là một số.',
             'shelve_id.number' => 'Shelve_id phải là một số.',
             'status.in' => 'Status phải là active, inactive hoặc deleted.',
+            'is_featured.boolean' => 'Is featured phải là một boolean.',
             'status.required' => 'Trường status là bắt buộc.'
         ];
 
@@ -271,14 +264,11 @@ class BookController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Request $request, Book $book)
     {
         $id = $request->route('id');
 
-        $validator = validator(['id' => $id], [
+        $validator = Validator::make(['id' => $id], [
             'id' => 'required|integer|min:1'
         ]);
 

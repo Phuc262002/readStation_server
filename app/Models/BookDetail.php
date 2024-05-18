@@ -26,7 +26,17 @@ class BookDetail extends Model
         'total_page',
         'translator',
         'language',
-        'book_size'
+        'book_size',
+        'status',
+    ];
+
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'images' => 'array',
     ];
 
     public function book()
@@ -38,4 +48,10 @@ class BookDetail extends Model
     // {
     //     return $this->belongsTo(PublishingCompany::class, 'publishing_company_id');
     // }
+
+    public function delete()
+    {
+        $this->status = 'deleted';
+        $this->save();
+    }
 }

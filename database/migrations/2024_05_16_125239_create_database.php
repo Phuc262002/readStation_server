@@ -149,6 +149,7 @@ return new class extends Migration
             $table->string('avatar')->nullable();
             $table->date('dob')->nullable();
             $table->string('description')->nullable();
+            $table->boolean('is_featured')->default(false);
             $table->enum('status', ['active', 'inactive', 'deleted'])->default('active');
             $table->timestamps();
         });
@@ -192,6 +193,7 @@ return new class extends Migration
             $table->unsignedBigInteger('category_id');
             $table->unsignedBigInteger('shelve_id')->nullable();
             $table->string('description');
+            $table->boolean('is_featured')->default(false);
             $table->string('slug')->unique();
             $table->timestamps();
             
@@ -217,6 +219,7 @@ return new class extends Migration
             $table->string('translator')->nullable();
             $table->string('language')->nullable();
             $table->string('book_size')->nullable();
+            $table->enum('status', ['active', 'inactive', 'deleted'])->default('active');
             $table->timestamps();
 
             $table->foreign('book_id')->references('id')->on('books')->onDelete('cascade');

@@ -20,6 +20,7 @@ class Book extends Model
         'description',
         'category_id',
         'shelve_id',
+        'is_featured',
         'slug',
     ];
 

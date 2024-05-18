@@ -35,6 +35,16 @@ class AuthController extends Controller
             'password' => 'required|string|min:8',
         ]);
 
+        $customMessages = [
+            'email.required' => 'Email không được để trống.',
+            'email.email' => 'Email không đúng định dạng.',
+            'password.required' => 'Mật khẩu không được để trống.',
+            'password.string' => 'Mật khẩu phải là một chuỗi.',
+            'password.min' => 'Mật khẩu phải có ít nhất 8 ký tự.',
+        ];
+
+        $validator->setCustomMessages($customMessages);
+
         if ($validator->fails()) {
             return response()->json([
                 'status' => false,
@@ -48,7 +58,7 @@ class AuthController extends Controller
                 'status' => false,
                 'message' => 'Unauthorized',
                 'errors' => [
-                    'email' => ['Email or password is incorrect']
+                    'email' => ['Email hoặc mật khẩu không đúng']
                 ]
             ], 401);
         }
@@ -58,7 +68,7 @@ class AuthController extends Controller
                 'status' => false,
                 'message' => 'Unauthorized',
                 'errors' => [
-                    'email' => ['Email is not verified']
+                    'email' => ['Email chưa được xác thực']
                 ]
             ], 401);
         }
@@ -68,7 +78,7 @@ class AuthController extends Controller
                 'status' => false,
                 'message' => 'Unauthorized',
                 'errors' => [
-                    'email' => ['User is banned']
+                    'email' => ['Tài khoản đã bị khóa']
                 ]
             ], 401);
         }
@@ -136,7 +146,7 @@ class AuthController extends Controller
                     'status' => false,
                     'message' => 'Unauthorized',
                     'errors' => [
-                        'email' => ['User is banned']
+                        'email' => ['Tài khoản đã bị khóa']
                     ]
                 ], 401);
             }
@@ -191,6 +201,23 @@ class AuthController extends Controller
             'email' => 'required|string|email|max:100|unique:users',
             'password' => 'required|string|confirmed|min:8',
         ]);
+
+        $customMessages = [
+            'fullname.required' => 'Tên không được để trống.',
+            'fullname.string' => 'Tên phải là một chuỗi.',
+            'fullname.between' => 'Tên phải có độ dài từ 2 đến 100 ký tự.',
+            'email.required' => 'Email không được để trống.',
+            'email.string' => 'Email phải là một chuỗi.',
+            'email.email' => 'Email không đúng định dạng.',
+            'email.max' => 'Email không được quá 100 ký tự.',
+            'email.unique' => 'Email đã tồn tại.',
+            'password.required' => 'Mật khẩu không được để trống.',
+            'password.string' => 'Mật khẩu phải là một chuỗi.',
+            'password.confirmed' => 'Mật khẩu không khớp.',
+            'password.min' => 'Mật khẩu phải có ít nhất 8 ký tự.',
+        ];
+
+        $validator->setCustomMessages($customMessages);
 
         if ($validator->fails()) {
             return response()->json([
@@ -332,6 +359,18 @@ class AuthController extends Controller
             'new_password' => 'required|string|confirmed|min:8',
         ]);
 
+        $customMessages = [
+            'old_password.required' => 'Mật khẩu cũ không được để trống.',
+            'old_password.string' => 'Mật khẩu cũ phải là một chuỗi.',
+            'old_password.min' => 'Mật khẩu cũ phải có ít nhất 8 ký tự.',
+            'new_password.required' => 'Mật khẩu mới không được để trống.',
+            'new_password.string' => 'Mật khẩu mới phải là một chuỗi.',
+            'new_password.confirmed' => 'Mật khẩu mới không khớp.',
+            'new_password.min' => 'Mật khẩu mới phải có ít nhất 8 ký tự.',
+        ];
+
+        $validator->setCustomMessages($customMessages);
+
         if ($validator->fails()) {
             return response()->json([
                 "staus" => true,
@@ -339,6 +378,27 @@ class AuthController extends Controller
                 "errors" => $validator->errors()
             ], 400);
         }
+
+        if (!auth()->attempt(['email' => auth()->user()->email, 'password' => $request->old_password])) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Unauthorized',
+                'errors' => [
+                    'old_password' => ['Mật khẩu cũ không đúng']
+                ]
+            ], 401);
+        }
+
+        if ($request->old_password == $request->new_password) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Unauthorized',
+                'errors' => [
+                    'new_password' => ['Mật khẩu mới không được trùng với mật khẩu cũ']
+                ]
+            ], 401);
+        }
+        
         $userId = auth()->user()->id;
 
         $user = User::where('id', $userId)->update(
@@ -350,5 +410,60 @@ class AuthController extends Controller
             'message' => 'User successfully changed password',
             'user' => $user,
         ], 201);
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'avatar' => 'nullable|string',
+            'fullname' => 'required|string|between:2,100',
+            'job' => 'nullable|string',
+            'story' => 'nullable|string',
+            'gender' => 'nullable|string|in:male,female',
+            'dob' => 'nullable|date',
+            'street' => 'nullable|string',
+            'province' => 'nullable|string',
+            'district' => 'nullable|string',
+            'ward' => 'nullable|string',
+            'address_detail' => 'nullable|string',
+            'phone' => 'required|string|min:10|max:11',
+        ]);
+
+        $customMessages = [
+            'gender.in' => 'Giới tính phải là male hoặc female.',
+            'dob.date' => 'Ngày sinh phải là một ngày.',
+            'phone.required' => 'Số điện thoại không được để trống.',
+            'phone.string' => 'Số điện thoại phải là một chuỗi.',
+            'phone.min' => 'Số điện thoại phải có ít nhất 10 ký tự.',
+            'phone.max' => 'Số điện thoại không được quá 11 ký tự.',
+            'fullname.required' => 'Tên không được để trống.',
+        ];
+
+        $validator->setCustomMessages($customMessages);
+
+        if ($validator->fails()) {
+            return response()->json([
+                "staus" => true,
+                "message" => "Validation error",
+                "errors" => $validator->errors()
+            ], 400);
+        }
+
+        $user = User::with('role')->find(auth()->user()->id);
+
+        try {
+            $user->update($validator->validated());
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Update profile successfully',
+                'data' => $user,
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Update profile failed',
+            ], 400);
+        }
     }
 }

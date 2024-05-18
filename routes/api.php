@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\AuthorController;
 use App\Http\Controllers\Api\BookController;
 use App\Http\Controllers\Api\BookDetailController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\HomeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -24,8 +25,16 @@ Route::group([
         Route::group(["middleware" => ["auth:api"]], function () {
             Route::post('/logout', [AuthController::class, 'logout']);
             Route::get('/profile', [AuthController::class, 'userProfile']);
-            Route::post('/change-pass', [AuthController::class, 'changePassWord']);
+            Route::put('/update-profile', [AuthController::class, 'updateProfile']);
+            Route::post('/change-password', [AuthController::class, 'changePassWord']);
         });
+    });
+
+    Route::group([
+        "prefix" => "home"
+    ], function () {
+        Route::get('/get-feautured-author', [HomeController::class, 'getFeaturedAuthor']);
+        Route::get('/get-feautured-book', [HomeController::class, 'getFeaturedBook']);
     });
 
     Route::group([

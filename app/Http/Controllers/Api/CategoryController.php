@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class CategoryController extends Controller
 {
@@ -14,7 +15,7 @@ class CategoryController extends Controller
     public function index(Request $request)
     {
         // Validate request parameters
-        $validator = validator($request->all(), [
+        $validator = Validator::make($request->all(), [
             'page' => 'integer|min:1',
             'pageSize' => 'integer|min:1',
             'search' => 'string',
@@ -92,7 +93,7 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = validator($request->all(), [
+        $validator = Validator::make($request->all(), [
             'name' => 'required|string',
             'description' => 'nullable|string',
             'type' => 'required|string|in:book,post'
@@ -136,7 +137,7 @@ class CategoryController extends Controller
     {
         $id = $request->route('id');
 
-        $validator = validator(['id' => $id], [
+        $validator = Validator::make(['id' => $id], [
             'id' => 'required|integer|min:1'
         ]);
 
@@ -187,7 +188,7 @@ class CategoryController extends Controller
     {
         $id = $request->route('id');
 
-        $validator = validator(array_merge(['id' => $id], $request->all()), [
+        $validator = Validator::make(array_merge(['id' => $id], $request->all()), [
             'id' => 'required|integer|min:1',
             'name' => 'required|string',
             'type' => 'required|string|in:book,post',
@@ -262,7 +263,7 @@ class CategoryController extends Controller
     {
         $id = $request->route('id');
 
-        $validator = validator(['id' => $id], [
+        $validator = Validator::make(['id' => $id], [
             'id' => 'required|integer|min:1'
         ]);
 
