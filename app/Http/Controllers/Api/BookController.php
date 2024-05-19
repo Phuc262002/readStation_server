@@ -223,13 +223,11 @@ class BookController extends Controller
         $id = $request->route('id');
 
         $validator = Validator::make(['id' => $id], [
-            'id' => 'required|integer|min:1'
+            'id' => 'required'
         ]);
 
         $customMessages = [
-            'id.required' => 'Trường id là bắt buộc.',
-            'id.integer' => 'Id phải là một số nguyên.',
-            'id.min' => 'Id phải lớn hơn hoặc bằng 1.'
+            'id.required' => 'Phải có id hoặc slug để lấy thông tin sách.',
         ];
 
         $validator->setCustomMessages($customMessages);
@@ -242,7 +240,11 @@ class BookController extends Controller
             ], 400);
         }
 
-        $book = Book::with('category', 'author', 'bookDetail')->find($id);
+        if (is_numeric($id)) {
+            $book = Book::with('category', 'author', 'bookDetail')->find($id);
+        } else {
+            $book = Book::with('category', 'author', 'bookDetail')->where('slug', $id)->first();
+        }
 
         if (!$book) {
             return response()->json([

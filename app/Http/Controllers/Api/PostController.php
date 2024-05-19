@@ -42,14 +42,15 @@ class PostController extends Controller
 
         // Tạo query ban đầu
         $query = Post::query()->with(['user', 'category']);
+        $totalItems = $query->count();
 
+        $query->where('status', 'active');
         // Áp dụng bộ lọc theo category_id
         if ($category_id) {
             $query->where('category_id', $category_id);
         }
 
         // Lấy tổng số mục trong DB trước khi áp dụng bộ lọc tìm kiếm
-        $totalItems = $query->count();
 
         $posts = $query->orderBy('created_at', 'desc')->paginate($pageSize, ['*'], 'page', $page);
 
@@ -132,7 +133,11 @@ class PostController extends Controller
 
     public function show(Post $post)
     {
-        //
+        return response()->json([
+            "status" => true,
+            "message" => "Get post successfully!",
+            "data" => $post
+        ], 200);
     }
 
     public function update(Request $request, Post $post)

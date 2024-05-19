@@ -43,6 +43,7 @@ Route::group([
     ], function () {
         Route::get('/', [CategoryController::class, 'index']);
 
+        Route::get('/get-all', [CategoryController::class, 'getAllCategory']);
         Route::get('/{id}', [CategoryController::class, 'show']);
         Route::post('/create', [CategoryController::class, 'store']);
         Route::put('/update/{id}', [CategoryController::class, 'update']);
@@ -65,7 +66,7 @@ Route::group([
     ], function () {
         Route::get('/', [PostController::class, 'index']);
         Route::get('/{id}', [PostController::class, 'show']);
-
+        
         Route::group(["middleware" => ["auth:api"]], function () {
             Route::post('/create', [PostController::class, 'store']);
             Route::put('/update/{id}', [PostController::class, 'update']);
@@ -86,7 +87,8 @@ Route::group([
         "prefix" => "authors"
     ], function () {
         Route::get('/', [AuthorController::class, 'index']);
-
+        
+        Route::get('/get-all', [AuthorController::class, 'getAllAuthor']);
         Route::get('/{id}', [AuthorController::class, 'show']);
         Route::post('/create', [AuthorController::class, 'store']);
         Route::put('/update/{id}', [AuthorController::class, 'update']);

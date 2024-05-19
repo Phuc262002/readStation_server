@@ -39,6 +39,28 @@ class Post extends Model
         });
     }
 
+    public function scopeSearch($query, $search)
+    {
+        return $query->where('title', 'like', '%' . $search . '%');
+    }
+
+    public function scopeFilter($query, $category_id, $status, $is_admin = false)
+    {
+        if ($category_id) {
+            $query->where('category_id', $category_id);
+        }
+
+        if ($status && $is_admin) {
+            $query->where('status', $status);
+        } else if ($is_admin) {
+            $query->where('status', '!=', 'deleted');
+        } else {
+            $query->where('status', 'active');
+        }
+
+        return $query;
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

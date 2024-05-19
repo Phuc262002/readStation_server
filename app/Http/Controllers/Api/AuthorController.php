@@ -10,9 +10,7 @@ use Illuminate\Support\Facades\Validator;
 
 class AuthorController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
     public function index(Request $request)
     {
         // Validate request parameters
@@ -79,18 +77,72 @@ class AuthorController extends Controller
         ]);
     }
 
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function getAllAuthor(Request $request)
     {
-        //
+        // Validate request parameters
+        $validator = Validator::make($request->all(), [
+            'page' => 'integer|min:1',
+            'pageSize' => 'integer|min:1',
+            'search' => 'string',
+            'status' => 'string|in:active,inactive,deleted',
+            'author' => 'string'
+        ]);
+
+        $customMessages = [
+            'page.integer' => 'Trang phải là số nguyên.',
+            'page.min' => 'Trang phải lớn hơn hoặc bằng 1.',
+            'pageSize.integer' => 'Kích thước trang phải là số nguyên.',
+            'pageSize.min' => 'Kích thước trang phải lớn hơn hoặc bằng 1.',
+            'author.string' => 'Tác giả phải là một chuỗi.',
+            'status.in' => 'Status phải là active, inactive hoặc deleted'
+        ];
+
+        $validator->setCustomMessages($customMessages);
+
+        if ($validator->fails()) {
+            return response()->json([
+                "staus" => false,
+                "message" => "Validation error",
+                "errors" => $validator->errors()
+            ], 400);
+        }
+
+        // Lấy giá trị page và pageSize từ query parameters
+        $page = $request->input('page', 1);
+        $pageSize = $request->input('pageSize', 10);
+        $search = $request->input('search');
+        $type = $request->input('author');
+        $status = $request->input('status');
+
+        // Tạo query ban đầu
+        $query = Author::query();
+
+        // Lấy tổng số mục trong DB trước khi áp dụng bộ lọc tìm kiếm
+
+        // Áp dụng bộ lọc theo type
+        $totalItems = $query->count();
+        $query = $query->filter($type, $status, true);
+
+        // Áp dụng bộ lọc tìm kiếm nếu có tham số tìm kiếm
+        $query = $query->search($search);
+
+        // Thực hiện phân trang
+        $authors = $query->paginate($pageSize, ['*'], 'page', $page);
+
+        return response()->json([
+            "status" => true,
+            "message" => "Get all authors successfully!",
+            "data" => [
+                "authors" => $authors->items(),
+                "page" => $authors->currentPage(),
+                "pageSize" => $authors->perPage(),
+                "lastPage" => $authors->lastPage(),
+                "totalResults" => $authors->total(),
+                "total" => $totalItems
+            ],
+        ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -143,9 +195,6 @@ class AuthorController extends Controller
         ], 200);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Request $request, Author $author)
     {
         $id = $request->route('id');
@@ -186,17 +235,6 @@ class AuthorController extends Controller
         ], 200);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Author $author)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Author $author)
     {
         $id = $request->route('id');
@@ -278,9 +316,6 @@ class AuthorController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Request $request, Author $author)
     {
         $id = $request->route('id');
