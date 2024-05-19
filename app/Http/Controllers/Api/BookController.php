@@ -60,7 +60,7 @@ class BookController extends Controller
             'category_id' => "required|string",
             'shelve_id' => "number",
             'is_featured' => 'nullable|boolean',
-            "status" => "required|string|in:active,inactive,deleted",
+            "status" => "string|in:active,inactive,deleted",
         ]);
 
         $customMessages = [
