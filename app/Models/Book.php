@@ -69,7 +69,7 @@ class Book extends Model
         return $query->where('title', 'like', '%' . $search . '%');
     }
 
-    public function scopeFilter($query, $category_id, $status, $author_id)
+    public function scopeFilter($query, $category_id, $status, $author_id, $is_admin = false)
     {
         if ($category_id) {
             $query->where('category_id', $category_id);
@@ -79,10 +79,12 @@ class Book extends Model
             $query->where('author_id', $author_id);
         }
 
-        if ($status) {
+        if ($status && $is_admin) {
             $query->where('status', $status);
-        } else {
+        } else if ($is_admin) {
             $query->where('status', '!=', 'deleted');
+        } else {
+            $query->where('status', 'active');
         }
 
         return $query;

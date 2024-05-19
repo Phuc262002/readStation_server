@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('roles', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('description')->nullable();
+            $table->text('description')->nullable();
             $table->timestamps();
         });
 
@@ -108,7 +108,8 @@ return new class extends Migration
             $table->id();
             $table->enum('type', ['book', 'post']);
             $table->string('name');
-            $table->string('description')->nullable();
+            $table->text('description')->nullable();
+            $table->string('slug')->unique();
             $table->enum('status', ['active', 'inactive', 'deleted'])->default('active');
             $table->timestamps();
         });
@@ -148,8 +149,9 @@ return new class extends Migration
             $table->string('author');
             $table->string('avatar')->nullable();
             $table->date('dob')->nullable();
-            $table->string('description')->nullable();
+            $table->text('description')->nullable();
             $table->boolean('is_featured')->default(false);
+            $table->string('slug')->unique();
             $table->enum('status', ['active', 'inactive', 'deleted'])->default('active');
             $table->timestamps();
         });
@@ -158,7 +160,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('logo_company')->nullable();
-            $table->string('description')->nullable();
+            $table->text('description')->nullable();
             $table->enum('status', ['active', 'inactive', 'deleted'])->default('active');
             $table->timestamps();
         });
@@ -188,11 +190,11 @@ return new class extends Migration
             $table->unsignedBigInteger('author_id');
             $table->string('title');
             $table->string('original_title');
-            $table->string('description_summary');
-            $table->enum('status', ['active', 'inactive', 'deleted'])->default('active');
+            $table->text('description_summary');
+            $table->enum('status', ['needUpdateDetail','active', 'inactive', 'deleted'])->default('needUpdateDetail');
             $table->unsignedBigInteger('category_id');
             $table->unsignedBigInteger('shelve_id')->nullable();
-            $table->string('description');
+            $table->text('description');
             $table->boolean('is_featured')->default(false);
             $table->string('slug')->unique();
             $table->timestamps();
@@ -206,7 +208,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('book_id');
             $table->string('poster');
-            $table->string('images')->nullable();
+            $table->json('images')->nullable();
             $table->string('book_version')->nullable();
             $table->string('price')->nullable();
             $table->decimal('hire_percent', 8, 2)->nullable();

@@ -10,25 +10,35 @@ use Illuminate\Support\Facades\Validator;
 
 class BookDetailController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
+    public function checkBookDetail() {
+        // Find books without a bookDetail or with an inactive bookDetail
+        $booksWithoutDetail = Book::doesntHave('bookDetail')
+            ->orWhereHas('bookDetail', function ($q) {
+                $q->where('status', '!=', 'active');
+            })
+            ->get();
+
+        // Update the status of these books to 'needUpdateDetail'
+        $booksWithoutDetail->each(function ($book) {
+            if ($book->status == 'active') {
+                $book->update(['status' => 'needUpdateDetail']);
+            }
+        });
+
+        // Find books having an active bookDetail
+
+        $booksWithDetail = Book::whereHas('bookDetail', function ($q) {
+            $q->where('status', 'active');
+        })->get();
+
+        // Update the status of these books to 'active'
+        $booksWithDetail->each(function ($book) {
+            if ($book->status == 'needUpdateDetail') {
+                $book->update(['status' => 'active']);
+            }
+        });
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -81,11 +91,11 @@ class BookDetailController extends Controller
                 "errors" => $validator->errors()
             ], 400);
         }
-
         try {
             $bookdetail = BookDetail::create(array_merge(
                 $validator->validated(),
             ));
+            $this->checkBookDetail();
 
             return response()->json([
                 "status" => true,
@@ -101,11 +111,9 @@ class BookDetailController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Request $request, BookDetail $bookDetail)
     {
+        $this->checkBookDetail();
         $id = $request->route('id');
 
         $validator = Validator::make(['id' => $id], [
@@ -129,7 +137,6 @@ class BookDetailController extends Controller
         }
 
         $bookdetail = BookDetail::with('book')->find($id);
-
         if (!$bookdetail) {
             return response()->json([
                 "status" => false,
@@ -144,17 +151,6 @@ class BookDetailController extends Controller
         ], 200);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(BookDetail $bookDetail)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, BookDetail $bookDetail)
     {
         $id = $request->route('id');
@@ -225,7 +221,7 @@ class BookDetailController extends Controller
 
         try {
             $bookdetail->update($validator->validated());
-
+            $this->checkBookDetail();
             return response()->json([
                 "status" => true,
                 "message" => "Update book detail successfully!",
@@ -239,9 +235,6 @@ class BookDetailController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Request $request, BookDetail $bookDetail)
     {
         $id = $request->route('id');
@@ -277,6 +270,7 @@ class BookDetailController extends Controller
 
         try {
             $bookdetail->delete();
+            $this->checkBookDetail();
         } catch (\Throwable $th) {
             return response()->json([
                 "status" => false,

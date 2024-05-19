@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Category extends Model
 {
@@ -13,13 +14,27 @@ class Category extends Model
         'name',
         'status',
         'description',
+        'slug',
         'type'
     ];
 
-    // public function posts()
-    // {
-    //     return $this->hasMany(Post::class);
-    // }
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            $model->slug = Str::slug($model->name . '-' . Str::random(5));
+        });
+
+        static::updating(function ($model) {
+            $model->slug = Str::slug($model->name . '-' . Str::random(5));
+        });
+    }
+
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
 
     public function books()
     {
@@ -31,16 +46,18 @@ class Category extends Model
         return $query->where('name', 'like', '%' . $search . '%');
     }
 
-    public function scopeFilter($query, $type, $status)
+    public function scopeFilter($query, $type, $status, $is_admin = false)
     {
         if ($type) {
             $query->where('type', $type);
         }
 
-        if ($status) {
+        if ($status && $is_admin) {
             $query->where('status', $status);
-        } else {
+        } else if ($is_admin) {
             $query->where('status', '!=', 'deleted');
+        } else {
+            $query->where('status', 'active');
         }
 
         return $query;

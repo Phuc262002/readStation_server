@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Author;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class AuthorController extends Controller
@@ -125,9 +126,15 @@ class AuthorController extends Controller
             }
         }
 
-        $author = Author::create(array_merge(
-            $validator->validated(),
-        ));
+        if (Author::where('is_featured', true)->count() == 0) {
+            $author = Author::create(array_merge(
+                $validator->validated(),
+                ['is_featured' => true]
+            ));
+        } else {
+            $author = Author::create($validator->validated());
+        }
+
 
         return response()->json([
             "status" => true,
@@ -193,7 +200,7 @@ class AuthorController extends Controller
     public function update(Request $request, Author $author)
     {
         $id = $request->route('id');
-        
+
         $validator = Validator::make(array_merge(['id' => $id], $request->all()), [
             'id' => 'required|integer|min:1',
             'author' => 'required|string',
@@ -234,7 +241,7 @@ class AuthorController extends Controller
             ], 404);
         }
 
-        
+
         if ($validator->fails()) {
             return response()->json([
                 "staus" => false,
@@ -248,7 +255,13 @@ class AuthorController extends Controller
                 if ($request->boolean('is_featured')) {
                     Author::query()->update(['is_featured' => false]);
                 }
+            } else {
+                return response()->json([
+                    "status" => false,
+                    "message" => "At least one author must be featured!"
+                ], 400);
             }
+
 
             $author->update($validator->validated());
 
