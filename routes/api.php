@@ -43,7 +43,7 @@ Route::group([
     ], function () {
         Route::get('/', [CategoryController::class, 'index']);
 
-        Route::get('/get-all', [CategoryController::class, 'getAllCategory']);
+        Route::get('/admin/get-all', [CategoryController::class, 'getAllCategory']);
         Route::get('/{id}', [CategoryController::class, 'show']);
         Route::post('/create', [CategoryController::class, 'store']);
         Route::put('/update/{id}', [CategoryController::class, 'update']);
@@ -88,7 +88,7 @@ Route::group([
     ], function () {
         Route::get('/', [AuthorController::class, 'index']);
         
-        Route::get('/get-all', [AuthorController::class, 'getAllAuthor']);
+        Route::get('/admin/get-all', [AuthorController::class, 'getAllAuthor']);
         Route::get('/{id}', [AuthorController::class, 'show']);
         Route::post('/create', [AuthorController::class, 'store']);
         Route::put('/update/{id}', [AuthorController::class, 'update']);
