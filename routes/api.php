@@ -18,10 +18,19 @@ Route::group([
     Route::group([
         "prefix" => "auth"
     ], function () {
+        Route::post('/register', [AuthController::class, 'register']);
+
         Route::post('/login', [AuthController::class, 'login']);
         Route::post('/google', [AuthController::class, 'loginWithGoogle']);
-        Route::post('/register', [AuthController::class, 'register']);
+        
         Route::post('/refresh', [AuthController::class, 'refresh']);
+
+        Route::post('/send-reset-password', [AuthController::class, 'senRequestForgotPassword'])->name('password.reset');
+        Route::post('/reset-password', [AuthController::class, 'changePassWordReset']);
+
+        Route::post('/verify-email', [AuthController::class, 'verifyEmail']);
+        Route::post('/resend-otp', [AuthController::class, 'reRegister']);
+
 
         Route::group(["middleware" => ["auth:api"]], function () {
             Route::post('/logout', [AuthController::class, 'logout']);
@@ -44,7 +53,7 @@ Route::group([
         Route::get('/', [CategoryController::class, 'index']);
 
         Route::get('/admin/get-all', [CategoryController::class, 'getAllCategory']);
-        Route::get('/{id}', [CategoryController::class, 'show']);
+        Route::get('/get-one/{id}', [CategoryController::class, 'show']);
         Route::post('/create', [CategoryController::class, 'store']);
         Route::put('/update/{id}', [CategoryController::class, 'update']);
         Route::delete('/delete/{id}', [CategoryController::class, 'destroy']);
@@ -54,7 +63,7 @@ Route::group([
         "prefix" => "books"
     ], function () {
         Route::get('/', [BookController::class, 'index']);
-        Route::get('/{id}', [BookController::class, 'show']);
+        Route::get('/get-one/{id}', [BookController::class, 'show']);
 
         Route::post('/create', [BookController::class, 'store']);
         Route::put('/update/{id}', [BookController::class, 'update']);
@@ -65,7 +74,7 @@ Route::group([
         "prefix" => "posts"
     ], function () {
         Route::get('/', [PostController::class, 'index']);
-        Route::get('/{id}', [PostController::class, 'show']);
+        Route::get('/get-one/{id}', [PostController::class, 'show']);
         
         Route::group(["middleware" => ["auth:api"]], function () {
             Route::post('/create', [PostController::class, 'store']);
@@ -77,7 +86,7 @@ Route::group([
     Route::group([
         "prefix" => "book-details",
     ], function () {
-        Route::get('/{id}', [BookDetailController::class, 'show']);
+        Route::get('/get-one/{id}', [BookDetailController::class, 'show']);
         Route::post('/create', [BookDetailController::class, 'store']);
         Route::put('/update/{id}', [BookDetailController::class, 'update']);
         Route::delete('/delete/{id}', [BookDetailController::class, 'destroy']);
@@ -89,7 +98,7 @@ Route::group([
         Route::get('/', [AuthorController::class, 'index']);
         
         Route::get('/admin/get-all', [AuthorController::class, 'getAllAuthor']);
-        Route::get('/{id}', [AuthorController::class, 'show']);
+        Route::get('/get-one/{id}', [AuthorController::class, 'show']);
         Route::post('/create', [AuthorController::class, 'store']);
         Route::put('/update/{id}', [AuthorController::class, 'update']);
         Route::delete('/delete/{id}', [AuthorController::class, 'destroy']);

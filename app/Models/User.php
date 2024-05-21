@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Notifications\ResetPasswordNotification;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -11,7 +12,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {
-    use HasFactory, Notifiable, HasUuids;
+    use HasFactory, Notifiable, HasUuids, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -40,6 +41,8 @@ class User extends Authenticatable implements JWTSubject
         'ward',
         'address_detail',
         'phone',
+        'confirmation_code',
+        'confirmation_code_expired_in',
         'remember_token',
         'refresh_token',
         'status',
@@ -75,6 +78,9 @@ class User extends Authenticatable implements JWTSubject
         'refresh_token',
         'remember_token',
         'role_id',
+        'confirmation_code',
+        'confirmation_code_expired_in',
+        'id'
     ];
 
     /**
@@ -116,5 +122,10 @@ class User extends Authenticatable implements JWTSubject
 
     public function post() {
         return $this->hasMany(Post::class);
+    }
+
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new ResetPasswordNotification($token));
     }
 }

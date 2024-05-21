@@ -3,9 +3,15 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Mail\UserVerification;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Socialite\Facades\Socialite;
 use Tymon\JWTAuth\Exceptions\JWTException;
@@ -13,37 +19,22 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
-    /**
-     * Create a new AuthController instance.
-     *
-     * @return void
-     */
     public function __construct()
     {
     }
-
-    /**
-     * Get a JWT via given credentials.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
 
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
             'password' => 'required|string|min:8',
-        ]);
-
-        $customMessages = [
+        ], [
             'email.required' => 'Email không được để trống.',
             'email.email' => 'Email không đúng định dạng.',
             'password.required' => 'Mật khẩu không được để trống.',
             'password.string' => 'Mật khẩu phải là một chuỗi.',
             'password.min' => 'Mật khẩu phải có ít nhất 8 ký tự.',
-        ];
-
-        $validator->setCustomMessages($customMessages);
+        ]);
 
         if ($validator->fails()) {
             return response()->json([
@@ -98,7 +89,6 @@ class AuthController extends Controller
         return $this->createNewToken($token, $refreshToken);
     }
 
-    // Login with Google
     public function loginWithGoogle(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -189,20 +179,13 @@ class AuthController extends Controller
         }
     }
 
-    /**
-     * Register a User.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'fullname' => 'required|string|between:2,100',
             'email' => 'required|string|email|max:100|unique:users',
-            'password' => 'required|string|confirmed|min:8',
-        ]);
-
-        $customMessages = [
+            'password' => 'required|string|confirmed|min:8|regex:/^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])[A-Za-z\d]{8,}$/',
+        ], [
             'fullname.required' => 'Tên không được để trống.',
             'fullname.string' => 'Tên phải là một chuỗi.',
             'fullname.between' => 'Tên phải có độ dài từ 2 đến 100 ký tự.',
@@ -213,11 +196,10 @@ class AuthController extends Controller
             'email.unique' => 'Email đã tồn tại.',
             'password.required' => 'Mật khẩu không được để trống.',
             'password.string' => 'Mật khẩu phải là một chuỗi.',
+            'password.regex' => 'Mật khẩu phải có ít nhất 1 chữ hoa, 1 chữ thường và 1 số.',
             'password.confirmed' => 'Mật khẩu không khớp.',
             'password.min' => 'Mật khẩu phải có ít nhất 8 ký tự.',
-        ];
-
-        $validator->setCustomMessages($customMessages);
+        ]);
 
         if ($validator->fails()) {
             return response()->json([
@@ -229,21 +211,82 @@ class AuthController extends Controller
 
         $user = User::create(array_merge(
             $validator->validated(),
+            [
+                'confirmation_code' => rand(100000, 999999),
+                'confirmation_code_expired_in' => Carbon::now()->addSecond(60)
+            ]
         ));
 
-        return response()->json([
-            "status" => true,
-            "message" => "User registered successfully",
-            "data" => $user
-        ], 201);
+        try {
+            Mail::to($user->email)->send(new UserVerification($user));
+            return response()->json([
+                "status" => true,
+                "message" => "User registered successfully",
+            ], 201);
+        } catch (\Exception $err) {
+            $user->delete();
+            return [
+                'status' => false,
+                'message' => 'Không thể gửi email xác nhận, vui lòng thử lại.',
+                'errors' => $err->getMessage()
+            ];
+        }
     }
 
+    public function reRegister(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|string|email|max:100',
+        ], [
+            'email.required' => 'Email không được để trống.',
+            'email.string' => 'Email phải là một chuỗi.',
+            'email.email' => 'Email không đúng định dạng.',
+            'email.max' => 'Email không được quá 100 ký tự.',
+        ]);
 
-    /**
-     * Log the user out (Invalidate the token).
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
+        if ($validator->fails()) {
+            return response()->json([
+                "staus" => false,
+                "message" => "Validation error",
+                "errors" => $validator->errors()
+            ], 400);
+        }
+        
+        $user = User::where([
+            'email' => $request->email,
+        ])->first();
+            
+        if ($user) {
+            if ($user['email_verified_at'] != null)
+                return [
+                    'status' => false,
+                    'message' => 'Email đã được xác nhận.',
+                ];
+            else {
+                $user->confirmation_code = rand(100000, 999999);
+                $user->confirmation_code_expired_in = Carbon::now()->addSecond(60);
+                $user->save();
+                try {
+                    Mail::to($user->email)->send(new UserVerification($user));
+                    return response()->json([
+                        'status' => true,
+                        'message' => 'Gửi lại mã xác nhận thành công.',
+                    ], 201);
+                } catch (\Exception $err) {
+                    return [
+                        'status' => false,
+                        'message' => 'Không thể gửi email xác nhận, vui lòng thử lại.',
+                    ];
+                }
+            }
+        } else {
+            return [
+                'status' => false,
+                'message' => 'Email không tồn tại',
+            ];
+        }
+    }
+
     public function logout()
     {
         auth()->logout(true);
@@ -254,11 +297,6 @@ class AuthController extends Controller
         ]);
     }
 
-    /**
-     * Refresh a token.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function refresh()
     {
         $refreshToken = validator(request()->all(), [
@@ -302,14 +340,11 @@ class AuthController extends Controller
         }
     }
 
-    /**
-     * Get the authenticated User.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function userProfile()
     {
-        $user = User::with('role')->find(auth()->user()->id);
+        $user = array_merge(User::with('role')->find(auth()->user()->id)->toArray(), [
+            'google_id' => auth()->user()->google_id ? true : false,
+        ]);
 
         // Trả về dữ liệu đã được định dạng lại thông qua Accessor
         return response()->json([
@@ -319,20 +354,16 @@ class AuthController extends Controller
         ]);
     }
 
-    /**
-     * Get the token array structure.
-     *
-     * @param  string $token
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
     protected function createNewToken($token, $refreshToken)
     {
+        $user = User::with('role')->find(auth()->user()->id);
         return response()->json([
             "status" => true,
             "message" => "Login successful",
             "data" => [
-                "user" => User::with('role')->find(auth()->user()->id),
+                "user" => array_merge($user->toArray(), [
+                    'google_id' => auth()->user()->google_id ? true : false,
+                ]),
                 "token" => [
                     "accessToken" =>  $token,
                     "refreshToken" => $refreshToken
@@ -356,7 +387,7 @@ class AuthController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'old_password' => 'required|string|min:8',
-            'new_password' => 'required|string|confirmed|min:8',
+            'new_password' => 'required|string|confirmed|min:8|regex:/^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])[A-Za-z\d]{8,}$/',
         ]);
 
         $customMessages = [
@@ -367,6 +398,7 @@ class AuthController extends Controller
             'new_password.string' => 'Mật khẩu mới phải là một chuỗi.',
             'new_password.confirmed' => 'Mật khẩu mới không khớp.',
             'new_password.min' => 'Mật khẩu mới phải có ít nhất 8 ký tự.',
+            'new_password.regex' => 'Mật khẩu mới phải có ít nhất 1 chữ hoa, 1 chữ thường và 1 số.',
         ];
 
         $validator->setCustomMessages($customMessages);
@@ -398,7 +430,7 @@ class AuthController extends Controller
                 ]
             ], 401);
         }
-        
+
         $userId = auth()->user()->id;
 
         $user = User::where('id', $userId)->update(
@@ -410,6 +442,218 @@ class AuthController extends Controller
             'message' => 'User successfully changed password',
             'user' => $user,
         ], 201);
+    }
+
+    public function senRequestForgotPassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email|exists:users,email'
+        ], [
+            'email.required' => 'Email không được để trống',
+            'email.email' => 'Email không đúng định dạng',
+            'email.exists' => 'Email không tồn tại',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                "staus" => true,
+                "message" => "Validation error",
+                "errors" => $validator->errors()
+            ], 400);
+        }
+
+        $checkEmail = User::where([
+            'email' => $request->email,
+        ])->first();
+
+        if (!$checkEmail) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Unauthorized',
+                'errors' => [
+                    'email' => ['Email không tồn tại']
+                ]
+            ], 401);
+        } else {
+            if ($checkEmail->email_verified_at == null) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Unauthorized',
+                    'errors' => [
+                        'email' => ['Email chưa được xác thực']
+                    ]
+                ], 401);
+            } elseif ($checkEmail->status == 'banned') {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Unauthorized',
+                    'errors' => [
+                        'email' => ['Tài khoản đã bị khóa']
+                    ]
+                ], 401);
+            } else {
+                try {
+                    $status = Password::sendResetLink(
+                        $request->only('email')
+                    );
+
+                    if ($status == Password::RESET_LINK_SENT) {
+                        return response()->json([
+                            'status' => true,
+                            'message' => 'Gửi email thành công',
+                        ], 200);
+                    } else {
+                        return response()->json([
+                            'status' => false,
+                            'message' => 'Gửi email thất bại',
+                        ], 400);
+                    }
+                } catch (\Throwable $th) {
+                    DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Gửi email thất bại',
+                    ], 400);
+                }
+            }
+        }
+    }
+
+    public function changePassWordReset(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|string|email|exists:users,email',
+            'token' => 'required|string',
+            'password' => 'required|string|confirmed|min:8|regex:/^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])[A-Za-z\d]{8,}$/',
+        ], [
+            'email.required' => 'Email không được để trống',
+            'email.string' => 'Email phải là một chuỗi',
+            'email.email' => 'Email không đúng định dạng',
+            'email.exists' => 'Email không tồn tại',
+            'token.required' => 'Token không được để trống',
+            'token.string' => 'Token phải là một chuỗi',
+            'password.required' => 'Mật khẩu không được để trống',
+            'password.string' => 'Mật khẩu phải là một chuỗi',
+            'password.confirmed' => 'Mật khẩu không khớp',
+            'password.min' => 'Mật khẩu phải có ít nhất 8 ký tự',
+            'password.regex' => 'Mật khẩu phải có ít nhất 1 chữ hoa, 1 chữ thường và 1 số',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                "staus" => false,
+                "message" => "Validation error",
+                "errors" => $validator->errors()
+            ], 400);
+        }
+
+        $user = User::where([
+            'email' => $request->email,
+        ])->first();
+
+        if ($user->status == 'banned') {
+            return response()->json([
+                'status' => false,
+                'message' => 'Unauthorized',
+                'errors' => [
+                    'email' => ['Tài khoản đã bị khóa. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết.']
+                ]
+            ], 401);
+        } elseif ($user->status == 'deleted') {
+            return response()->json([
+                'status' => false,
+                'message' => 'Unauthorized',
+                'errors' => [
+                    'email' => ['Tài khoản đã bị xóa. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết.']
+                ]
+            ], 401);
+        }
+
+        $resetToken = DB::table('password_reset_tokens')
+            ->where('email', $request->email)
+            ->first();
+
+        if ($resetToken && Hash::check($request->token, $resetToken->token)) {
+            $now = Carbon::now();
+            if ($now->diffInMinutes($resetToken->created_at) > 5) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Unauthorized',
+                    'errors' => [
+                        'token' => ['Token đã hết hạn']
+                    ]
+                ], 401);
+            } else {
+
+                $user = User::where([
+                    'email' => $request->email,
+                ])->first();
+
+                if ($user) {
+                    if (!Hash::check($request->password, $user->password)) {
+                        $user->password = Hash::make($request->password);
+                        $user->save();
+                        DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+                        if ($user->email_verified_at == null) {
+                            return response()->json([
+                                'status' => false,
+                                'message' => 'Unauthorized',
+                                'errors' => [
+                                    'email' => ['Email chưa được xác thực']
+                                ]
+                            ], 401);
+                        } elseif ($user->status == 'banned') {
+                            return response()->json([
+                                'status' => false,
+                                'message' => 'Unauthorized',
+                                'errors' => [
+                                    'email' => ['Tài khoản đã bị khóa. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết.']
+                                ]
+                            ], 401);
+                        } elseif ($user->status == 'deleted') {
+                            return response()->json([
+                                'status' => false,
+                                'message' => 'Unauthorized',
+                                'errors' => [
+                                    'email' => ['Tài khoản đã bị xóa. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết.']
+                                ]
+                            ], 401);
+                        } else {
+                            return response()->json([
+                                'status' => true,
+                                'message' => 'Đổi mật khẩu thành công',
+                            ], 200);
+                        }
+                        
+                    } else {
+                        return response()->json([
+                            'status' => false,
+                            'message' => 'Unauthorized',
+                            'errors' => [
+                                'password' => ['Mật khẩu mới không được trùng với mật khẩu cũ']
+                            ]
+                        ], 401);
+                    }
+                } else {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Unauthorized',
+                        'errors' => [
+                            'email' => ['Email không tồn tại']
+                        ]
+                    ], 401);
+                }
+
+            }
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'Unauthorized',
+                'errors' => [
+                    'token' => ['Token không hợp lệ']
+                ]
+            ], 401);
+        }
     }
 
     public function updateProfile(Request $request)
@@ -464,6 +708,68 @@ class AuthController extends Controller
                 'status' => false,
                 'message' => 'Update profile failed',
             ], 400);
+        }
+    }
+
+    public function verifyEmail(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email|exists:users,email',
+            'otpCode' => 'required|string|min:6|max:6',
+        ], [
+            'email.required' => 'Email không được để trống',
+            'email.email' => 'Email không đúng định dạng',
+            'email.exists' => 'Email không tồn tại',
+            'otpCode.required' => 'Mã OTP không được để trống',
+            'otpCode.string' => 'Mã OTP phải là một chuỗi',
+            'otpCode.min' => 'Mã OTP phải có ít nhất 6 ký tự',
+            'otpCode.max' => 'Mã OTP không được quá 6 ký tự',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                "staus" => true,
+                "message" => "Validation error",
+                "errors" => $validator->errors()
+            ], 400);
+        }
+
+        $user = User::where([
+            'email' => $request->input('email'),
+            'google_id' => null,
+        ])->first();
+        if (!$user) {
+            return [
+                'status' => false,
+                'message' => 'Tài khoản không tồn tại'
+            ];
+        }
+
+        if ($user->email_verified_at != null) {
+            return [
+                'status' => false,
+                'message' => 'Email đã được xác thực'
+            ];
+        }
+
+        if (Carbon::now()->gt($user->confirmation_code_expired_in)) {
+            return [
+                'status' => false,
+                'message' => 'Mã OTP đã hết hạn'
+            ];
+        } else {
+            if ($request->input('otpCode') != $user->confirmation_code) {
+                return [
+                    'status' => false,
+                    'message' => 'Mã OTP không hợp lệ'
+                ];
+            }
+            $user->email_verified_at = Carbon::now();
+            $user->save();
+            return [
+                'status' => true,
+                'message' => 'Xác thực thành công'
+            ];
         }
     }
 }
