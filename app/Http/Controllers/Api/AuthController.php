@@ -17,6 +17,38 @@ use Laravel\Socialite\Facades\Socialite;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
+/**
+ * @OA\Post(
+ *      path="/api/v1/auth/login",
+ *      operationId="login",
+ *      tags={"Auth"},
+ *      summary="Login",
+ *      description="Login",
+ *      @OA\RequestBody(
+ *          required=true,
+ *          @OA\JsonContent(
+ *              required={"email","password"},
+ *              @OA\Property(property="email", type="string", format="email"),
+ *              @OA\Property(property="password", type="string", format="password")
+ *          )
+ *      ),
+ *      @OA\Response(
+ *          response=200,
+ *          description="Successful login"
+ *      ),
+ *      @OA\Response(
+ *          response=400,
+ *          description="Validation error"
+ *      ),
+ *      @OA\Response(
+ *          response=401,
+ *          description="Unauthorized"
+ *      )
+ * )
+ * 
+ * Returns a successful login response with user details.
+ */
+
 class AuthController extends Controller
 {
     public function __construct()
@@ -251,11 +283,11 @@ class AuthController extends Controller
                 "errors" => $validator->errors()
             ], 400);
         }
-        
+
         $user = User::where([
             'email' => $request->email,
         ])->first();
-            
+
         if ($user) {
             if ($user['email_verified_at'] != null)
                 return [
@@ -624,7 +656,6 @@ class AuthController extends Controller
                                 'message' => 'Đổi mật khẩu thành công',
                             ], 200);
                         }
-                        
                     } else {
                         return response()->json([
                             'status' => false,
@@ -643,7 +674,6 @@ class AuthController extends Controller
                         ]
                     ], 401);
                 }
-
             }
         } else {
             return response()->json([

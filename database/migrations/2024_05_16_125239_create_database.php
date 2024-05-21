@@ -125,6 +125,7 @@ return new class extends Migration
             $table->text('summary');
             $table->string('image');
             $table->string('slug')->unique();
+            $table->string('view')->default(0);
             $table->enum('status', ['draft', 'published', 'hidden', 'deleted'])->default('published');
             $table->timestamps();
 
