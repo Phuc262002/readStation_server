@@ -8,6 +8,5 @@ services:
     restart: always
     environment:
       - PORT=8000
-      - DB_HOST=postgres
     ports:
       - '8000:8000'
