@@ -5,6 +5,11 @@
         "description": "API for Read Station",
         "version": "1.0.0"
     },
+    "servers": [
+        {
+            "url": "http://localhost"
+        }
+    ],
     "paths": {
         "/api/v1/auth/login": {
             "post": {
