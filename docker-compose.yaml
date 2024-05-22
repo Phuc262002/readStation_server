@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  readstation_server:
+    image: readstation_server
+    build: .
+    container_name: readStation_server
+    restart: always
+    environment:
+      - PORT=8000
+    ports:
+      - '8000:8000'
