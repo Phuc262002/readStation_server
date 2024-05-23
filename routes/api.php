@@ -25,7 +25,7 @@ Route::group([
         
         Route::post('/refresh', [AuthController::class, 'refresh']);
 
-        Route::post('/send-reset-password', [AuthController::class, 'senRequestForgotPassword'])->name('password.reset');
+        Route::post('/send-reset-password', [AuthController::class, 'sendRequestForgotPassword'])->name('password.reset');
         Route::post('/reset-password', [AuthController::class, 'changePassWordReset']);
 
         Route::post('/verify-email', [AuthController::class, 'verifyEmail']);

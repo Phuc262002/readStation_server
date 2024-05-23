@@ -16,38 +16,358 @@ use Illuminate\Support\Facades\Validator;
 use Laravel\Socialite\Facades\Socialite;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use OpenApi\Attributes as OA;
 
-/**
- * @OA\Post(
- *      path="/api/v1/auth/login",
- *      operationId="login",
- *      tags={"Auth"},
- *      summary="Login",
- *      description="Login",
- *      @OA\RequestBody(
- *          required=true,
- *          @OA\JsonContent(
- *              required={"email","password"},
- *              @OA\Property(property="email", type="string", format="email"),
- *              @OA\Property(property="password", type="string", format="password")
- *          )
- *      ),
- *      @OA\Response(
- *          response=200,
- *          description="Successful login"
- *      ),
- *      @OA\Response(
- *          response=400,
- *          description="Validation error"
- *      ),
- *      @OA\Response(
- *          response=401,
- *          description="Unauthorized"
- *      )
- * )
- * 
- * Returns a successful login response with user details.
- */
+#[OA\Post(
+    path: '/api/v1/auth/login',
+    operationId: 'login',
+    tags: ['Auth'],
+    summary: 'Login',
+    description: 'Login',
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            required: ['email', 'password'],
+            properties: [
+                new OA\Property(property: 'email', type: 'string', format: 'email'),
+                new OA\Property(property: 'password', type: 'string', format: 'password')
+            ]
+        )
+    ),
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Successful login'
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error'
+        ),
+        new OA\Response(
+            response: 401,
+            description: 'Unauthorized'
+        )
+    ]
+)]
+
+#[OA\Post(
+    path: '/api/v1/auth/google',
+    operationId: 'loginWithGoogle',
+    tags: ['Auth'],
+    summary: 'Login with Google',
+    description: 'Login with Google',
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            required: ['idToken'],
+            properties: [
+                new OA\Property(property: 'idToken', type: 'string')
+            ]
+        )
+    ),
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Successful login with Google'
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error'
+        ),
+        new OA\Response(
+            response: 401,
+            description: 'Unauthorized'
+        )
+    ]
+)]
+
+#[OA\Post(
+    path: '/api/v1/auth/register',
+    operationId: 'register',
+    tags: ['Auth'],
+    summary: 'Register',
+    description: 'Register',
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            required: ['fullname', 'email', 'password', 'password_confirmation'],
+            properties: [
+                new OA\Property(property: 'fullname', type: 'string'),
+                new OA\Property(property: 'email', type: 'string', format: 'email'),
+                new OA\Property(property: 'password', type: 'string', format: 'password'),
+                new OA\Property(property: 'password_confirmation', type: 'string', format: 'password')
+            ]
+        )
+    ),
+    responses: [
+        new OA\Response(
+            response: 201,
+            description: 'User registered successfully'
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error'
+        )
+    ]
+)]
+
+#[OA\Post(
+    path: '/api/v1/auth/verify-email',
+    operationId: 'verifyEmail',
+    tags: ['Auth'],
+    summary: 'Verify email',
+    description: 'Verify email',
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            required: ['email', 'code'],
+            properties: [
+                new OA\Property(property: 'email', type: 'string', format: 'email'),
+                new OA\Property(property: 'otpCode', type: 'string')
+            ]
+        )
+    ),
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Email verified successfully'
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error'
+        ),
+        new OA\Response(
+            response: 401,
+            description: 'Unauthorized'
+        )
+    ]
+)]
+
+#[OA\Post(
+    path: '/api/v1/auth/resend-otp',
+    operationId: 'reRegister',
+    tags: ['Auth'],
+    summary: 'Resend OTP',
+    description: 'Resend OTP',
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            required: ['email'],
+            properties: [
+                new OA\Property(property: 'email', type: 'string', format: 'email')
+            ]
+        )
+    ),
+    responses: [
+        new OA\Response(
+            response: 201,
+            description: 'Re-register successfully'
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error'
+        )
+    ]
+)]
+
+#[OA\Post(
+    path: '/api/v1/auth/logout',
+    operationId: 'logout',
+    tags: ['Auth'],
+    summary: 'Logout',
+    description: 'Logout',
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'User Logged out successfully'
+        )
+    ]
+)]
+
+#[OA\Post(
+    path: '/api/v1/auth/refresh',
+    operationId: 'refresh',
+    tags: ['Auth'],
+    summary: 'Refresh',
+    description: 'Refresh',
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            required: ['refreshToken'],
+            properties: [
+                new OA\Property(property: 'refreshToken', type: 'string')
+            ]
+        )
+    ),
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Refresh token successful'
+        ),
+        new OA\Response(
+            response: 401,
+            description: 'Invalid refresh token'
+        )
+    ]
+)]
+
+#[OA\Post(
+    path: '/api/v1/auth/send-reset-password',
+    operationId: 'sendRequestForgotPassword',
+    tags: ['Auth'],
+    summary: 'Send request forgot password',
+    description: 'Send request forgot password',
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            required: ['email'],
+            properties: [
+                new OA\Property(property: 'email', type: 'string', format: 'email')
+            ]
+        )
+    ),
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Send email successfully'
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error'
+        )
+    ]
+)]
+
+#[OA\Post(
+    path: '/api/v1/auth/reset-password',
+    operationId: 'changePassWordReset',
+    tags: ['Auth'],
+    summary: 'Change password reset',
+    description: 'Change password reset',
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            required: ['email', 'token', 'password', 'password_confirmation'],
+            properties: [
+                new OA\Property(property: 'email', type: 'string', format: 'email'),
+                new OA\Property(property: 'token', type: 'string'),
+                new OA\Property(property: 'password', type: 'string', format: 'password'),
+                new OA\Property(property: 'password_confirmation', type: 'string', format: 'password')
+            ]
+        )
+    ),
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Change password reset successfully'
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error'
+        ),
+        new OA\Response(
+            response: 401,
+            description: 'Unauthorized'
+        )
+    ]
+)]
+
+#[OA\Get(
+    path: '/api/v1/auth/profile',
+    operationId: 'userProfile',
+    tags: ['Auth'],
+    summary: 'User profile',
+    description: 'User profile',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'User profile fetched successfully'
+        )
+    ]
+)]
+
+#[OA\Post(
+    path: '/api/v1/auth/update-profile',
+    operationId: 'updateProfile',
+    tags: ['Auth'],
+    summary: 'Update profile',
+    description: 'Update profile',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            required: ['avatar', 'fullname', 'job', 'story', 'gender', 'dob', 'street', 'province', 'district', 'ward', 'address_detail', 'phone'],
+            properties: [
+                new OA\Property(property: 'avatar', type: 'string'),
+                new OA\Property(property: 'fullname', type: 'string'),
+                new OA\Property(property: 'job', type: 'string'),
+                new OA\Property(property: 'story', type: 'string'),
+                new OA\Property(property: 'gender', type: 'string', enum: ['male', 'female']),
+                new OA\Property(property: 'dob', type: 'string', format: 'date'),
+                new OA\Property(property: 'street', type: 'string'),
+                new OA\Property(property: 'province', type: 'string'),
+                new OA\Property(property: 'district', type: 'string'),
+                new OA\Property(property: 'ward', type: 'string'),
+                new OA\Property(property: 'address_detail', type: 'string'),
+                new OA\Property(property: 'phone', type: 'string')
+            ]
+        )
+    ),
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Update profile successfully'
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error'
+        )
+    ]
+)]
+
+#[OA\Post(
+    path: '/api/v1/auth/change-password',
+    operationId: 'changePassWord',
+    tags: ['Auth'],
+    summary: 'Change password',
+    description: 'Change password',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            required: ['old_password', 'new_password', 'new_password_confirmation'],
+            properties: [
+                new OA\Property(property: 'old_password', type: 'string', format: 'password'),
+                new OA\Property(property: 'new_password', type: 'string', format: 'password'),
+                new OA\Property(property: 'new_password_confirmation', type: 'string', format: 'password')
+            ]
+        )
+    ),
+    responses: [
+        new OA\Response(
+            response: 201,
+            description: 'User successfully changed password'
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error'
+        ),
+        new OA\Response(
+            response: 401,
+            description: 'Unauthorized'
+        )
+    ]
+)]
+
+
+
 
 class AuthController extends Controller
 {
@@ -476,7 +796,7 @@ class AuthController extends Controller
         ], 201);
     }
 
-    public function senRequestForgotPassword(Request $request)
+    public function sendRequestForgotPassword(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'email' => 'required|email|exists:users,email'

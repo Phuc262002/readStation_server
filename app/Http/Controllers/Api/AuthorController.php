@@ -7,6 +7,233 @@ use App\Models\Author;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use OpenApi\Attributes as OA;
+
+#[OA\Get(
+    path: '/api/v1/authors',
+    tags: ['Authors'],
+    operationId: 'getAllAuthorsPublic',
+    summary: 'Get all authors public',
+    description: 'Get all authors',
+    parameters: [
+        new OA\Parameter(
+            name: 'page',
+            in: 'query',
+            required: false,
+            description: 'Số trang hiện tại',
+            schema: new OA\Schema(type: 'integer', default: 1)
+        ),
+        new OA\Parameter(
+            name: 'pageSize',
+            in: 'query',
+            required: false,
+            description: 'Số lượng mục trên mỗi trang',
+            schema: new OA\Schema(type: 'integer', default: 10)
+        ),
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Get all authors successfully',
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error',
+        ),
+    ],
+)]
+
+#[OA\Get(
+    path: '/api/v1/authors/admim/get-all',
+    tags: ['Authors'],
+    operationId: 'getAllAuthors',
+    summary: 'Get all authors (admin)',
+    description: 'Get all authors',
+    parameters: [
+        new OA\Parameter(
+            name: 'page',
+            in: 'query',
+            required: false,
+            description: 'Số trang hiện tại',
+            schema: new OA\Schema(type: 'integer', default: 1)
+        ),
+        new OA\Parameter(
+            name: 'pageSize',
+            in: 'query',
+            required: false,
+            description: 'Số lượng mục trên mỗi trang',
+            schema: new OA\Schema(type: 'integer', default: 10)
+        ),
+        new OA\Parameter(
+            name: 'search',
+            in: 'query',
+            required: false,
+            description: 'Từ khóa tìm kiếm',
+            schema: new OA\Schema(type: 'string')
+        ),
+        new OA\Parameter(
+            name: 'status',
+            in: 'query',
+            required: false,
+            description: 'Trạng thái của tác giả',
+            schema: new OA\Schema(type: 'string', enum: ['active', 'inactive', 'deleted'])
+        ),
+        new OA\Parameter(
+            name: 'author',
+            in: 'query',
+            required: false,
+            description: 'Loại tác giả',
+            schema: new OA\Schema(type: 'string')
+        ),
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Get all authors successfully',
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error',
+        ),
+    ],
+)]
+
+#[OA\Get(
+    path: '/api/v1/authors/{id}',
+    tags: ['Authors'],
+    operationId: 'getAuthor',
+    summary: 'Get author by id',
+    description: 'Get author by id',
+    parameters: [
+        new OA\Parameter(
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Id của tác giả',
+            schema: new OA\Schema(type: 'integer')
+        ),
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Get author successfully',
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error',
+        ),
+        new OA\Response(
+            response: 404,
+            description: 'Author not found',
+        ),
+    ],
+)]
+
+#[OA\Post(
+    path: '/api/v1/authors/create',
+    tags: ['Authors'],
+    operationId: 'createAuthor',
+    summary: 'Create author',
+    description: 'Create author',
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            required: ['author'],
+            properties: [
+                new OA\Property(property: 'author', type: 'string'),
+                new OA\Property(property: 'avatar', type: 'string'),
+                new OA\Property(property: 'is_featured', type: 'boolean'),
+                new OA\Property(property: 'description', type: 'string'),
+                new OA\Property(property: 'dob', type: 'date'),
+            ]
+        )
+    ),
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Create author successfully',
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error',
+        ),
+    ],
+)]
+
+#[OA\Put(
+    path: '/api/v1/authors/update/{id}',
+    tags: ['Authors'],
+    operationId: 'updateAuthor',
+    summary: 'Update author',
+    description: 'Update author',
+    parameters: [
+        new OA\Parameter(
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Id của tác giả',
+            schema: new OA\Schema(type: 'integer')
+        ),
+    ],
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            required: ['author'],
+            properties: [
+                new OA\Property(property: 'author', type: 'string'),
+                new OA\Property(property: 'avatar', type: 'string'),
+                new OA\Property(property: 'is_featured', type: 'boolean'),
+                new OA\Property(property: 'description', type: 'string'),
+                new OA\Property(property: 'dob', type: 'date'),
+            ]
+        )
+    ),
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Update author successfully',
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error',
+        ),
+        new OA\Response(
+            response: 404,
+            description: 'Author not found',
+        ),
+    ],
+)]
+
+#[OA\Delete(
+    path: '/api/v1/authors/delete/{id}',
+    tags: ['Authors'],
+    operationId: 'deleteAuthor',
+    summary: 'Delete author',
+    description: 'Delete author',
+    parameters: [
+        new OA\Parameter(
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Id của tác giả',
+            schema: new OA\Schema(type: 'integer')
+        ),
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Delete author successfully',
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error',
+        ),
+        new OA\Response(
+            response: 404,
+            description: 'Author not found',
+        ),
+    ],
+)]
 
 class AuthorController extends Controller
 {
@@ -17,9 +244,6 @@ class AuthorController extends Controller
         $validator = Validator::make($request->all(), [
             'page' => 'integer|min:1',
             'pageSize' => 'integer|min:1',
-            'search' => 'string',
-            'status' => 'string|in:active,inactive,deleted',
-            'author' => 'string'
         ]);
 
         $customMessages = [
@@ -27,8 +251,6 @@ class AuthorController extends Controller
             'page.min' => 'Trang phải lớn hơn hoặc bằng 1.',
             'pageSize.integer' => 'Kích thước trang phải là số nguyên.',
             'pageSize.min' => 'Kích thước trang phải lớn hơn hoặc bằng 1.',
-            'author.string' => 'Tác giả phải là một chuỗi.',
-            'status.in' => 'Status phải là active, inactive hoặc deleted'
         ];
 
         $validator->setCustomMessages($customMessages);
@@ -44,9 +266,6 @@ class AuthorController extends Controller
         // Lấy giá trị page và pageSize từ query parameters
         $page = $request->input('page', 1);
         $pageSize = $request->input('pageSize', 10);
-        $search = $request->input('search');
-        $type = $request->input('author');
-        $status = $request->input('status');
 
         // Tạo query ban đầu
         $query = Author::query();
@@ -55,10 +274,6 @@ class AuthorController extends Controller
 
         // Áp dụng bộ lọc theo type
         $totalItems = $query->count();
-        $query = $query->filter($type, $status);
-
-        // Áp dụng bộ lọc tìm kiếm nếu có tham số tìm kiếm
-        $query = $query->search($search);
 
         // Thực hiện phân trang
         $authors = $query->paginate($pageSize, ['*'], 'page', $page);

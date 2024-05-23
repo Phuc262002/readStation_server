@@ -6,6 +6,245 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use OpenApi\Attributes as OA;
+
+#[OA\Get(
+    path: '/api/v1/categories',
+    tags: ['Category'],
+    operationId: 'getAllCategories public',
+    summary: 'Get all categories',
+    description: 'Get all categories',
+    parameters: [
+        new OA\Parameter(
+            name: 'page',
+            in: 'query',
+            required: false,
+            description: 'Số trang hiện tại',
+            schema: new OA\Schema(type: 'integer', default: 1)
+        ),
+        new OA\Parameter(
+            name: 'pageSize',
+            in: 'query',
+            required: false,
+            description: 'Số lượng mục trên mỗi trang',
+            schema: new OA\Schema(type: 'integer', default: 10)
+        ),
+        new OA\Parameter(
+            name: 'type',
+            in: 'query',
+            required: false,
+            description: 'Loại danh mục',
+            schema: new OA\Schema(enum: ['book', 'post'], default: 'book')
+        ),
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Get all categories successfully!',
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error',
+        ),
+    ],
+)]
+
+#[OA\Get(
+    path: '/api/v1/categories/admin/get-all',
+    tags: ['Category'],
+    operationId: 'getAllCategory',
+    summary: 'Get all categories (admin)',
+    description: 'Get all categories',
+    parameters: [
+        new OA\Parameter(
+            name: 'page',
+            in: 'query',
+            required: false,
+            description: 'Số trang hiện tại',
+            schema: new OA\Schema(type: 'integer', default: 1)
+        ),
+        new OA\Parameter(
+            name: 'pageSize',
+            in: 'query',
+            required: false,
+            description: 'Số lượng mục trên mỗi trang',
+            schema: new OA\Schema(type: 'integer', default: 10)
+        ),
+        new OA\Parameter(
+            name: 'type',
+            in: 'query',
+            required: true,
+            description: 'Loại danh mục',
+            schema: new OA\Schema(enum: ['book', 'post'], default: 'book')
+        ),
+        new OA\Parameter(
+            name: 'status',
+            in: 'query',
+            required: false,
+            description: 'Loại danh mục',
+            schema: new OA\Schema(enum: ['active', 'inactive', 'deleted'])
+        ),
+        new OA\Parameter(
+            name: 'search',
+            in: 'query',
+            required: false,
+            description: 'Từ khóa tìm kiếm',
+            schema: new OA\Schema(type: 'string')
+        ),
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Get all categories successfully!',
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error',
+        ),
+    ],
+)]
+
+#[OA\Get(
+    path: '/api/v1/categories/get-one/{id}',
+    tags: ['Category'],
+    operationId: 'getCategory',
+    summary: 'Get a category',
+    description: 'Get a category',
+    parameters: [
+        new OA\Parameter(
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'ID của danh mục',
+            schema: new OA\Schema(type: 'integer')
+        ),
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Get category successfully!',
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error',
+        ),
+        new OA\Response(
+            response: 404,
+            description: 'Category not found!',
+        ),
+    ],
+)]
+
+#[OA\Post(
+    path: '/api/v1/categories/create',
+    tags: ['Category'],
+    operationId: 'createCategory',
+    summary: 'Create a category',
+    description: 'Create a category',
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            required: ['name', 'type'],
+            properties: [
+                new OA\Property(property: 'name', type: 'string'),
+                new OA\Property(property: 'description', type: 'string'),
+                new OA\Property(property: 'type', type: 'string', enum: ['book', 'post'])
+            ]
+        )
+    ),
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Create category successfully!',
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error',
+        ),
+    ],
+)]
+
+#[OA\Put(
+    path: '/api/v1/categories/update/{id}',
+    tags: ['Category'],
+    operationId: 'updateCategory',
+    summary: 'Update a category',
+    description: 'Update a category',
+    parameters: [
+        new OA\Parameter(
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'ID của danh mục',
+            schema: new OA\Schema(type: 'integer')
+        ),
+    ],
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            required: ['name', 'type', 'status'],
+            properties: [
+                new OA\Property(property: 'name', type: 'string'),
+                new OA\Property(property: 'description', type: 'string'),
+                new OA\Property(property: 'type', type: 'string', enum: ['book', 'post']),
+                new OA\Property(property: 'status', type: 'string', enum: ['active', 'inactive', 'deleted'])
+            ]
+        )
+    ),
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Update category successfully!',
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error',
+        ),
+        new OA\Response(
+            response: 404,
+            description: 'Category not found!',
+        ),
+        new OA\Response(
+            response: 500,
+            description: 'Update category failed!',
+        ),
+    ],
+)]
+
+#[OA\Delete(
+    path: '/api/v1/categories/delete/{id}',
+    tags: ['Category'],
+    operationId: 'deleteCategory',
+    summary: 'Delete a category',
+    description: 'Delete a category',
+    parameters: [
+        new OA\Parameter(
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'ID của danh mục',
+            schema: new OA\Schema(type: 'integer')
+        ),
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Delete category successfully!',
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error',
+        ),
+        new OA\Response(
+            response: 404,
+            description: 'Category not found!',
+        ),
+        new OA\Response(
+            response: 500,
+            description: 'Delete category failed!',
+        ),
+    ],
+)]
 
 class CategoryController extends Controller
 {
