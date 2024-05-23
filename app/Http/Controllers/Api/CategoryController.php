@@ -55,6 +55,9 @@ use OpenApi\Attributes as OA;
     operationId: 'getAllCategory',
     summary: 'Get all categories (admin)',
     description: 'Get all categories',
+    security: [
+        ['bearerAuth' => []]
+    ],
     parameters: [
         new OA\Parameter(
             name: 'page',
@@ -110,6 +113,9 @@ use OpenApi\Attributes as OA;
     operationId: 'getCategory',
     summary: 'Get a category',
     description: 'Get a category',
+    security: [
+        ['bearerAuth' => []]
+    ],
     parameters: [
         new OA\Parameter(
             name: 'id',
@@ -141,6 +147,9 @@ use OpenApi\Attributes as OA;
     operationId: 'createCategory',
     summary: 'Create a category',
     description: 'Create a category',
+    security: [
+        ['bearerAuth' => []]
+    ],
     requestBody: new OA\RequestBody(
         required: true,
         content: new OA\JsonContent(
@@ -170,6 +179,9 @@ use OpenApi\Attributes as OA;
     operationId: 'updateCategory',
     summary: 'Update a category',
     description: 'Update a category',
+    security: [
+        ['bearerAuth' => []]
+    ],
     parameters: [
         new OA\Parameter(
             name: 'id',
@@ -217,6 +229,9 @@ use OpenApi\Attributes as OA;
     operationId: 'deleteCategory',
     summary: 'Delete a category',
     description: 'Delete a category',
+    security: [
+        ['bearerAuth' => []]
+    ],
     parameters: [
         new OA\Parameter(
             name: 'id',
@@ -569,6 +584,11 @@ class CategoryController extends Controller
                 "status" => false,
                 "message" => "Category not found!"
             ], 404);
+        } else if ($category->status == 'deleted') {
+            return response()->json([
+                "status" => false,
+                "message" => "Category is not exist!"
+            ], 400);
         }
 
         try {

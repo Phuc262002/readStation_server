@@ -56,7 +56,7 @@ class Post extends Model
         } else if ($is_admin) {
             $query->where('status', '!=', 'deleted');
         } else {
-            $query->where('status', 'active');
+            $query->where('status', 'published');
         }
 
         return $query;
@@ -70,5 +70,11 @@ class Post extends Model
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function delete()
+    {
+        $this->status = 'deleted';
+        $this->save();
     }
 }

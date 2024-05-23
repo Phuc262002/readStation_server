@@ -6,6 +6,35 @@ use App\Http\Controllers\Controller;
 use App\Models\Author;
 use App\Models\Book;
 use Illuminate\Http\Request;
+use OpenApi\Attributes as OA;
+
+#[OA\Get(
+    path: '/api/v1/home/get-feautured-author',
+    tags: ['Home'],
+    operationId: 'getFeaturedAuthor',
+    summary: 'Get featured authors',
+    description: 'Get featured authors and their books',
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Get all categories successfully!',
+        ),
+    ]
+)]
+
+#[OA\Get(
+    path: '/api/v1/home/get-feautured-book',
+    tags: ['Home'],
+    operationId: 'getFeaturedBook',
+    summary: 'Get featured books',
+    description: 'Get featured books',
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Get all categories successfully!',
+        ),
+    ]
+)]
 
 class HomeController extends Controller
 {

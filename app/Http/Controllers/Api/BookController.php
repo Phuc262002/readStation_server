@@ -6,6 +6,288 @@ use App\Http\Controllers\Controller;
 use App\Models\Book;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use OpenApi\Attributes as OA;
+
+#[OA\Get(
+    path: '/api/v1/books',
+    tags: ['Book'],
+    operationId: 'getAllBooksPublic',
+    summary: 'Get all books public',
+    description: 'Get all books',
+    parameters: [
+        new OA\Parameter(
+            name: 'page',
+            in: 'query',
+            required: false,
+            description: 'Số trang hiện tại',
+            schema: new OA\Schema(type: 'integer', default: 1)
+        ),
+        new OA\Parameter(
+            name: 'pageSize',
+            in: 'query',
+            required: false,
+            description: 'Số lượng mục trên mỗi trang',
+            schema: new OA\Schema(type: 'integer', default: 10)
+        ),
+        new OA\Parameter(
+            name: 'search',
+            in: 'query',
+            required: false,
+            description: 'Từ khóa tìm kiếm',
+            schema: new OA\Schema(type: 'string')
+        ),
+        new OA\Parameter(
+            name: 'category_id',
+            in: 'query',
+            required: false,
+            description: 'Id của category',
+            schema: new OA\Schema(type: 'integer')
+        ),
+        new OA\Parameter(
+            name: 'author_id',
+            in: 'query',
+            required: false,
+            description: 'Id của author',
+            schema: new OA\Schema(type: 'integer')
+        ),
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Get all books successfully!',
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error',
+        ),
+    ],
+)]
+
+#[OA\Get(
+    path: '/api/v1/books/get-one/{book}',
+    tags: ['Book'],
+    operationId: 'getOneBook',
+    summary: 'Get one book',
+    description: 'Get one book',
+    parameters: [
+        new OA\Parameter(
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Id hoặc slug của sách',
+            schema: new OA\Schema(type: 'string')
+        ),
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Get book successfully!',
+        ),
+        new OA\Response(
+            response: 404,
+            description: 'Book not found!',
+        ),
+    ],
+)]
+
+#[OA\Get(
+    path: '/api/v1/books/admin/get-all',
+    tags: ['Book'],
+    operationId: 'getAllBooks',
+    summary: 'Get all books admin',
+    description: 'Get all books',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    parameters: [
+        new OA\Parameter(
+            name: 'page',
+            in: 'query',
+            required: false,
+            description: 'Số trang hiện tại',
+            schema: new OA\Schema(type: 'integer', default: 1)
+        ),
+        new OA\Parameter(
+            name: 'pageSize',
+            in: 'query',
+            required: false,
+            description: 'Số lượng mục trên mỗi trang',
+            schema: new OA\Schema(type: 'integer', default: 10)
+        ),
+        new OA\Parameter(
+            name: 'search',
+            in: 'query',
+            required: false,
+            description: 'Từ khóa tìm kiếm',
+            schema: new OA\Schema(type: 'string')
+        ),
+        new OA\Parameter(
+            name: 'category_id',
+            in: 'query',
+            required: false,
+            description: 'Id của category',
+            schema: new OA\Schema(type: 'integer')
+        ),
+        new OA\Parameter(
+            name: 'author_id',
+            in: 'query',
+            required: false,
+            description: 'Id của author',
+            schema: new OA\Schema(type: 'integer')
+        ),
+        new OA\Parameter(
+            name: 'status',
+            in: 'query',
+            required: false,
+            description: 'Trạng thái sách',
+            schema: new OA\Schema(type: 'string', enum: ['active', 'inactive', 'deleted'])
+        ),
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Get all books successfully!',
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error',
+        ),
+    ],
+)]
+
+#[OA\Post(
+    path: '/api/v1/books/create',
+    tags: ['Book'],
+    operationId: 'createBook',
+    summary: 'Create book',
+    description: 'Create book',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            required: ['sku', 'author_id', 'title', 'original_title', 'description_summary', 'description', 'category_id'],
+            properties: [
+                new OA\Property(property: 'sku', type: 'string'),
+                new OA\Property(property: 'author_id', type: 'string'),
+                new OA\Property(property: 'title', type: 'string'),
+                new OA\Property(property: 'original_title', type: 'string'),
+                new OA\Property(property: 'description_summary', type: 'string'),
+                new OA\Property(property: 'description', type: 'text'),
+                new OA\Property(property: 'is_featured', type: 'boolean'),
+                new OA\Property(property: 'category_id', type: 'string'),
+                new OA\Property(property: 'shelve_id', type: 'string'),
+            ]
+        )
+    ),
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Create book successfully!',
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error',
+        ),
+        new OA\Response(
+            response: 500,
+            description: 'Create book failed!',
+        ),
+    ],
+)]
+
+#[OA\Put(
+    path: '/api/v1/books/update/{id}',
+    tags: ['Book'],
+    operationId: 'updateBook',
+    summary: 'Update book',
+    description: 'Update book',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    parameters: [
+        new OA\Parameter(
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Id của sách',
+            schema: new OA\Schema(type: 'integer')
+        ),
+    ],
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            required: ['sku', 'author_id', 'title', 'original_title', 'description_summary', 'description', 'category_id', 'shelve_id', 'is_featured', 'status'],
+            properties: [
+                new OA\Property(property: 'sku', type: 'string'),
+                new OA\Property(property: 'author_id', type: 'string'),
+                new OA\Property(property: 'title', type: 'string'),
+                new OA\Property(property: 'original_title', type: 'string'),
+                new OA\Property(property: 'description_summary', type: 'string'),
+                new OA\Property(property: 'description', type: 'text'),
+                new OA\Property(property: 'category_id', type: 'string'),
+                new OA\Property(property: 'shelve_id', type: 'string'),
+                new OA\Property(property: 'is_featured', type: 'boolean'),
+                new OA\Property(property: 'status', type: 'string', enum: ['active', 'inactive', 'deleted']),
+            ]
+        )
+    ),
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Update book successfully!',
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error',
+        ),
+        new OA\Response(
+            response: 500,
+            description: 'Update book failed!',
+        ),
+    ],
+)]
+
+#[OA\Delete(
+    path: '/api/v1/books/delete/{id}',
+    tags: ['Book'],
+    operationId: 'deleteBook',
+    summary: 'Delete book',
+    description: 'Delete book',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    parameters: [
+        new OA\Parameter(
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Id của sách',
+            schema: new OA\Schema(type: 'integer')
+        ),
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Delete book successfully!',
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error',
+        ),
+        new OA\Response(
+            response: 404,
+            description: 'Book not found!',
+        ),
+        new OA\Response(
+            response: 500,
+            description: 'Delete book failed!',
+        ),
+    ],
+)]
+
+
 class BookController extends Controller
 {
     public function checkStoreValidator($request)
@@ -57,7 +339,7 @@ class BookController extends Controller
             'description_summary' => "required|string",
             'description' => "required|string",
             'category_id' => "required|string",
-            'shelve_id' => "number",
+            'shelve_id' => "string",
             'is_featured' => 'nullable|boolean',
             "status" => "string|in:active,inactive,deleted",
         ]);
@@ -69,7 +351,7 @@ class BookController extends Controller
             'sku.required' => 'Trường sku là bắt buộc.',
             'sku.string' => 'Sku phải là một chuỗi.',
             'author_id.required' => 'Trường author_id là bắt buộc.',
-            'author_id.number' => 'Author_id phải là một số.',
+            'author_id.string' => 'Author_id phải là một chuỗi.',
             'title.required' => 'Trường title là bắt buộc.',
             'title.string' => 'Title phải là một chuỗi.',
             'original_title.required' => 'Trường original_title là bắt buộc.',
@@ -118,6 +400,78 @@ class BookController extends Controller
             'search' => 'string',
             'category_id' => 'integer',
             'author_id' => 'integer',
+        ]);
+
+        $customMessages = [
+            'page.integer' => 'Trang phải là số nguyên.',
+            'page.min' => 'Trang phải lớn hơn hoặc bằng 1.',
+            'pageSize.integer' => 'Kích thước trang phải là số nguyên.',
+            'pageSize.min' => 'Kích thước trang phải lớn hơn hoặc bằng 1.',
+            'category_id.integer' => 'Category_id phải là một số nguyên.',
+            'author_id.integer' => 'Author_id phải là một số nguyên.',
+        ];
+
+        $validator->setCustomMessages($customMessages);
+
+        if ($validator->fails()) {
+            return response()->json([
+                "staus" => false,
+                "message" => "Validation error",
+                "errors" => $validator->errors()
+            ], 400);
+        }
+
+        // Lấy giá trị page và pageSize từ query parameters
+        $page = $request->input('page', 1);
+        $pageSize = $request->input('pageSize', 10);
+        $search = $request->input('search');
+        $category_id = $request->input('category_id');
+        $author_id = $request->input('author_id');
+
+        // Tạo query ban đầu
+        $query = Book::query()
+            ->with(['category', 'author', 'bookDetail' => function ($query) {
+                $query->where('status', '!=', 'deleted');
+            }])
+            ->whereHas('bookDetail', function ($q) {
+                $q->whereNotNull('id')
+                    ->whereNotNull('status')
+                    ->where('status', '=', 'active');
+            });
+
+        $totalItems = $query->count();
+        $query = $query->filter($category_id, null, $author_id);
+
+        // Áp dụng bộ lọc tìm kiếm nếu có tham số tìm kiếm
+        $query = $query->search($search);
+
+        // Thực hiện phân trang
+        $books = $query->orderBy('created_at', 'desc')->paginate($pageSize, ['*'], 'page', $page);
+
+        return response()->json([
+            "status" => true,
+            "message" => "Get all books successfully!",
+            "data" => [
+                "books" => $books->items(),
+                "page" => $books->currentPage(),
+                "pageSize" => $books->perPage(),
+                "lastPage" => $books->lastPage(),
+                "totalResults" => $books->total(),
+                "total" => $totalItems
+            ],
+        ], 200);
+    }
+
+    public function getAllBook(Request $request)
+    {
+        $this->checkBookDetail();
+
+        $validator = Validator::make($request->all(), [
+            'page' => 'integer|min:1',
+            'pageSize' => 'integer|min:1',
+            'search' => 'string',
+            'category_id' => 'integer',
+            'author_id' => 'integer',
             'status' => 'string|in:active,inactive,deleted',
         ]);
 
@@ -128,7 +482,7 @@ class BookController extends Controller
             'pageSize.min' => 'Kích thước trang phải lớn hơn hoặc bằng 1.',
             'category_id.integer' => 'Category_id phải là một số nguyên.',
             'author_id.integer' => 'Author_id phải là một số nguyên.',
-            'status.in' => 'Status phải là active, inactive hoặc deleted.'
+            'status.in' => 'Status phải là active, inactive hoặc deleted.',
         ];
 
         $validator->setCustomMessages($customMessages);
@@ -219,10 +573,10 @@ class BookController extends Controller
     public function show(Request $request, Book $book)
     {
         $this->checkBookDetail();
-        $id = $request->route('id');
+        $id = $request->route('book');
 
-        $validator = Validator::make(['id' => $id], [
-            'id' => 'required'
+        $validator = Validator::make(['book' => $id], [
+            'book' => 'required'
         ]);
 
         $customMessages = [
@@ -249,6 +603,11 @@ class BookController extends Controller
             return response()->json([
                 "status" => false,
                 "message" => "Book not found!"
+            ], 404);
+        } elseif ($book->status != 'active') {
+            return response()->json([
+                "status" => false,
+                "message" => "Book is not active!"
             ], 404);
         }
 
@@ -325,6 +684,11 @@ class BookController extends Controller
         $book = Book::find($id);
 
         if (!$book) {
+            return response()->json([
+                "status" => false,
+                "message" => "Book not found!"
+            ], 404);
+        } elseif ($book->status == 'deleted') {
             return response()->json([
                 "status" => false,
                 "message" => "Book not found!"

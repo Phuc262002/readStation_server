@@ -266,6 +266,11 @@ class BookDetailController extends Controller
                 "status" => false,
                 "message" => "Book detail not found!"
             ], 404);
+        } elseif ($bookdetail->status == 'deleted') {
+            return response()->json([
+                "status" => false,
+                "message" => "Book detail is not found!"
+            ], 400);
         }
 
         try {

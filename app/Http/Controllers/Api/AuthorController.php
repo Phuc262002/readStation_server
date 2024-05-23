@@ -11,7 +11,7 @@ use OpenApi\Attributes as OA;
 
 #[OA\Get(
     path: '/api/v1/authors',
-    tags: ['Authors'],
+    tags: ['Author'],
     operationId: 'getAllAuthorsPublic',
     summary: 'Get all authors public',
     description: 'Get all authors',
@@ -45,10 +45,13 @@ use OpenApi\Attributes as OA;
 
 #[OA\Get(
     path: '/api/v1/authors/admim/get-all',
-    tags: ['Authors'],
+    tags: ['Author'],
     operationId: 'getAllAuthors',
     summary: 'Get all authors (admin)',
     description: 'Get all authors',
+    security: [
+        ['bearerAuth' => []]
+    ],
     parameters: [
         new OA\Parameter(
             name: 'page',
@@ -100,10 +103,13 @@ use OpenApi\Attributes as OA;
 
 #[OA\Get(
     path: '/api/v1/authors/{id}',
-    tags: ['Authors'],
+    tags: ['Author'],
     operationId: 'getAuthor',
     summary: 'Get author by id',
     description: 'Get author by id',
+    security: [
+        ['bearerAuth' => []]
+    ],
     parameters: [
         new OA\Parameter(
             name: 'id',
@@ -131,10 +137,13 @@ use OpenApi\Attributes as OA;
 
 #[OA\Post(
     path: '/api/v1/authors/create',
-    tags: ['Authors'],
+    tags: ['Author'],
     operationId: 'createAuthor',
     summary: 'Create author',
     description: 'Create author',
+    security: [
+        ['bearerAuth' => []]
+    ],
     requestBody: new OA\RequestBody(
         required: true,
         content: new OA\JsonContent(
@@ -162,10 +171,13 @@ use OpenApi\Attributes as OA;
 
 #[OA\Put(
     path: '/api/v1/authors/update/{id}',
-    tags: ['Authors'],
+    tags: ['Author'],
     operationId: 'updateAuthor',
     summary: 'Update author',
     description: 'Update author',
+    security: [
+        ['bearerAuth' => []]
+    ],
     parameters: [
         new OA\Parameter(
             name: 'id',
@@ -206,10 +218,13 @@ use OpenApi\Attributes as OA;
 
 #[OA\Delete(
     path: '/api/v1/authors/delete/{id}',
-    tags: ['Authors'],
+    tags: ['Author'],
     operationId: 'deleteAuthor',
     summary: 'Delete author',
     description: 'Delete author',
+    security: [
+        ['bearerAuth' => []]
+    ],
     parameters: [
         new OA\Parameter(
             name: 'id',
@@ -562,6 +577,16 @@ class AuthorController extends Controller
                 "status" => false,
                 "message" => "Author not found!"
             ], 404);
+        } elseif ($author->is_featured) {
+            return response()->json([
+                "status" => false,
+                "message" => "Cannot delete featured author!"
+            ], 400);
+        } elseif ($author->status == 'deleted') {
+            return response()->json([
+                "status" => false,
+                "message" => "Author not found!"
+            ], 400);
         }
 
         try {

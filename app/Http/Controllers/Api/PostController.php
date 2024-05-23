@@ -6,6 +6,205 @@ use App\Http\Controllers\Controller;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use OpenApi\Attributes as OA;
+
+#[OA\Get(
+    path: '/api/v1/posts',
+    tags: ['Post'],
+    operationId: 'getAllPosts',
+    summary: 'Get all posts',
+    description: 'Get all posts with pagination',
+    parameters: [
+        new OA\Parameter(
+            name: 'page',
+            in: 'query',
+            required: false,
+            description: 'Số trang hiện tại',
+            schema: new OA\Schema(type: 'integer', default: 1)
+        ),
+        new OA\Parameter(
+            name: 'pageSize',
+            in: 'query',
+            required: false,
+            description: 'Số lượng mục trên mỗi trang',
+            schema: new OA\Schema(type: 'integer', default: 10)
+        ),
+        new OA\Parameter(
+            name: 'category_id',
+            in: 'query',
+            required: false,
+            description: 'ID của category',
+            schema: new OA\Schema(type: 'integer')
+        ),
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Get all posts successfully!',
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error',
+        ),
+    ]
+)]
+
+#[OA\Get(
+    path: '/api/v1/posts/get-one/{post}',
+    tags: ['Post'],
+    operationId: 'getPost',
+    summary: 'Get a post by ID or slug',
+    description: 'Get a post by ID or slug',
+    parameters: [
+        new OA\Parameter(
+            name: 'post',
+            in: 'path',
+            required: true,
+            description: 'ID của post',
+            schema: new OA\Schema(type: 'string')
+        ),
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Get post successfully!',
+        ),
+        new OA\Response(
+            response: 404,
+            description: 'Post not found',
+        ),
+    ]
+)]
+
+
+#[OA\Post(
+    path: '/api/v1/posts/create',
+    tags: ['Post'],
+    operationId: 'createPost',
+    summary: 'Create a new post',
+    description: 'Create a new post',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            required: ['category_id', 'title', 'content', 'summary', 'image', 'status'],
+            properties: [
+                new OA\Property(property: 'category_id', type: 'string'),
+                new OA\Property(property: 'title', type: 'string'),
+                new OA\Property(property: 'content', type: 'string'),
+                new OA\Property(property: 'summary', type: 'string'),
+                new OA\Property(property: 'image', type: 'string'),
+                new OA\Property(property: 'status', type: 'string', enum: ['published', 'draft']),
+            ]
+        )
+    ),
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Create post successfully!',
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error',
+        ),
+        new OA\Response(
+            response: 500,
+            description: 'Create post failed!',
+        ),
+    ]
+)]
+
+#[OA\Put(
+    path: '/api/v1/posts/update/{id}',
+    tags: ['Post'],
+    operationId: 'updatePost',
+    summary: 'Update a post',
+    description: 'Update a post by ID',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    parameters: [
+        new OA\Parameter(
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'ID của post',
+            schema: new OA\Schema(type: 'integer')
+        ),
+    ],
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            required: ['category_id', 'title', 'content', 'summary', 'image', 'status'],
+            properties: [
+                new OA\Property(property: 'category_id', type: 'string'),
+                new OA\Property(property: 'title', type: 'string'),
+                new OA\Property(property: 'content', type: 'string'),
+                new OA\Property(property: 'summary', type: 'string'),
+                new OA\Property(property: 'image', type: 'string'),
+                new OA\Property(property: 'status', type: 'string', enum: ['published', 'draft']),
+            ]
+        )
+    ),
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Update post successfully!',
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error',
+        ),
+        new OA\Response(
+            response: 404,
+            description: 'Post not found',
+        ),
+        new OA\Response(
+            response: 500,
+            description: 'Update post failed!',
+        ),
+    ]
+)]
+
+#[OA\Delete(
+    path: '/api/v1/posts/delete/{id}',
+    tags: ['Post'],
+    operationId: 'deletePost',
+    summary: 'Delete a post',
+    description: 'Delete a post by ID',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    parameters: [
+        new OA\Parameter(
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'ID của post',
+            schema: new OA\Schema(type: 'integer')
+        ),
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Delete post successfully!',
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error',
+        ),
+        new OA\Response(
+            response: 404,
+            description: 'Post not found',
+        ),
+        new OA\Response(
+            response: 500,
+            description: 'Delete post failed!',
+        ),
+    ]
+)]
 
 class PostController extends Controller
 {
@@ -44,11 +243,7 @@ class PostController extends Controller
         $query = Post::query()->with(['user', 'category']);
         $totalItems = $query->count();
 
-        $query->where('status', 'active');
-        // Áp dụng bộ lọc theo category_id
-        if ($category_id) {
-            $query->where('category_id', $category_id);
-        }
+        $query->filter($category_id, null, false);
 
         // Lấy tổng số mục trong DB trước khi áp dụng bộ lọc tìm kiếm
 
@@ -77,7 +272,7 @@ class PostController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'category_id' => 'required|integer',
+            'category_id' => 'required|string',
             'title' => 'required|string|max:255',
             "content" => "required|string",
             "summary" => "required|string",
@@ -87,7 +282,7 @@ class PostController extends Controller
 
         $customMessages = [
             'category_id.required' => 'Category_id không được để trống.',
-            'category_id.integer' => 'Category_id phải là một số nguyên.',
+            'category_id.string' => 'Category_id phải là một chuỗi.',
             'title.required' => 'Title không được để trống.',
             'title.string' => 'Title phải là một chuỗi.',
             'title.max' => 'Title không được vượt quá 255 ký tự.',
@@ -131,22 +326,171 @@ class PostController extends Controller
         }
     }
 
-    public function show(Post $post)
+    public function show(Request $request)
     {
+
+        $post = $request->route('post');
+
+        $validator = Validator::make(['post' => $post], [
+            'post' => 'required',
+        ]);
+
+        $customMessages = [
+            'post.required' => 'Post không được để trống.',
+        ];
+
+        $validator->setCustomMessages($customMessages);
+
+        if ($validator->fails()) {
+            return response()->json([
+                "staus" => false,
+                "message" => "Validation error",
+                "errors" => $validator->errors()
+            ], 400);
+        }
+
+        if (is_numeric($request->post)) {
+            $post = Post::with('user', 'category')->find($request->post);
+        } else {
+            $post = Post::with('user', 'category')->where('slug', $request->post)->first();
+        }
+
+        if (!$post) {
+            return response()->json([
+                "status" => false,
+                "message" => "Post not found",
+            ], 404);
+        } else if ($post->status != 'published') {
+            return response()->json([
+                "status" => false,
+                "message" => "Post not found",
+            ], 404);
+        } else {
+            $post->increment('views');
+        }
+
         return response()->json([
             "status" => true,
             "message" => "Get post successfully!",
-            "data" => $post
+            "data" => array_merge($post->toArray(), [
+                "user" => $post->user->only(['fullname', 'avatar', 'gender', 'job', 'story']),
+            ])
         ], 200);
     }
 
     public function update(Request $request, Post $post)
     {
-        //
+        $id = $request->route('id');
+
+        $validator = Validator::make(array_merge(
+            $request->all(),
+            ["id" => $id]
+        ), [
+            'id' => 'required|exists:posts,id',
+            'category_id' => 'required|string',
+            'title' => 'required|string|max:255',
+            "content" => "required|string",
+            "summary" => "required|string",
+            "image" => "required|string",
+            "status" => "string|in:published,draft",
+        ], [
+            'id.required' => 'ID không được để trống.',
+            'id.exists' => 'ID không tồn tại.',
+            'category_id.required' => 'Category_id không được để trống.',
+            'category_id.string' => 'Category_id phải là một chuỗi.',
+            'title.required' => 'Title không được để trống.',
+            'title.string' => 'Title phải là một chuỗi.',
+            'title.max' => 'Title không được vượt quá 255 ký tự.',
+            'content.required' => 'Content không được để trống.',
+            'content.string' => 'Content phải là một chuỗi.',
+            'summary.required' => 'Summary không được để trống.',
+            'summary.string' => 'Summary phải là một chuỗi.',
+            'image.required' => 'Image không được để trống.',
+            'image.string' => 'Image phải là một chuỗi.',
+            'status.required' => 'Status không được để trống.',
+            'status.in' => 'Status phải là published hoặc draft.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                "staus" => false,
+                "message" => "Validation error",
+                "errors" => $validator->errors()
+            ], 400);
+        }
+
+        $post = Post::find($id);
+
+        if (!$post) {
+            return response()->json([
+                "status" => false,
+                "message" => "Post not found",
+            ], 404);
+        }
+
+        try {
+            $post->update($validator->validated());
+
+            return response()->json([
+                "status" => true,
+                "message" => "Update post successfully!",
+                "data" => $post
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => false,
+                "message" => "Update post failed!",
+                "errors" => $th->getMessage()
+            ], 500);
+        }
     }
 
-    public function destroy(Post $post)
+    public function destroy(Request $request)
     {
-        //
+        $id = $request->route('id');
+
+        $validator = Validator::make(['id' => $id], [
+            'id' => 'required|exists:posts,id',
+        ], [
+            'id.required' => 'ID không được để trống.',
+            'id.exists' => 'ID không tồn tại.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                "staus" => false,
+                "message" => "Validation error",
+                "errors" => $validator->errors()
+            ], 400);
+        }
+
+        $post = Post::find($id);
+
+        if (!$post) {
+            return response()->json([
+                "status" => false,
+                "message" => "Post not found",
+            ], 404);
+        } else if ($post->status == 'deleted') {
+            return response()->json([
+                "status" => false,
+                "message" => "Post not found",
+            ], 404);
+        }
+
+        try {
+            $post->delete();
+
+            return response()->json([
+                "status" => true,
+                "message" => "Delete post successfully!",
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => false,
+                "message" => "Delete post failed!",
+                "errors" => $th->getMessage()
+            ], 500);
+        }
     }
 }

@@ -22,7 +22,7 @@ Route::group([
 
         Route::post('/login', [AuthController::class, 'login']);
         Route::post('/google', [AuthController::class, 'loginWithGoogle']);
-        
+
         Route::post('/refresh', [AuthController::class, 'refresh']);
 
         Route::post('/send-reset-password', [AuthController::class, 'sendRequestForgotPassword'])->name('password.reset');
@@ -52,30 +52,35 @@ Route::group([
     ], function () {
         Route::get('/', [CategoryController::class, 'index']);
 
-        Route::get('/admin/get-all', [CategoryController::class, 'getAllCategory']);
-        Route::get('/get-one/{id}', [CategoryController::class, 'show']);
-        Route::post('/create', [CategoryController::class, 'store']);
-        Route::put('/update/{id}', [CategoryController::class, 'update']);
-        Route::delete('/delete/{id}', [CategoryController::class, 'destroy']);
+        Route::group(["middleware" => ["auth:api"]], function () {
+            Route::get('/admin/get-all', [CategoryController::class, 'getAllCategory']);
+            Route::get('/get-one/{id}', [CategoryController::class, 'show']);
+            Route::post('/create', [CategoryController::class, 'store']);
+            Route::put('/update/{id}', [CategoryController::class, 'update']);
+            Route::delete('/delete/{id}', [CategoryController::class, 'destroy']);
+        });
     });
 
     Route::group([
         "prefix" => "books"
     ], function () {
         Route::get('/', [BookController::class, 'index']);
-        Route::get('/get-one/{id}', [BookController::class, 'show']);
+        Route::get('/get-one/{book}', [BookController::class, 'show']);
 
-        Route::post('/create', [BookController::class, 'store']);
-        Route::put('/update/{id}', [BookController::class, 'update']);
-        Route::delete('/delete/{id}', [BookController::class, 'destroy']);
+        Route::group(["middleware" => ["auth:api"]], function () {
+            Route::get('/admin/get-all', [BookController::class, 'getAllBook']);
+            Route::post('/create', [BookController::class, 'store']);
+            Route::put('/update/{id}', [BookController::class, 'update']);
+            Route::delete('/delete/{id}', [BookController::class, 'destroy']);
+        });
     });
 
     Route::group([
         "prefix" => "posts"
     ], function () {
         Route::get('/', [PostController::class, 'index']);
-        Route::get('/get-one/{id}', [PostController::class, 'show']);
-        
+        Route::get('/get-one/{post}', [PostController::class, 'show']);
+
         Route::group(["middleware" => ["auth:api"]], function () {
             Route::post('/create', [PostController::class, 'store']);
             Route::put('/update/{id}', [PostController::class, 'update']);
@@ -85,6 +90,7 @@ Route::group([
 
     Route::group([
         "prefix" => "book-details",
+        "middleware" => ["auth:api"]
     ], function () {
         Route::get('/get-one/{id}', [BookDetailController::class, 'show']);
         Route::post('/create', [BookDetailController::class, 'store']);
@@ -96,11 +102,13 @@ Route::group([
         "prefix" => "authors"
     ], function () {
         Route::get('/', [AuthorController::class, 'index']);
-        
-        Route::get('/admin/get-all', [AuthorController::class, 'getAllAuthor']);
-        Route::get('/get-one/{id}', [AuthorController::class, 'show']);
-        Route::post('/create', [AuthorController::class, 'store']);
-        Route::put('/update/{id}', [AuthorController::class, 'update']);
-        Route::delete('/delete/{id}', [AuthorController::class, 'destroy']);
+
+        Route::group(["middleware" => ["auth:api"]], function () {
+            Route::get('/admin/get-all', [AuthorController::class, 'getAllAuthor']);
+            Route::get('/get-one/{id}', [AuthorController::class, 'show']);
+            Route::post('/create', [AuthorController::class, 'store']);
+            Route::put('/update/{id}', [AuthorController::class, 'update']);
+            Route::delete('/delete/{id}', [AuthorController::class, 'destroy']);
+        });
     });
 });
