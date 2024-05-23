@@ -25,13 +25,13 @@ class HomeController extends Controller
     public function getFeaturedBook()
     {
         $books = Book::with(['category', 'author', 'bookDetail' => function ($query) {
-            $query->where('status', '!=', 'deleted');
+            $query->where('status', 'active');
         }])
         ->where('is_featured', true)
         ->whereHas('bookDetail', function ($q) {
             $q->whereNotNull('id')
                 ->whereNotNull('status')
-                ->where('status', '=', 'active');
+                ->where('status', 'active');
         })
         ->get();
 
