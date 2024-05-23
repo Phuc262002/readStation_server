@@ -289,7 +289,7 @@ use OpenApi\Attributes as OA;
     ]
 )]
 
-#[OA\Post(
+#[OA\Put(
     path: '/api/v1/auth/update-profile',
     operationId: 'updateProfile',
     tags: ['Auth'],
