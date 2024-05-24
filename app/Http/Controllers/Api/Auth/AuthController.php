@@ -112,6 +112,9 @@ use OpenApi\Attributes as OA;
     tags: ['Auth'],
     summary: 'Logout',
     description: 'Logout',
+    security: [
+        ['bearerAuth' => []]
+    ],
     responses: [
         new OA\Response(
             response: 200,

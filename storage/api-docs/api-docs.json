@@ -1494,7 +1494,12 @@
                     "200": {
                         "description": "User Logged out successfully"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/v1/auth/refresh": {
