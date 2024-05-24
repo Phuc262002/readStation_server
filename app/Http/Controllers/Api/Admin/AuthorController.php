@@ -1,51 +1,16 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Author;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use OpenApi\Attributes as OA;
 
 #[OA\Get(
-    path: '/api/v1/authors',
-    tags: ['Author'],
-    operationId: 'getAllAuthorsPublic',
-    summary: 'Get all authors public',
-    description: 'Get all authors',
-    parameters: [
-        new OA\Parameter(
-            name: 'page',
-            in: 'query',
-            required: false,
-            description: 'Số trang hiện tại',
-            schema: new OA\Schema(type: 'integer', default: 1)
-        ),
-        new OA\Parameter(
-            name: 'pageSize',
-            in: 'query',
-            required: false,
-            description: 'Số lượng mục trên mỗi trang',
-            schema: new OA\Schema(type: 'integer', default: 10)
-        ),
-    ],
-    responses: [
-        new OA\Response(
-            response: 200,
-            description: 'Get all authors successfully',
-        ),
-        new OA\Response(
-            response: 400,
-            description: 'Validation error',
-        ),
-    ],
-)]
-
-#[OA\Get(
     path: '/api/v1/authors/admim/get-all',
-    tags: ['Author'],
+    tags: ['Admin / Author'],
     operationId: 'getAllAuthors',
     summary: 'Get all authors (admin)',
     description: 'Get all authors',
@@ -103,7 +68,7 @@ use OpenApi\Attributes as OA;
 
 #[OA\Get(
     path: '/api/v1/authors/{id}',
-    tags: ['Author'],
+    tags: ['Admin / Author'],
     operationId: 'getAuthor',
     summary: 'Get author by id',
     description: 'Get author by id',
@@ -137,7 +102,7 @@ use OpenApi\Attributes as OA;
 
 #[OA\Post(
     path: '/api/v1/authors/create',
-    tags: ['Author'],
+    tags: ['Admin / Author'],
     operationId: 'createAuthor',
     summary: 'Create author',
     description: 'Create author',
@@ -147,7 +112,7 @@ use OpenApi\Attributes as OA;
     requestBody: new OA\RequestBody(
         required: true,
         content: new OA\JsonContent(
-            required: ['author'],
+            required: ['Admin / Author'],
             properties: [
                 new OA\Property(property: 'author', type: 'string'),
                 new OA\Property(property: 'avatar', type: 'string'),
@@ -171,7 +136,7 @@ use OpenApi\Attributes as OA;
 
 #[OA\Put(
     path: '/api/v1/authors/update/{id}',
-    tags: ['Author'],
+    tags: ['Admin / Author'],
     operationId: 'updateAuthor',
     summary: 'Update author',
     description: 'Update author',
@@ -190,7 +155,7 @@ use OpenApi\Attributes as OA;
     requestBody: new OA\RequestBody(
         required: true,
         content: new OA\JsonContent(
-            required: ['author'],
+            required: ['Admin / Author'],
             properties: [
                 new OA\Property(property: 'author', type: 'string'),
                 new OA\Property(property: 'avatar', type: 'string'),
@@ -218,7 +183,7 @@ use OpenApi\Attributes as OA;
 
 #[OA\Delete(
     path: '/api/v1/authors/delete/{id}',
-    tags: ['Author'],
+    tags: ['Admin / Author'],
     operationId: 'deleteAuthor',
     summary: 'Delete author',
     description: 'Delete author',
@@ -252,61 +217,6 @@ use OpenApi\Attributes as OA;
 
 class AuthorController extends Controller
 {
-
-    public function index(Request $request)
-    {
-        // Validate request parameters
-        $validator = Validator::make($request->all(), [
-            'page' => 'integer|min:1',
-            'pageSize' => 'integer|min:1',
-        ]);
-
-        $customMessages = [
-            'page.integer' => 'Trang phải là số nguyên.',
-            'page.min' => 'Trang phải lớn hơn hoặc bằng 1.',
-            'pageSize.integer' => 'Kích thước trang phải là số nguyên.',
-            'pageSize.min' => 'Kích thước trang phải lớn hơn hoặc bằng 1.',
-        ];
-
-        $validator->setCustomMessages($customMessages);
-
-        if ($validator->fails()) {
-            return response()->json([
-                "staus" => false,
-                "message" => "Validation error",
-                "errors" => $validator->errors()
-            ], 400);
-        }
-
-        // Lấy giá trị page và pageSize từ query parameters
-        $page = $request->input('page', 1);
-        $pageSize = $request->input('pageSize', 10);
-
-        // Tạo query ban đầu
-        $query = Author::query();
-
-        // Lấy tổng số mục trong DB trước khi áp dụng bộ lọc tìm kiếm
-
-        // Áp dụng bộ lọc theo type
-        $totalItems = $query->count();
-
-        // Thực hiện phân trang
-        $authors = $query->paginate($pageSize, ['*'], 'page', $page);
-
-        return response()->json([
-            "status" => true,
-            "message" => "Get all authors successfully!",
-            "data" => [
-                "authors" => $authors->items(),
-                "page" => $authors->currentPage(),
-                "pageSize" => $authors->perPage(),
-                "lastPage" => $authors->lastPage(),
-                "totalResults" => $authors->total(),
-                "total" => $totalItems
-            ],
-        ]);
-    }
-
     public function getAllAuthor(Request $request)
     {
         // Validate request parameters

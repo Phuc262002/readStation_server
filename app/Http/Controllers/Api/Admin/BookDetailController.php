@@ -1,16 +1,227 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Book;
 use App\Models\BookDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use OpenApi\Attributes as OA;
+
+#[OA\Post(
+    path: '/api/v1/book-details/create',
+    tags: ['Admin / BookDetail'],
+    operationId: 'createBookDetail',
+    summary: 'Create book detail',
+    description: 'Create book detail',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            required: [
+                'book_id',
+                'poster',
+                'images',
+                'book_version',
+                'price',
+                'hire_percent',
+                'stock',
+                'publish_date',
+                'publishing_company_id',
+                'issuing_company',
+                'cardboard',
+                'total_page',
+                'language',
+            ],
+            properties: [
+                new OA\Property(property: 'book_id', type: 'string'),
+                new OA\Property(property: 'poster', type: 'string'),
+                new OA\Property(property: 'images', type: 'array', items: new OA\Items(type: 'string')),
+                new OA\Property(property: 'book_version', type: 'string'),
+                new OA\Property(property: 'price', type: 'string'),
+                new OA\Property(property: 'hire_percent', type: 'string'),
+                new OA\Property(property: 'stock', type: 'string'),
+                new OA\Property(property: 'publish_date', type: 'date'),
+                new OA\Property(property: 'publishing_company_id', type: 'string'),
+                new OA\Property(property: 'issuing_company', type: 'string'),
+                new OA\Property(property: 'cardboard', type: 'string'),
+                new OA\Property(property: 'total_page', type: 'string'),
+                new OA\Property(property: 'translator', type: 'string'),
+                new OA\Property(property: 'language', type: 'string'),
+                new OA\Property(property: 'book_size', type: 'string'),
+            ]
+        )
+    ),
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Create book detail successfully!'
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error'
+        ),
+        new OA\Response(
+            response: 500,
+            description: 'Create book detail failed!'
+        )
+    ],
+)]
+
+#[OA\Get(
+    path: '/api/v1/book-details/get-one/{id}',
+    tags: ['Admin / BookDetail'],
+    operationId: 'getBookDetail',
+    summary: 'Get book detail',
+    description: 'Get book detail',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    parameters: [
+        new OA\Parameter(
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Id of book detail',
+            schema: new OA\Schema(type: 'string')
+        )
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Get book detail successfully!'
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error'
+        ),
+        new OA\Response(
+            response: 404,
+            description: 'Book detail not found!'
+        )
+    ],
+)]
+
+#[OA\Put(
+    path: '/api/v1/book-details/update/{id}',
+    tags: ['Admin / BookDetail'],
+    operationId: 'updateBookDetail',
+    summary: 'Update book detail',
+    description: 'Update book detail',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    parameters: [
+        new OA\Parameter(
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Id of book detail',
+            schema: new OA\Schema(type: 'string')
+        )
+    ],
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            required: [
+                'book_id',
+                'poster',
+                'images',
+                'book_version',
+                'price',
+                'hire_percent',
+                'stock',
+                'publish_date',
+                'publishing_company_id',
+                'issuing_company',
+                'cardboard',
+                'total_page',
+                'language',
+            ],
+            properties: [
+                new OA\Property(property: 'book_id', type: 'string'),
+                new OA\Property(property: 'poster', type: 'string'),
+                new OA\Property(property: 'images', type: 'array', items: new OA\Items(type: 'string')),
+                new OA\Property(property: 'book_version', type: 'string'),
+                new OA\Property(property: 'price', type: 'string'),
+                new OA\Property(property: 'hire_percent', type: 'string'),
+                new OA\Property(property: 'stock', type: 'string'),
+                new OA\Property(property: 'publish_date', type: 'date'),
+                new OA\Property(property: 'publishing_company_id', type: 'string'),
+                new OA\Property(property: 'issuing_company', type: 'string'),
+                new OA\Property(property: 'cardboard', type: 'string'),
+                new OA\Property(property: 'total_page', type: 'string'),
+                new OA\Property(property: 'translator', type: 'string'),
+                new OA\Property(property: 'language', type: 'string'),
+                new OA\Property(property: 'book_size', type: 'string'),
+            ]
+        )
+    ),
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Update book detail successfully!'
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error'
+        ),
+        new OA\Response(
+            response: 404,
+            description: 'Book detail not found!'
+        ),
+        new OA\Response(
+            response: 500,
+            description: 'Update book detail failed!'
+        )
+    ],
+)]
+
+#[OA\Delete(
+    path: '/api/v1/book-details/delete/{id}',
+    tags: ['Admin / BookDetail'],
+    operationId: 'deleteBookDetail',
+    summary: 'Delete book detail',
+    description: 'Delete book detail',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    parameters: [
+        new OA\Parameter(
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Id of book detail',
+            schema: new OA\Schema(type: 'string')
+        )
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Delete book detail successfully!'
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Book detail is not found!'
+        ),
+        new OA\Response(
+            response: 404,
+            description: 'Book detail not found!'
+        ),
+        new OA\Response(
+            response: 500,
+            description: 'Delete book detail failed!'
+        )
+    ],
+)]
 
 class BookDetailController extends Controller
 {
-    public function checkBookDetail() {
+    public function checkBookDetail()
+    {
         // Find books without a bookDetail or with an inactive bookDetail
         $booksWithoutDetail = Book::doesntHave('bookDetail')
             ->orWhereHas('bookDetail', function ($q) {
@@ -42,21 +253,21 @@ class BookDetailController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'book_id' => "required|integer",
-            'poster' => "required|string",
+            'book_id' => "required",
+            'poster' => "required",
             'images' => "required|array",
-            'book_version' => "required|string",
-            'price' => "required|integer",
-            'hire_percent' => "required|integer",
-            'stock' => "required|integer",
+            'book_version' => "required",
+            'price' => "required",
+            'hire_percent' => "required",
+            'stock' => "required",
             'publish_date' => "required|date",
-            'publishing_company_id' => "required|integer",
-            'issuing_company' => "required|string",
-            'cardboard' => "required|string|in:hard,soft",
-            'total_page' => "required|integer",
-            'translator' => "nullable|string",
-            'language' => "required|string",
-            'book_size' => "nullable|string",
+            'publishing_company_id' => "required",
+            'issuing_company' => "required",
+            'cardboard' => "required|in:hard,soft",
+            'total_page' => "required",
+            'translator' => "nullable",
+            'language' => "required",
+            'book_size' => "nullable",
         ]);
 
         $customMessages = [
@@ -73,13 +284,7 @@ class BookDetailController extends Controller
             'cardboard.required' => 'Trường cardboard là bắt buộc.',
             'total_page.required' => 'Trường total_page là bắt buộc.',
             'language.required' => 'Trường language là bắt buộc.',
-            'images.array' => 'Trường images phải là một mảng.',
-            'price.integer' => 'Trường price phải là một số.',
-            'hire_percent.integer' => 'Trường hire_percent phải là một số.',
-            'stock.integer' => 'Trường stock phải là một số.',
-            'publishing_company_id.integer' => 'Trường publishing_company_id phải là một số.',
-            'cardboard.in' => 'Trường cardboard phải là hard hoặc soft.',
-            'total_page.integer' => 'Trường total_page phải là một số.'
+            'images.array' => 'Trường images phải là một mảng.'
         ];
 
         $validator->setCustomMessages($customMessages);

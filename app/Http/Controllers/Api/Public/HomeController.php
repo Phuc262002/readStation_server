@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\Public;
 
 use App\Http\Controllers\Controller;
 use App\Models\Author;
@@ -10,7 +10,7 @@ use OpenApi\Attributes as OA;
 
 #[OA\Get(
     path: '/api/v1/home/get-feautured-author',
-    tags: ['Home'],
+    tags: ['Public / Home'],
     operationId: 'getFeaturedAuthor',
     summary: 'Get featured authors',
     description: 'Get featured authors and their books',
@@ -24,7 +24,7 @@ use OpenApi\Attributes as OA;
 
 #[OA\Get(
     path: '/api/v1/home/get-feautured-book',
-    tags: ['Home'],
+    tags: ['Public / Home'],
     operationId: 'getFeaturedBook',
     summary: 'Get featured books',
     description: 'Get featured books',

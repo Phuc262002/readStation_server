@@ -6,6 +6,1347 @@
         "version": "1.0.0"
     },
     "paths": {
+        "/api/v1/authors/admim/get-all": {
+            "get": {
+                "tags": [
+                    "Admin / Author"
+                ],
+                "summary": "Get all authors (admin)",
+                "description": "Get all authors",
+                "operationId": "getAllAuthors",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Số trang hiện tại",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "pageSize",
+                        "in": "query",
+                        "description": "Số lượng mục trên mỗi trang",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Từ khóa tìm kiếm",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Trạng thái của tác giả",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "active",
+                                "inactive",
+                                "deleted"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "author",
+                        "in": "query",
+                        "description": "Loại tác giả",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get all authors successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/authors/{id}": {
+            "get": {
+                "tags": [
+                    "Admin / Author"
+                ],
+                "summary": "Get author by id",
+                "description": "Get author by id",
+                "operationId": "getAuthor",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id của tác giả",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get author successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "404": {
+                        "description": "Author not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/authors/create": {
+            "post": {
+                "tags": [
+                    "Admin / Author"
+                ],
+                "summary": "Create author",
+                "description": "Create author",
+                "operationId": "createAuthor",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "Admin / Author"
+                                ],
+                                "properties": {
+                                    "author": {
+                                        "type": "string"
+                                    },
+                                    "avatar": {
+                                        "type": "string"
+                                    },
+                                    "is_featured": {
+                                        "type": "boolean"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "dob": {
+                                        "type": "string",
+                                        "format": "date"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Create author successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/authors/update/{id}": {
+            "put": {
+                "tags": [
+                    "Admin / Author"
+                ],
+                "summary": "Update author",
+                "description": "Update author",
+                "operationId": "updateAuthor",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id của tác giả",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "Admin / Author"
+                                ],
+                                "properties": {
+                                    "author": {
+                                        "type": "string"
+                                    },
+                                    "avatar": {
+                                        "type": "string"
+                                    },
+                                    "is_featured": {
+                                        "type": "boolean"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "dob": {
+                                        "type": "string",
+                                        "format": "date"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Update author successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "404": {
+                        "description": "Author not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/authors/delete/{id}": {
+            "delete": {
+                "tags": [
+                    "Admin / Author"
+                ],
+                "summary": "Delete author",
+                "description": "Delete author",
+                "operationId": "deleteAuthor",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id của tác giả",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Delete author successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "404": {
+                        "description": "Author not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/books/admin/get-all": {
+            "get": {
+                "tags": [
+                    "Admin / Book"
+                ],
+                "summary": "Get all books admin",
+                "description": "Get all books",
+                "operationId": "getAllBooks",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Số trang hiện tại",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "pageSize",
+                        "in": "query",
+                        "description": "Số lượng mục trên mỗi trang",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Từ khóa tìm kiếm",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "category_id",
+                        "in": "query",
+                        "description": "Id của category",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "author_id",
+                        "in": "query",
+                        "description": "Id của author",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Trạng thái sách",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "active",
+                                "inactive",
+                                "deleted"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get all books successfully!"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/books/create": {
+            "post": {
+                "tags": [
+                    "Admin / Book"
+                ],
+                "summary": "Create book",
+                "description": "Create book",
+                "operationId": "createBook",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "sku",
+                                    "author_id",
+                                    "title",
+                                    "original_title",
+                                    "description_summary",
+                                    "description",
+                                    "category_id"
+                                ],
+                                "properties": {
+                                    "sku": {
+                                        "type": "string"
+                                    },
+                                    "author_id": {
+                                        "type": "string"
+                                    },
+                                    "title": {
+                                        "type": "string"
+                                    },
+                                    "original_title": {
+                                        "type": "string"
+                                    },
+                                    "description_summary": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "text"
+                                    },
+                                    "is_featured": {
+                                        "type": "boolean"
+                                    },
+                                    "category_id": {
+                                        "type": "string"
+                                    },
+                                    "shelve_id": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Create book successfully!"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Create book failed!"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/books/update/{id}": {
+            "put": {
+                "tags": [
+                    "Admin / Book"
+                ],
+                "summary": "Update book",
+                "description": "Update book",
+                "operationId": "updateBook",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id của sách",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "sku",
+                                    "author_id",
+                                    "title",
+                                    "original_title",
+                                    "description_summary",
+                                    "description",
+                                    "category_id",
+                                    "shelve_id",
+                                    "is_featured",
+                                    "status"
+                                ],
+                                "properties": {
+                                    "sku": {
+                                        "type": "string"
+                                    },
+                                    "author_id": {
+                                        "type": "string"
+                                    },
+                                    "title": {
+                                        "type": "string"
+                                    },
+                                    "original_title": {
+                                        "type": "string"
+                                    },
+                                    "description_summary": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "text"
+                                    },
+                                    "category_id": {
+                                        "type": "string"
+                                    },
+                                    "shelve_id": {
+                                        "type": "string"
+                                    },
+                                    "is_featured": {
+                                        "type": "boolean"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "active",
+                                            "inactive",
+                                            "deleted"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Update book successfully!"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Update book failed!"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/books/delete/{id}": {
+            "delete": {
+                "tags": [
+                    "Admin / Book"
+                ],
+                "summary": "Delete book",
+                "description": "Delete book",
+                "operationId": "deleteBook",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id của sách",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Delete book successfully!"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "404": {
+                        "description": "Book not found!"
+                    },
+                    "500": {
+                        "description": "Delete book failed!"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/book-details/create": {
+            "post": {
+                "tags": [
+                    "Admin / BookDetail"
+                ],
+                "summary": "Create book detail",
+                "description": "Create book detail",
+                "operationId": "createBookDetail",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "book_id",
+                                    "poster",
+                                    "images",
+                                    "book_version",
+                                    "price",
+                                    "hire_percent",
+                                    "stock",
+                                    "publish_date",
+                                    "publishing_company_id",
+                                    "issuing_company",
+                                    "cardboard",
+                                    "total_page",
+                                    "language"
+                                ],
+                                "properties": {
+                                    "book_id": {
+                                        "type": "string"
+                                    },
+                                    "poster": {
+                                        "type": "string"
+                                    },
+                                    "images": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "book_version": {
+                                        "type": "string"
+                                    },
+                                    "price": {
+                                        "type": "string"
+                                    },
+                                    "hire_percent": {
+                                        "type": "string"
+                                    },
+                                    "stock": {
+                                        "type": "string"
+                                    },
+                                    "publish_date": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "publishing_company_id": {
+                                        "type": "string"
+                                    },
+                                    "issuing_company": {
+                                        "type": "string"
+                                    },
+                                    "cardboard": {
+                                        "type": "string"
+                                    },
+                                    "total_page": {
+                                        "type": "string"
+                                    },
+                                    "translator": {
+                                        "type": "string"
+                                    },
+                                    "language": {
+                                        "type": "string"
+                                    },
+                                    "book_size": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Create book detail successfully!"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Create book detail failed!"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/book-details/get-one/{id}": {
+            "get": {
+                "tags": [
+                    "Admin / BookDetail"
+                ],
+                "summary": "Get book detail",
+                "description": "Get book detail",
+                "operationId": "getBookDetail",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id of book detail",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get book detail successfully!"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "404": {
+                        "description": "Book detail not found!"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/book-details/update/{id}": {
+            "put": {
+                "tags": [
+                    "Admin / BookDetail"
+                ],
+                "summary": "Update book detail",
+                "description": "Update book detail",
+                "operationId": "updateBookDetail",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id of book detail",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "book_id",
+                                    "poster",
+                                    "images",
+                                    "book_version",
+                                    "price",
+                                    "hire_percent",
+                                    "stock",
+                                    "publish_date",
+                                    "publishing_company_id",
+                                    "issuing_company",
+                                    "cardboard",
+                                    "total_page",
+                                    "language"
+                                ],
+                                "properties": {
+                                    "book_id": {
+                                        "type": "string"
+                                    },
+                                    "poster": {
+                                        "type": "string"
+                                    },
+                                    "images": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "book_version": {
+                                        "type": "string"
+                                    },
+                                    "price": {
+                                        "type": "string"
+                                    },
+                                    "hire_percent": {
+                                        "type": "string"
+                                    },
+                                    "stock": {
+                                        "type": "string"
+                                    },
+                                    "publish_date": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "publishing_company_id": {
+                                        "type": "string"
+                                    },
+                                    "issuing_company": {
+                                        "type": "string"
+                                    },
+                                    "cardboard": {
+                                        "type": "string"
+                                    },
+                                    "total_page": {
+                                        "type": "string"
+                                    },
+                                    "translator": {
+                                        "type": "string"
+                                    },
+                                    "language": {
+                                        "type": "string"
+                                    },
+                                    "book_size": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Update book detail successfully!"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "404": {
+                        "description": "Book detail not found!"
+                    },
+                    "500": {
+                        "description": "Update book detail failed!"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/book-details/delete/{id}": {
+            "delete": {
+                "tags": [
+                    "Admin / BookDetail"
+                ],
+                "summary": "Delete book detail",
+                "description": "Delete book detail",
+                "operationId": "deleteBookDetail",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id of book detail",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Delete book detail successfully!"
+                    },
+                    "400": {
+                        "description": "Book detail is not found!"
+                    },
+                    "404": {
+                        "description": "Book detail not found!"
+                    },
+                    "500": {
+                        "description": "Delete book detail failed!"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/categories/admin/get-all": {
+            "get": {
+                "tags": [
+                    "Admin / Category"
+                ],
+                "summary": "Get all categories (admin)",
+                "description": "Get all categories",
+                "operationId": "getAllCategory",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Số trang hiện tại",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "pageSize",
+                        "in": "query",
+                        "description": "Số lượng mục trên mỗi trang",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "Loại danh mục",
+                        "required": true,
+                        "schema": {
+                            "default": "book",
+                            "enum": [
+                                "book",
+                                "post"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Loại danh mục",
+                        "required": false,
+                        "schema": {
+                            "enum": [
+                                "active",
+                                "inactive",
+                                "deleted"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Từ khóa tìm kiếm",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get all categories successfully!"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/categories/get-one/{id}": {
+            "get": {
+                "tags": [
+                    "Admin / Category"
+                ],
+                "summary": "Get a category",
+                "description": "Get a category",
+                "operationId": "getCategory",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID của danh mục",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get category successfully!"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "404": {
+                        "description": "Category not found!"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/categories/create": {
+            "post": {
+                "tags": [
+                    "Admin / Category"
+                ],
+                "summary": "Create a category",
+                "description": "Create a category",
+                "operationId": "createCategory",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "type"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "book",
+                                            "post"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Create category successfully!"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/categories/update/{id}": {
+            "put": {
+                "tags": [
+                    "Admin / Category"
+                ],
+                "summary": "Update a category",
+                "description": "Update a category",
+                "operationId": "updateCategory",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID của danh mục",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "type",
+                                    "status"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "book",
+                                            "post"
+                                        ]
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "active",
+                                            "inactive",
+                                            "deleted"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Update category successfully!"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "404": {
+                        "description": "Category not found!"
+                    },
+                    "500": {
+                        "description": "Update category failed!"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/categories/delete/{id}": {
+            "delete": {
+                "tags": [
+                    "Admin / Category"
+                ],
+                "summary": "Delete a category",
+                "description": "Delete a category",
+                "operationId": "deleteCategory",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID của danh mục",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Delete category successfully!"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "404": {
+                        "description": "Category not found!"
+                    },
+                    "500": {
+                        "description": "Delete category failed!"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/posts/create": {
+            "post": {
+                "tags": [
+                    "Admin / Post"
+                ],
+                "summary": "Create a new post",
+                "description": "Create a new post",
+                "operationId": "createPost",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "category_id",
+                                    "title",
+                                    "content",
+                                    "summary",
+                                    "image",
+                                    "status"
+                                ],
+                                "properties": {
+                                    "category_id": {
+                                        "type": "string"
+                                    },
+                                    "title": {
+                                        "type": "string"
+                                    },
+                                    "content": {
+                                        "type": "string"
+                                    },
+                                    "summary": {
+                                        "type": "string"
+                                    },
+                                    "image": {
+                                        "type": "string"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "published",
+                                            "draft"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Create post successfully!"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Create post failed!"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/posts/update/{id}": {
+            "put": {
+                "tags": [
+                    "Admin / Post"
+                ],
+                "summary": "Update a post",
+                "description": "Update a post by ID",
+                "operationId": "updatePost",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID của post",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "category_id",
+                                    "title",
+                                    "content",
+                                    "summary",
+                                    "image",
+                                    "status"
+                                ],
+                                "properties": {
+                                    "category_id": {
+                                        "type": "string"
+                                    },
+                                    "title": {
+                                        "type": "string"
+                                    },
+                                    "content": {
+                                        "type": "string"
+                                    },
+                                    "summary": {
+                                        "type": "string"
+                                    },
+                                    "image": {
+                                        "type": "string"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "published",
+                                            "draft"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Update post successfully!"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "404": {
+                        "description": "Post not found"
+                    },
+                    "500": {
+                        "description": "Update post failed!"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/posts/delete/{id}": {
+            "delete": {
+                "tags": [
+                    "Admin / Post"
+                ],
+                "summary": "Delete a post",
+                "description": "Delete a post by ID",
+                "operationId": "deletePost",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID của post",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Delete post successfully!"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "404": {
+                        "description": "Post not found"
+                    },
+                    "500": {
+                        "description": "Delete post failed!"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/auth/login": {
             "post": {
                 "tags": [
@@ -134,87 +1475,6 @@
                 "responses": {
                     "201": {
                         "description": "User registered successfully"
-                    },
-                    "400": {
-                        "description": "Validation error"
-                    }
-                }
-            }
-        },
-        "/api/v1/auth/verify-email": {
-            "post": {
-                "tags": [
-                    "Auth"
-                ],
-                "summary": "Verify email",
-                "description": "Verify email",
-                "operationId": "verifyEmail",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "email",
-                                    "code"
-                                ],
-                                "properties": {
-                                    "email": {
-                                        "type": "string",
-                                        "format": "email"
-                                    },
-                                    "otpCode": {
-                                        "type": "string"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Email verified successfully"
-                    },
-                    "400": {
-                        "description": "Validation error"
-                    },
-                    "401": {
-                        "description": "Unauthorized"
-                    }
-                }
-            }
-        },
-        "/api/v1/auth/resend-otp": {
-            "post": {
-                "tags": [
-                    "Auth"
-                ],
-                "summary": "Resend OTP",
-                "description": "Resend OTP",
-                "operationId": "reRegister",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "email"
-                                ],
-                                "properties": {
-                                    "email": {
-                                        "type": "string",
-                                        "format": "email"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Re-register successfully"
                     },
                     "400": {
                         "description": "Validation error"
@@ -364,10 +1624,146 @@
                 }
             }
         },
-        "/api/v1/auth/profile": {
-            "get": {
+        "/api/v1/auth/change-password": {
+            "post": {
                 "tags": [
                     "Auth"
+                ],
+                "summary": "Change password",
+                "description": "Change password",
+                "operationId": "changePassWord",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "old_password",
+                                    "new_password",
+                                    "new_password_confirmation"
+                                ],
+                                "properties": {
+                                    "old_password": {
+                                        "type": "string",
+                                        "format": "password"
+                                    },
+                                    "new_password": {
+                                        "type": "string",
+                                        "format": "password"
+                                    },
+                                    "new_password_confirmation": {
+                                        "type": "string",
+                                        "format": "password"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "User successfully changed password"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/auth/verify-email": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Verify email",
+                "description": "Verify email",
+                "operationId": "verifyEmail",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "code"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "otpCode": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Email verified successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/resend-otp": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Resend OTP",
+                "description": "Resend OTP",
+                "operationId": "reRegister",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Re-register successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/v1/account/get-profile": {
+            "get": {
+                "tags": [
+                    "Account"
                 ],
                 "summary": "User profile",
                 "description": "User profile",
@@ -384,10 +1780,10 @@
                 ]
             }
         },
-        "/api/v1/auth/update-profile": {
+        "/api/v1/account/update-profile": {
             "put": {
                 "tags": [
-                    "Auth"
+                    "Account"
                 ],
                 "summary": "Update profile",
                 "description": "Update profile",
@@ -474,65 +1870,10 @@
                 ]
             }
         },
-        "/api/v1/auth/change-password": {
-            "post": {
-                "tags": [
-                    "Auth"
-                ],
-                "summary": "Change password",
-                "description": "Change password",
-                "operationId": "changePassWord",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "old_password",
-                                    "new_password",
-                                    "new_password_confirmation"
-                                ],
-                                "properties": {
-                                    "old_password": {
-                                        "type": "string",
-                                        "format": "password"
-                                    },
-                                    "new_password": {
-                                        "type": "string",
-                                        "format": "password"
-                                    },
-                                    "new_password_confirmation": {
-                                        "type": "string",
-                                        "format": "password"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "User successfully changed password"
-                    },
-                    "400": {
-                        "description": "Validation error"
-                    },
-                    "401": {
-                        "description": "Unauthorized"
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
         "/api/v1/authors": {
             "get": {
                 "tags": [
-                    "Author"
+                    "Public / Category"
                 ],
                 "summary": "Get all authors public",
                 "description": "Get all authors",
@@ -569,283 +1910,10 @@
                 }
             }
         },
-        "/api/v1/authors/admim/get-all": {
-            "get": {
-                "tags": [
-                    "Author"
-                ],
-                "summary": "Get all authors (admin)",
-                "description": "Get all authors",
-                "operationId": "getAllAuthors",
-                "parameters": [
-                    {
-                        "name": "page",
-                        "in": "query",
-                        "description": "Số trang hiện tại",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "default": 1
-                        }
-                    },
-                    {
-                        "name": "pageSize",
-                        "in": "query",
-                        "description": "Số lượng mục trên mỗi trang",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "default": 10
-                        }
-                    },
-                    {
-                        "name": "search",
-                        "in": "query",
-                        "description": "Từ khóa tìm kiếm",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "status",
-                        "in": "query",
-                        "description": "Trạng thái của tác giả",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "enum": [
-                                "active",
-                                "inactive",
-                                "deleted"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "author",
-                        "in": "query",
-                        "description": "Loại tác giả",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Get all authors successfully"
-                    },
-                    "400": {
-                        "description": "Validation error"
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/api/v1/authors/{id}": {
-            "get": {
-                "tags": [
-                    "Author"
-                ],
-                "summary": "Get author by id",
-                "description": "Get author by id",
-                "operationId": "getAuthor",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "Id của tác giả",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Get author successfully"
-                    },
-                    "400": {
-                        "description": "Validation error"
-                    },
-                    "404": {
-                        "description": "Author not found"
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/api/v1/authors/create": {
-            "post": {
-                "tags": [
-                    "Author"
-                ],
-                "summary": "Create author",
-                "description": "Create author",
-                "operationId": "createAuthor",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "author"
-                                ],
-                                "properties": {
-                                    "author": {
-                                        "type": "string"
-                                    },
-                                    "avatar": {
-                                        "type": "string"
-                                    },
-                                    "is_featured": {
-                                        "type": "boolean"
-                                    },
-                                    "description": {
-                                        "type": "string"
-                                    },
-                                    "dob": {
-                                        "type": "string",
-                                        "format": "date"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Create author successfully"
-                    },
-                    "400": {
-                        "description": "Validation error"
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/api/v1/authors/update/{id}": {
-            "put": {
-                "tags": [
-                    "Author"
-                ],
-                "summary": "Update author",
-                "description": "Update author",
-                "operationId": "updateAuthor",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "Id của tác giả",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "author"
-                                ],
-                                "properties": {
-                                    "author": {
-                                        "type": "string"
-                                    },
-                                    "avatar": {
-                                        "type": "string"
-                                    },
-                                    "is_featured": {
-                                        "type": "boolean"
-                                    },
-                                    "description": {
-                                        "type": "string"
-                                    },
-                                    "dob": {
-                                        "type": "string",
-                                        "format": "date"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Update author successfully"
-                    },
-                    "400": {
-                        "description": "Validation error"
-                    },
-                    "404": {
-                        "description": "Author not found"
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/api/v1/authors/delete/{id}": {
-            "delete": {
-                "tags": [
-                    "Author"
-                ],
-                "summary": "Delete author",
-                "description": "Delete author",
-                "operationId": "deleteAuthor",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "Id của tác giả",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Delete author successfully"
-                    },
-                    "400": {
-                        "description": "Validation error"
-                    },
-                    "404": {
-                        "description": "Author not found"
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
         "/api/v1/books": {
             "get": {
                 "tags": [
-                    "Book"
+                    "Public / Book"
                 ],
                 "summary": "Get all books public",
                 "description": "Get all books",
@@ -912,7 +1980,7 @@
         "/api/v1/books/get-one/{book}": {
             "get": {
                 "tags": [
-                    "Book"
+                    "Public / Book"
                 ],
                 "summary": "Get one book",
                 "description": "Get one book",
@@ -938,306 +2006,10 @@
                 }
             }
         },
-        "/api/v1/books/admin/get-all": {
-            "get": {
-                "tags": [
-                    "Book"
-                ],
-                "summary": "Get all books admin",
-                "description": "Get all books",
-                "operationId": "getAllBooks",
-                "parameters": [
-                    {
-                        "name": "page",
-                        "in": "query",
-                        "description": "Số trang hiện tại",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "default": 1
-                        }
-                    },
-                    {
-                        "name": "pageSize",
-                        "in": "query",
-                        "description": "Số lượng mục trên mỗi trang",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "default": 10
-                        }
-                    },
-                    {
-                        "name": "search",
-                        "in": "query",
-                        "description": "Từ khóa tìm kiếm",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "category_id",
-                        "in": "query",
-                        "description": "Id của category",
-                        "required": false,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "name": "author_id",
-                        "in": "query",
-                        "description": "Id của author",
-                        "required": false,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "name": "status",
-                        "in": "query",
-                        "description": "Trạng thái sách",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "enum": [
-                                "active",
-                                "inactive",
-                                "deleted"
-                            ]
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Get all books successfully!"
-                    },
-                    "400": {
-                        "description": "Validation error"
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/api/v1/books/create": {
-            "post": {
-                "tags": [
-                    "Book"
-                ],
-                "summary": "Create book",
-                "description": "Create book",
-                "operationId": "createBook",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "sku",
-                                    "author_id",
-                                    "title",
-                                    "original_title",
-                                    "description_summary",
-                                    "description",
-                                    "category_id"
-                                ],
-                                "properties": {
-                                    "sku": {
-                                        "type": "string"
-                                    },
-                                    "author_id": {
-                                        "type": "string"
-                                    },
-                                    "title": {
-                                        "type": "string"
-                                    },
-                                    "original_title": {
-                                        "type": "string"
-                                    },
-                                    "description_summary": {
-                                        "type": "string"
-                                    },
-                                    "description": {
-                                        "type": "text"
-                                    },
-                                    "is_featured": {
-                                        "type": "boolean"
-                                    },
-                                    "category_id": {
-                                        "type": "string"
-                                    },
-                                    "shelve_id": {
-                                        "type": "string"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Create book successfully!"
-                    },
-                    "400": {
-                        "description": "Validation error"
-                    },
-                    "500": {
-                        "description": "Create book failed!"
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/api/v1/books/update/{id}": {
-            "put": {
-                "tags": [
-                    "Book"
-                ],
-                "summary": "Update book",
-                "description": "Update book",
-                "operationId": "updateBook",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "Id của sách",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "sku",
-                                    "author_id",
-                                    "title",
-                                    "original_title",
-                                    "description_summary",
-                                    "description",
-                                    "category_id",
-                                    "shelve_id",
-                                    "is_featured",
-                                    "status"
-                                ],
-                                "properties": {
-                                    "sku": {
-                                        "type": "string"
-                                    },
-                                    "author_id": {
-                                        "type": "string"
-                                    },
-                                    "title": {
-                                        "type": "string"
-                                    },
-                                    "original_title": {
-                                        "type": "string"
-                                    },
-                                    "description_summary": {
-                                        "type": "string"
-                                    },
-                                    "description": {
-                                        "type": "text"
-                                    },
-                                    "category_id": {
-                                        "type": "string"
-                                    },
-                                    "shelve_id": {
-                                        "type": "string"
-                                    },
-                                    "is_featured": {
-                                        "type": "boolean"
-                                    },
-                                    "status": {
-                                        "type": "string",
-                                        "enum": [
-                                            "active",
-                                            "inactive",
-                                            "deleted"
-                                        ]
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Update book successfully!"
-                    },
-                    "400": {
-                        "description": "Validation error"
-                    },
-                    "500": {
-                        "description": "Update book failed!"
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/api/v1/books/delete/{id}": {
-            "delete": {
-                "tags": [
-                    "Book"
-                ],
-                "summary": "Delete book",
-                "description": "Delete book",
-                "operationId": "deleteBook",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "Id của sách",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Delete book successfully!"
-                    },
-                    "400": {
-                        "description": "Validation error"
-                    },
-                    "404": {
-                        "description": "Book not found!"
-                    },
-                    "500": {
-                        "description": "Delete book failed!"
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
         "/api/v1/categories": {
             "get": {
                 "tags": [
-                    "Category"
+                    "Public / Category"
                 ],
                 "summary": "Get all categories",
                 "description": "Get all categories",
@@ -1287,297 +2059,10 @@
                 }
             }
         },
-        "/api/v1/categories/admin/get-all": {
-            "get": {
-                "tags": [
-                    "Category"
-                ],
-                "summary": "Get all categories (admin)",
-                "description": "Get all categories",
-                "operationId": "getAllCategory",
-                "parameters": [
-                    {
-                        "name": "page",
-                        "in": "query",
-                        "description": "Số trang hiện tại",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "default": 1
-                        }
-                    },
-                    {
-                        "name": "pageSize",
-                        "in": "query",
-                        "description": "Số lượng mục trên mỗi trang",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "default": 10
-                        }
-                    },
-                    {
-                        "name": "type",
-                        "in": "query",
-                        "description": "Loại danh mục",
-                        "required": true,
-                        "schema": {
-                            "default": "book",
-                            "enum": [
-                                "book",
-                                "post"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "status",
-                        "in": "query",
-                        "description": "Loại danh mục",
-                        "required": false,
-                        "schema": {
-                            "enum": [
-                                "active",
-                                "inactive",
-                                "deleted"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "search",
-                        "in": "query",
-                        "description": "Từ khóa tìm kiếm",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Get all categories successfully!"
-                    },
-                    "400": {
-                        "description": "Validation error"
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/api/v1/categories/get-one/{id}": {
-            "get": {
-                "tags": [
-                    "Category"
-                ],
-                "summary": "Get a category",
-                "description": "Get a category",
-                "operationId": "getCategory",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID của danh mục",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Get category successfully!"
-                    },
-                    "400": {
-                        "description": "Validation error"
-                    },
-                    "404": {
-                        "description": "Category not found!"
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/api/v1/categories/create": {
-            "post": {
-                "tags": [
-                    "Category"
-                ],
-                "summary": "Create a category",
-                "description": "Create a category",
-                "operationId": "createCategory",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "name",
-                                    "type"
-                                ],
-                                "properties": {
-                                    "name": {
-                                        "type": "string"
-                                    },
-                                    "description": {
-                                        "type": "string"
-                                    },
-                                    "type": {
-                                        "type": "string",
-                                        "enum": [
-                                            "book",
-                                            "post"
-                                        ]
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Create category successfully!"
-                    },
-                    "400": {
-                        "description": "Validation error"
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/api/v1/categories/update/{id}": {
-            "put": {
-                "tags": [
-                    "Category"
-                ],
-                "summary": "Update a category",
-                "description": "Update a category",
-                "operationId": "updateCategory",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID của danh mục",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "name",
-                                    "type",
-                                    "status"
-                                ],
-                                "properties": {
-                                    "name": {
-                                        "type": "string"
-                                    },
-                                    "description": {
-                                        "type": "string"
-                                    },
-                                    "type": {
-                                        "type": "string",
-                                        "enum": [
-                                            "book",
-                                            "post"
-                                        ]
-                                    },
-                                    "status": {
-                                        "type": "string",
-                                        "enum": [
-                                            "active",
-                                            "inactive",
-                                            "deleted"
-                                        ]
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Update category successfully!"
-                    },
-                    "400": {
-                        "description": "Validation error"
-                    },
-                    "404": {
-                        "description": "Category not found!"
-                    },
-                    "500": {
-                        "description": "Update category failed!"
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/api/v1/categories/delete/{id}": {
-            "delete": {
-                "tags": [
-                    "Category"
-                ],
-                "summary": "Delete a category",
-                "description": "Delete a category",
-                "operationId": "deleteCategory",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID của danh mục",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Delete category successfully!"
-                    },
-                    "400": {
-                        "description": "Validation error"
-                    },
-                    "404": {
-                        "description": "Category not found!"
-                    },
-                    "500": {
-                        "description": "Delete category failed!"
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
         "/api/v1/home/get-feautured-author": {
             "get": {
                 "tags": [
-                    "Home"
+                    "Public / Home"
                 ],
                 "summary": "Get featured authors",
                 "description": "Get featured authors and their books",
@@ -1592,7 +2077,7 @@
         "/api/v1/home/get-feautured-book": {
             "get": {
                 "tags": [
-                    "Home"
+                    "Public / Home"
                 ],
                 "summary": "Get featured books",
                 "description": "Get featured books",
@@ -1607,7 +2092,7 @@
         "/api/v1/posts": {
             "get": {
                 "tags": [
-                    "Post"
+                    "Public / Post"
                 ],
                 "summary": "Get all posts",
                 "description": "Get all posts with pagination",
@@ -1656,7 +2141,7 @@
         "/api/v1/posts/get-one/{post}": {
             "get": {
                 "tags": [
-                    "Post"
+                    "Public / Post"
                 ],
                 "summary": "Get a post by ID or slug",
                 "description": "Get a post by ID or slug",
@@ -1680,196 +2165,6 @@
                         "description": "Post not found"
                     }
                 }
-            }
-        },
-        "/api/v1/posts/create": {
-            "post": {
-                "tags": [
-                    "Post"
-                ],
-                "summary": "Create a new post",
-                "description": "Create a new post",
-                "operationId": "createPost",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "category_id",
-                                    "title",
-                                    "content",
-                                    "summary",
-                                    "image",
-                                    "status"
-                                ],
-                                "properties": {
-                                    "category_id": {
-                                        "type": "string"
-                                    },
-                                    "title": {
-                                        "type": "string"
-                                    },
-                                    "content": {
-                                        "type": "string"
-                                    },
-                                    "summary": {
-                                        "type": "string"
-                                    },
-                                    "image": {
-                                        "type": "string"
-                                    },
-                                    "status": {
-                                        "type": "string",
-                                        "enum": [
-                                            "published",
-                                            "draft"
-                                        ]
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Create post successfully!"
-                    },
-                    "400": {
-                        "description": "Validation error"
-                    },
-                    "500": {
-                        "description": "Create post failed!"
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/api/v1/posts/update/{id}": {
-            "put": {
-                "tags": [
-                    "Post"
-                ],
-                "summary": "Update a post",
-                "description": "Update a post by ID",
-                "operationId": "updatePost",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID của post",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "category_id",
-                                    "title",
-                                    "content",
-                                    "summary",
-                                    "image",
-                                    "status"
-                                ],
-                                "properties": {
-                                    "category_id": {
-                                        "type": "string"
-                                    },
-                                    "title": {
-                                        "type": "string"
-                                    },
-                                    "content": {
-                                        "type": "string"
-                                    },
-                                    "summary": {
-                                        "type": "string"
-                                    },
-                                    "image": {
-                                        "type": "string"
-                                    },
-                                    "status": {
-                                        "type": "string",
-                                        "enum": [
-                                            "published",
-                                            "draft"
-                                        ]
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Update post successfully!"
-                    },
-                    "400": {
-                        "description": "Validation error"
-                    },
-                    "404": {
-                        "description": "Post not found"
-                    },
-                    "500": {
-                        "description": "Update post failed!"
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/api/v1/posts/delete/{id}": {
-            "delete": {
-                "tags": [
-                    "Post"
-                ],
-                "summary": "Delete a post",
-                "description": "Delete a post by ID",
-                "operationId": "deletePost",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID của post",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Delete post successfully!"
-                    },
-                    "400": {
-                        "description": "Validation error"
-                    },
-                    "404": {
-                        "description": "Post not found"
-                    },
-                    "500": {
-                        "description": "Delete post failed!"
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
             }
         }
     },

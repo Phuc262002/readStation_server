@@ -1,13 +1,20 @@
 <?php
 
-use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\AuthorController;
-use App\Http\Controllers\Api\BookController;
-use App\Http\Controllers\Api\BookDetailController;
-use App\Http\Controllers\Api\CategoryController;
-use App\Http\Controllers\Api\HomeController;
-use App\Http\Controllers\Api\PostController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\Api\Admin\AuthorController as AdminAuthorController;
+use App\Http\Controllers\Api\Admin\BookController as AdminBookController;
+use App\Http\Controllers\Api\Admin\BookDetailController;
+use App\Http\Controllers\Api\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\Api\Admin\PostController as AdminPostController;
+use App\Http\Controllers\Api\Auth\AuthController;
+use App\Http\Controllers\Api\Auth\PasswordController;
+use App\Http\Controllers\Api\Auth\VerifyEmailController;
+use App\Http\Controllers\Api\Client\AccountController;
+use App\Http\Controllers\Api\Client\OrderController;
+use App\Http\Controllers\Api\Public\AuthorController;
+use App\Http\Controllers\Api\Public\BookController;
+use App\Http\Controllers\Api\Public\CategoryController;
+use App\Http\Controllers\Api\Public\HomeController as PublicHomeController;
+use App\Http\Controllers\Api\Public\PostController as PublicPostController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -25,26 +32,35 @@ Route::group([
 
         Route::post('/refresh', [AuthController::class, 'refresh']);
 
-        Route::post('/send-reset-password', [AuthController::class, 'sendRequestForgotPassword'])->name('password.reset');
-        Route::post('/reset-password', [AuthController::class, 'changePassWordReset']);
+        Route::post('/send-reset-password', [PasswordController::class, 'sendRequestForgotPassword'])->name('password.reset');
+        Route::post('/reset-password', [PasswordController::class, 'changePassWordReset']);
 
-        Route::post('/verify-email', [AuthController::class, 'verifyEmail']);
-        Route::post('/resend-otp', [AuthController::class, 'reRegister']);
+        Route::post('/verify-email', [VerifyEmailController::class, 'verifyEmail']);
+        Route::post('/resend-otp', [VerifyEmailController::class, 'reRegister']);
 
 
         Route::group(["middleware" => ["auth:api"]], function () {
             Route::post('/logout', [AuthController::class, 'logout']);
-            Route::get('/profile', [AuthController::class, 'userProfile']);
-            Route::put('/update-profile', [AuthController::class, 'updateProfile']);
-            Route::post('/change-password', [AuthController::class, 'changePassWord']);
+            
+            Route::post('/change-password', [PasswordController::class, 'changePassWord']);
         });
+    });
+
+    Route::group([
+        "prefix" => "account",
+        "middleware" => ["auth:api"]
+    ], function () {
+        Route::get('/get-profile', [AccountController::class, 'userProfile']);
+        Route::put('/update-profile', [AccountController::class, 'updateProfile']);
+        Route::get('/', [OrderController::class, 'index']);
+        Route::get('/get-one/{order}', [OrderController::class, 'show']);
     });
 
     Route::group([
         "prefix" => "home"
     ], function () {
-        Route::get('/get-feautured-author', [HomeController::class, 'getFeaturedAuthor']);
-        Route::get('/get-feautured-book', [HomeController::class, 'getFeaturedBook']);
+        Route::get('/get-feautured-author', [PublicHomeController::class, 'getFeaturedAuthor']);
+        Route::get('/get-feautured-book', [PublicHomeController::class, 'getFeaturedBook']);
     });
 
     Route::group([
@@ -53,11 +69,11 @@ Route::group([
         Route::get('/', [CategoryController::class, 'index']);
 
         Route::group(["middleware" => ["auth:api"]], function () {
-            Route::get('/admin/get-all', [CategoryController::class, 'getAllCategory']);
-            Route::get('/get-one/{id}', [CategoryController::class, 'show']);
-            Route::post('/create', [CategoryController::class, 'store']);
-            Route::put('/update/{id}', [CategoryController::class, 'update']);
-            Route::delete('/delete/{id}', [CategoryController::class, 'destroy']);
+            Route::get('/admin/get-all', [AdminCategoryController::class, 'getAllCategory']);
+            Route::get('/get-one/{id}', [AdminCategoryController::class, 'show']);
+            Route::post('/create', [AdminCategoryController::class, 'store']);
+            Route::put('/update/{id}', [AdminCategoryController::class, 'update']);
+            Route::delete('/delete/{id}', [AdminCategoryController::class, 'destroy']);
         });
     });
 
@@ -68,23 +84,23 @@ Route::group([
         Route::get('/get-one/{book}', [BookController::class, 'show']);
 
         Route::group(["middleware" => ["auth:api"]], function () {
-            Route::get('/admin/get-all', [BookController::class, 'getAllBook']);
-            Route::post('/create', [BookController::class, 'store']);
-            Route::put('/update/{id}', [BookController::class, 'update']);
-            Route::delete('/delete/{id}', [BookController::class, 'destroy']);
+            Route::get('/admin/get-all', [AdminBookController::class, 'getAllBook']);
+            Route::post('/create', [AdminBookController::class, 'store']);
+            Route::put('/update/{id}', [AdminBookController::class, 'update']);
+            Route::delete('/delete/{id}', [AdminBookController::class, 'destroy']);
         });
     });
 
     Route::group([
         "prefix" => "posts"
     ], function () {
-        Route::get('/', [PostController::class, 'index']);
-        Route::get('/get-one/{post}', [PostController::class, 'show']);
+        Route::get('/', [PublicPostController::class, 'index']);
+        Route::get('/get-one/{post}', [PublicPostController::class, 'show']);
 
         Route::group(["middleware" => ["auth:api"]], function () {
-            Route::post('/create', [PostController::class, 'store']);
-            Route::put('/update/{id}', [PostController::class, 'update']);
-            Route::delete('/delete/{id}', [PostController::class, 'destroy']);
+            Route::post('/create', [AdminPostController::class, 'store']);
+            Route::put('/update/{id}', [AdminPostController::class, 'update']);
+            Route::delete('/delete/{id}', [AdminPostController::class, 'destroy']);
         });
     });
 
@@ -104,11 +120,11 @@ Route::group([
         Route::get('/', [AuthorController::class, 'index']);
 
         Route::group(["middleware" => ["auth:api"]], function () {
-            Route::get('/admin/get-all', [AuthorController::class, 'getAllAuthor']);
-            Route::get('/get-one/{id}', [AuthorController::class, 'show']);
-            Route::post('/create', [AuthorController::class, 'store']);
-            Route::put('/update/{id}', [AuthorController::class, 'update']);
-            Route::delete('/delete/{id}', [AuthorController::class, 'destroy']);
+            Route::get('/admin/get-all', [AdminAuthorController::class, 'getAllAuthor']);
+            Route::get('/get-one/{id}', [AdminAuthorController::class, 'show']);
+            Route::post('/create', [AdminAuthorController::class, 'store']);
+            Route::put('/update/{id}', [AdminAuthorController::class, 'update']);
+            Route::delete('/delete/{id}', [AdminAuthorController::class, 'destroy']);
         });
     });
 });
