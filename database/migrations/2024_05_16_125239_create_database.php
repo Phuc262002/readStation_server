@@ -41,8 +41,8 @@ return new class extends Migration
             $table->string('ward')->nullable();
             $table->string('address_detail')->nullable();
             $table->string('phone')->unique()->nullable();
-            $table->string('confirmation_code')->default(NULL);
-            $table->dateTime('confirmation_code_expired_in')->default(NULL);
+            $table->string('confirmation_code')->nullable()->default(NULL);
+            $table->dateTime('confirmation_code_expired_in')->nullable()->default(NULL);
             $table->string('refresh_token')->nullable();
             $table->string('remember_token')->nullable();
             $table->enum('status', ['active', 'inactive', 'banned', 'delete'])->default('active');
