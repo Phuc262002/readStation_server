@@ -126,7 +126,7 @@ return new class extends Migration
             $table->string('image');
             $table->string('slug')->unique();
             $table->string('view')->default(0);
-            $table->enum('status', ['draft', 'published', 'hidden', 'deleted'])->default('published');
+            $table->enum('status', ['wating_approve','draft', 'published','hidden', 'deleted'])->default('published');
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');

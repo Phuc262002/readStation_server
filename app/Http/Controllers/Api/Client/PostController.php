@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\Admin;
+namespace App\Http\Controllers\Api\Client;
 
 use App\Http\Controllers\Controller;
 use App\Models\Post;
@@ -13,7 +13,7 @@ use OpenApi\Attributes as OA;
 
 #[OA\Post(
     path: '/api/v1/posts/create',
-    tags: ['Admin / Post'],
+    tags: ['Post'],
     operationId: 'createPost',
     summary: 'Create a new post',
     description: 'Create a new post',
@@ -23,14 +23,14 @@ use OpenApi\Attributes as OA;
     requestBody: new OA\RequestBody(
         required: true,
         content: new OA\JsonContent(
-            required: ['category_id', 'title', 'content', 'summary', 'image', 'status'],
+            required: ['category_id', 'title', 'content', 'summary', 'image'],
             properties: [
                 new OA\Property(property: 'category_id', type: 'string'),
                 new OA\Property(property: 'title', type: 'string'),
                 new OA\Property(property: 'content', type: 'string'),
                 new OA\Property(property: 'summary', type: 'string'),
                 new OA\Property(property: 'image', type: 'string'),
-                new OA\Property(property: 'status', type: 'string', enum: ['published', 'draft']),
+                new OA\Property(property: 'status', type: 'string', enum: ['published', 'draft', 'wating_approve']),
             ]
         )
     ),
@@ -52,7 +52,7 @@ use OpenApi\Attributes as OA;
 
 #[OA\Put(
     path: '/api/v1/posts/update/{id}',
-    tags: ['Admin / Post'],
+    tags: ['Post'],
     operationId: 'updatePost',
     summary: 'Update a post',
     description: 'Update a post by ID',
@@ -104,7 +104,7 @@ use OpenApi\Attributes as OA;
 
 #[OA\Delete(
     path: '/api/v1/posts/delete/{id}',
-    tags: ['Admin / Post'],
+    tags: ['Post'],
     operationId: 'deletePost',
     summary: 'Delete a post',
     description: 'Delete a post by ID',
@@ -150,10 +150,8 @@ class PostController extends Controller
             "content" => "required|string",
             "summary" => "required|string",
             "image" => "required|string",
-            "status" => "string|in:published,draft",
-        ]);
-
-        $customMessages = [
+            "status" => "string|in:published,draft,wating_approve",
+        ], [
             'category_id.required' => 'Category_id không được để trống.',
             'category_id.string' => 'Category_id phải là một chuỗi.',
             'title.required' => 'Title không được để trống.',
@@ -165,11 +163,7 @@ class PostController extends Controller
             'summary.string' => 'Summary phải là một chuỗi.',
             'image.required' => 'Image không được để trống.',
             'image.string' => 'Image phải là một chuỗi.',
-            'status.required' => 'Status không được để trống.',
-            'status.in' => 'Status phải là published hoặc draft.',
-        ];
-
-        $validator->setCustomMessages($customMessages);
+        ]);
 
         if ($validator->fails()) {
             return response()->json([
@@ -180,15 +174,26 @@ class PostController extends Controller
         }
 
         try {
-            $post = Post::create(array_merge(
-                $validator->validated(),
-                ["user_id" => auth()->user()->id]
-            ));
+            if (auth()->user()->role->name == 'admin' || auth()->user()->role->name == 'manager') {
+                $post = Post::create(array_merge(
+                    $validator->validated(),
+                    ["user_id" => auth()->user()->id]
+                ));
+            } else {
+                $post = Post::create(array_merge(
+                    $validator->validated(),
+                    [
+                        "user_id" => auth()->user()->id, 
+                        "status" => $request->status == 'published' ? 'wating_approve' : $request->status
+                    ]
+                ));
+            }
 
             return response()->json([
                 "status" => true,
                 "message" => "Create post successfully!",
-                "data" => $post
+                "data" => $post,
+                "user" => auth()->user()->role->name
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
