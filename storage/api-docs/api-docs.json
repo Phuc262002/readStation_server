@@ -1157,6 +1157,173 @@
                 ]
             }
         },
+        "/api/v1/publishing-companies/create": {
+            "post": {
+                "tags": [
+                    "Admin / Publishing Company"
+                ],
+                "summary": "Create a new publishing company",
+                "description": "Create a new publishing company",
+                "operationId": "createPublishingCompany",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "logo_company": {
+                                        "type": "string"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "active",
+                                            "inactive",
+                                            "deleted"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Create publishing company successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/publishing-companies/update/{id}": {
+            "put": {
+                "tags": [
+                    "Admin / Publishing Company"
+                ],
+                "summary": "Update a publishing company",
+                "description": "Update a publishing company",
+                "operationId": "updatePublishingCompany",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID của danh mục",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "logo_company": {
+                                        "type": "string"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "active",
+                                            "inactive",
+                                            "deleted"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Update category successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "404": {
+                        "description": "Publishing company not found!"
+                    },
+                    "500": {
+                        "description": "Update publishing company failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/publishing-companies/delete/{id}": {
+            "delete": {
+                "tags": [
+                    "Admin / Publishing Company"
+                ],
+                "summary": "Delete a publishing company",
+                "description": "Delete a publishing company",
+                "operationId": "deletePublishingCompany",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID của danh mục",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Delete publishing company successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "404": {
+                        "description": "Publishing company not found!"
+                    },
+                    "500": {
+                        "description": "Delete publishing company failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/auth/login": {
             "post": {
                 "tags": [
@@ -2337,6 +2504,45 @@
                     },
                     "404": {
                         "description": "Post not found"
+                    }
+                }
+            }
+        },
+        "/api/v1/publishing-companies": {
+            "get": {
+                "tags": [
+                    "Public / Publishing Company"
+                ],
+                "summary": "Get all publishing companies public",
+                "operationId": "getAllPublishingCompaniesPublic",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Số trang hiện tại",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "pageSize",
+                        "in": "query",
+                        "description": "Số lượng mục trên mỗi trang",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get all publish companies successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
                     }
                 }
             }

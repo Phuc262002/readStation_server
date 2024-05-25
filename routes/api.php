@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\Admin\AuthorController as AdminAuthorController;
 use App\Http\Controllers\Api\Admin\BookController as AdminBookController;
 use App\Http\Controllers\Api\Admin\BookDetailController;
 use App\Http\Controllers\Api\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\Api\Admin\PublishingCompanyController as AdminPublishingCompanyController;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Auth\PasswordController;
 use App\Http\Controllers\Api\Auth\VerifyEmailController;
@@ -16,6 +17,7 @@ use App\Http\Controllers\Api\Public\BookController;
 use App\Http\Controllers\Api\Public\CategoryController;
 use App\Http\Controllers\Api\Public\HomeController as PublicHomeController;
 use App\Http\Controllers\Api\Public\PostController as PublicPostController;
+use App\Http\Controllers\Api\Public\PublishingCompanyController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -84,6 +86,18 @@ Route::group([
             Route::post('/create', [AdminCategoryController::class, 'store']);
             Route::put('/update/{id}', [AdminCategoryController::class, 'update']);
             Route::delete('/delete/{id}', [AdminCategoryController::class, 'destroy']);
+        });
+    });
+
+    Route::group([
+        "prefix" => "publishing-companies"
+    ], function () {
+        Route::get('/', [PublishingCompanyController::class, 'index']);
+
+        Route::group(["middleware" => ["auth:api"]], function () {
+            Route::post('/create', [AdminPublishingCompanyController::class, 'store']);
+            Route::put('/update/{id}', [AdminPublishingCompanyController::class, 'update']);
+            Route::delete('/delete/{id}', [AdminPublishingCompanyController::class, 'destroy']);
         });
     });
 

@@ -231,9 +231,7 @@ class CategoryController extends Controller
             'search' => 'string',
             'status' => 'string|in:active,inactive,deleted',
             'type' => 'required|string|in:book,post'
-        ]);
-
-        $customMessages = [
+        ],[
             'page.integer' => 'Trang phải là số nguyên.',
             'page.min' => 'Trang phải lớn hơn hoặc bằng 1.',
             'pageSize.integer' => 'Kích thước trang phải là số nguyên.',
@@ -242,9 +240,7 @@ class CategoryController extends Controller
             'type.string' => 'Type phải là một chuỗi.',
             'type.in' => 'Type phải là book hoặc post.',
             'status.in' => 'Status phải là active, inactive hoặc deleted'
-        ];
-
-        $validator->setCustomMessages($customMessages);
+        ]);
 
         if ($validator->fails()) {
             return response()->json([
@@ -296,18 +292,14 @@ class CategoryController extends Controller
             'name' => 'required|string',
             'description' => 'nullable|string',
             'type' => 'required|string|in:book,post'
-        ]);
-
-        $customMessages = [
+        ],[
             'name.required' => 'Trường name là bắt buộc.',
             'name.string' => 'Name phải là một chuỗi.',
             'type.required' => 'Trường type là bắt buộc.',
             'type.string' => 'Type phải là một chuỗi.',
             'type.in' => 'Type phải là book hoặc post.',
             'status.in' => 'Status phải là active, inactive hoặc deleted'
-        ];
-
-        $validator->setCustomMessages($customMessages);
+        ]);
 
         if ($validator->fails()) {
             return response()->json([
@@ -334,15 +326,11 @@ class CategoryController extends Controller
 
         $validator = Validator::make(['id' => $id], [
             'id' => 'required|integer|min:1'
-        ]);
-
-        $customMessages = [
+        ],[
             'id.required' => 'Trường id là bắt buộc.',
             'id.integer' => 'Id phải là một số nguyên.',
             'id.min' => 'Id phải lớn hơn hoặc bằng 1.'
-        ];
-
-        $validator->setCustomMessages($customMessages);
+        ]);
 
         if ($validator->fails()) {
             return response()->json([
@@ -378,9 +366,7 @@ class CategoryController extends Controller
             'type' => 'required|string|in:book,post',
             'description' => 'nullable|string',
             'status' => 'required|string|in:active,inactive,deleted',
-        ]);
-
-        $customMessages = [
+        ],[
             'id.required' => 'Trường id là bắt buộc.',
             'id.integer' => 'Id phải là một số nguyên.',
             'id.min' => 'Id phải lớn hơn hoặc bằng 1.',
@@ -393,9 +379,7 @@ class CategoryController extends Controller
             'status.required' => 'Trường status là bắt buộc.',
             'status.string' => 'Status phải là một chuỗi.',
             'description.string' => 'Description phải là một chuỗi.'
-        ];
-
-        $validator->setCustomMessages($customMessages);
+        ]);
 
         if ($validator->fails()) {
             return response()->json([
@@ -445,15 +429,11 @@ class CategoryController extends Controller
 
         $validator = Validator::make(['id' => $id], [
             'id' => 'required|integer|min:1'
-        ]);
-
-        $customMessages = [
+        ],[
             'id.required' => 'Trường id là bắt buộc.',
             'id.integer' => 'Id phải là một số nguyên.',
             'id.min' => 'Id phải lớn hơn hoặc bằng 1.'
-        ];
-
-        $validator->setCustomMessages($customMessages);
+        ]);
 
         if ($validator->fails()) {
             return response()->json([

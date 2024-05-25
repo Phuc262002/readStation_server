@@ -54,10 +54,10 @@ class BookDetail extends Model
         return $this->hasMany(OrderDetail::class, 'book_details_id');
     }
 
-    // public function publishingCompany()
-    // {
-    //     return $this->belongsTo(PublishingCompany::class, 'publishing_company_id');
-    // }
+    public function publishingCompany()
+    {
+        return $this->belongsTo(PublishingCompany::class, 'publishing_company_id');
+    }
 
     public function delete()
     {
