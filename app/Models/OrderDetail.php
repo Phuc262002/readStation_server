@@ -7,5 +7,40 @@ use Illuminate\Database\Eloquent\Model;
 
 class OrderDetail extends Model
 {
-    use HasFactory;
+    protected $table = 'order_details';
+
+    protected $fillable = [
+        'order_id',
+        'service_fee',
+        'book_details_id',
+        'return_date',
+        'tomax_extensionstal',
+        'current_extensions',
+        'extension_dates',
+        'expired_date',
+        'rate',
+        'comment',
+        'status_cmt',
+        'status_od',
+        'deposit'
+    ];
+
+    protected $hidden = [
+        'order_id',
+        'book_details_id'
+    ];
+
+    protected $casts = [
+        'extension_dates' => 'array'
+    ];
+
+    public function bookDetail()
+    {
+        return $this->belongsTo(BookDetail::class, 'book_details_id');
+    }
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class, 'order_id');
+    }
 }

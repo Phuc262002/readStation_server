@@ -30,6 +30,11 @@ class BookDetail extends Model
         'status',
     ];
 
+    protected $hidden = [
+        'book_id',
+        'publishing_company_id',
+    ];
+
     /**
      * The attributes that should be cast to native types.
      *
@@ -42,6 +47,11 @@ class BookDetail extends Model
     public function book()
     {
         return $this->belongsTo(Book::class, 'book_id');
+    }
+
+    public function order_details()
+    {
+        return $this->hasMany(OrderDetail::class, 'book_details_id');
     }
 
     // public function publishingCompany()

@@ -68,7 +68,7 @@ return new class extends Migration
             $table->string('transaction_code')->unique();
             $table->enum('transaction_type', ['deposit', 'withdraw']);
             $table->enum('transaction_method', ['online', 'offline']);
-            $table->enum('status', ['pending', 'completed', 'failed', 'canceled']);
+            $table->enum('status', ['pending', 'completed', 'failed', 'canceled'])->default('pending');
             $table->decimal('amount', 20, 8);
             $table->timestamps();
 
@@ -136,7 +136,7 @@ return new class extends Migration
         Schema::create('comments', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('parent_id')->nullable();
-            $table->foreignUuid('user_id')->nullable()->index();
+            $table->foreignUuid('user_id')->index();
             $table->foreignId('post_id')->index();
             $table->text('content');
             $table->enum('status', ['published','banned', 'hidden', 'delete'])->default('published');
@@ -250,7 +250,7 @@ return new class extends Migration
             $table->decimal('deposit_fee', 20, 8)->default(0);
             $table->decimal('fine_fee', 20, 8)->default(0);
             $table->decimal('total_fee', 20, 8)->default(0);
-            $table->enum('status', ['pending', 'hiring', 'completed', 'cancel', 'out_of_date']);
+            $table->enum('status', ['pending', 'hiring', 'completed', 'canceled', 'out_of_date'])->default('pending');
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
@@ -267,10 +267,10 @@ return new class extends Migration
             $table->integer('current_extensions')->default(0);
             $table->json('extension_dates')->nullable();
             $table->date('expired_date')->nullable();
-            $table->integer('rate')->default(0);
+            $table->integer('rate')->default(5);
             $table->text('comment')->nullable();
-            $table->enum('status_cmt', ['rating_yet', 'active', 'hide']);
-            $table->enum('status_od', ['pending', 'hiring', 'completed', 'cancel', 'out_of_date']);
+            $table->enum('status_cmt', ['hiring', 'rating_yet', 'active', 'hide', 'canceled'])->default('hiring');
+            $table->enum('status_od', ['pending', 'hiring', 'completed', 'canceled', 'out_of_date'])->default('pending');
             $table->decimal('deposit', 20, 8)->default(0);
             $table->timestamps();
 
@@ -296,7 +296,7 @@ return new class extends Migration
             $table->decimal('total', 20, 8);
             $table->string('invoice_description')->nullable();
             $table->unsignedBigInteger('supplier_id');
-            $table->enum('status', ['draft','active', 'cancel'])->default('draft');
+            $table->enum('status', ['draft','active', 'canceled'])->default('draft');
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

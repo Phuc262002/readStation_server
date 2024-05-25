@@ -54,6 +54,7 @@ class User extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $attributes = [
+        'image' => 'https://anubis.gr/wp-content/uploads/2018/03/no-avatar.png',
         'role_id' => '1',
         'status' => 'active',
     ];
@@ -122,6 +123,16 @@ class User extends Authenticatable implements JWTSubject
 
     public function post() {
         return $this->hasMany(Post::class);
+    }
+
+    public function order()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    public function comment()
+    {
+        return $this->hasMany(Comment::class);
     }
 
     public function sendPasswordResetNotification($token): void

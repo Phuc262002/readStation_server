@@ -1875,6 +1875,122 @@
                 ]
             }
         },
+        "/api/v1/comments": {
+            "get": {
+                "tags": [
+                    "Comment"
+                ],
+                "summary": "Get comments",
+                "description": "Get comments",
+                "operationId": "getComment",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Số trang hiện tại",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "pageSize",
+                        "in": "query",
+                        "description": "Số lượng mục trên mỗi trang",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "post_id",
+                        "in": "query",
+                        "description": "Id của bài viết",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User profile fetched successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/v1/account/order/get-all": {
+            "get": {
+                "tags": [
+                    "Account"
+                ],
+                "summary": "Get all order",
+                "description": "Get all order",
+                "operationId": "getAllOrder",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Số trang hiện tại",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "pageSize",
+                        "in": "query",
+                        "description": "Số lượng mục trên mỗi trang",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Trạng thái của order",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "pending",
+                                "hiring",
+                                "completed",
+                                "canceled",
+                                "out_of_date"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Mã đơn hàng cần tìm kiếm",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get all order successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/authors": {
             "get": {
                 "tags": [
@@ -1987,7 +2103,7 @@
                 "tags": [
                     "Public / Book"
                 ],
-                "summary": "Get one book",
+                "summary": "Get one book by ID or slug",
                 "description": "Get one book",
                 "operationId": "getOneBook",
                 "parameters": [

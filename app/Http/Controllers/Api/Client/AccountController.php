@@ -98,9 +98,7 @@ class AccountController extends Controller
             'ward' => 'nullable|string',
             'address_detail' => 'nullable|string',
             'phone' => 'required|string|min:10|max:11',
-        ]);
-
-        $customMessages = [
+        ], [
             'gender.in' => 'Giới tính phải là male hoặc female.',
             'dob.date' => 'Ngày sinh phải là một ngày.',
             'phone.required' => 'Số điện thoại không được để trống.',
@@ -108,9 +106,7 @@ class AccountController extends Controller
             'phone.min' => 'Số điện thoại phải có ít nhất 10 ký tự.',
             'phone.max' => 'Số điện thoại không được quá 11 ký tự.',
             'fullname.required' => 'Tên không được để trống.',
-        ];
-
-        $validator->setCustomMessages($customMessages);
+        ]);
 
         if ($validator->fails()) {
             return response()->json([

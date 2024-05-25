@@ -67,7 +67,7 @@ use OpenApi\Attributes as OA;
     path: '/api/v1/books/get-one/{book}',
     tags: ['Public / Book'],
     operationId: 'getOneBook',
-    summary: 'Get one book',
+    summary: 'Get one book by ID or slug',
     description: 'Get one book',
     parameters: [
         new OA\Parameter(
@@ -108,7 +108,7 @@ class BookController extends Controller
             }
         });
     }
-    
+
     public function index(Request $request)
     {
         $this->checkBookDetail();
@@ -119,18 +119,14 @@ class BookController extends Controller
             'search' => 'string',
             'category_id' => 'integer',
             'author_id' => 'integer',
-        ]);
-
-        $customMessages = [
+        ], [
             'page.integer' => 'Trang phải là số nguyên.',
             'page.min' => 'Trang phải lớn hơn hoặc bằng 1.',
             'pageSize.integer' => 'Kích thước trang phải là số nguyên.',
             'pageSize.min' => 'Kích thước trang phải lớn hơn hoặc bằng 1.',
             'category_id.integer' => 'Category_id phải là một số nguyên.',
             'author_id.integer' => 'Author_id phải là một số nguyên.',
-        ];
-
-        $validator->setCustomMessages($customMessages);
+        ]);
 
         if ($validator->fails()) {
             return response()->json([
@@ -150,7 +146,7 @@ class BookController extends Controller
         // Tạo query ban đầu
         $query = Book::query()
             ->with(['category', 'author', 'bookDetail' => function ($query) {
-                $query->where('status', '!=', 'deleted');
+                $query->where('status', '!=', 'deleted')->with('order_details');
             }])
             ->whereHas('bookDetail', function ($q) {
                 $q->whereNotNull('id')
@@ -166,6 +162,28 @@ class BookController extends Controller
 
         // Thực hiện phân trang
         $books = $query->orderBy('created_at', 'desc')->paginate($pageSize, ['*'], 'page', $page);
+
+        $books->getCollection()->transform(function ($book) {
+            $bookDetails = $book->bookDetail->map(function ($bookDetail) {
+                $averageRate = $bookDetail->order_details()
+                    ->where('status_cmt', 'active')
+                    ->where('status_od', 'completed')
+                    ->avg('rate');
+
+                $averageRateRounded = round($averageRate, 1);
+
+                $bookDetailArray = $bookDetail->toArray();
+                $bookDetailArray['average_rate'] = $averageRateRounded;
+                unset($bookDetailArray['order_details']);
+
+                return $bookDetailArray;
+            });
+
+            $bookArray = $book->toArray();
+            $bookArray['book_detail'] = $bookDetails;
+
+            return $bookArray;
+        });
 
         return response()->json([
             "status" => true,

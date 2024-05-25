@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Auth\PasswordController;
 use App\Http\Controllers\Api\Auth\VerifyEmailController;
 use App\Http\Controllers\Api\Client\AccountController;
+use App\Http\Controllers\Api\Client\CommentController;
 use App\Http\Controllers\Api\Client\OrderController;
 use App\Http\Controllers\Api\Public\AuthorController;
 use App\Http\Controllers\Api\Public\BookController;
@@ -51,8 +52,18 @@ Route::group([
     ], function () {
         Route::get('/get-profile', [AccountController::class, 'userProfile']);
         Route::put('/update-profile', [AccountController::class, 'updateProfile']);
+
         Route::get('/', [OrderController::class, 'index']);
         Route::get('/get-one/{order}', [OrderController::class, 'show']);
+
+        Route::group([
+            "prefix" => "order"
+        ], function () {
+            Route::get('/get-all', [OrderController::class, 'index']);
+            Route::post('/create', [OrderController::class, 'store']);
+            Route::put('/update/{order}', [OrderController::class, 'update']);
+            Route::delete('/delete/{order}', [OrderController::class, 'destroy']);
+        });
     });
 
     Route::group([
@@ -101,6 +112,12 @@ Route::group([
             Route::put('/update/{id}', [AdminPostController::class, 'update']);
             Route::delete('/delete/{id}', [AdminPostController::class, 'destroy']);
         });
+    });
+
+    Route::group([
+        "prefix" => "comments"
+    ], function () {
+        Route::get('/', [CommentController::class, 'index']);
     });
 
     Route::group([

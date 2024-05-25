@@ -397,9 +397,19 @@ class BookController extends Controller
         }
 
         try {
-            $book = Book::create(array_merge(
-                $validator->validated(),
-            ));
+
+
+            $count_feutured = Book::where('is_featured', true)->count();
+            if ($count_feutured <= 7) {
+                $book = Book::create(array_merge(
+                    $validator->validated(),
+                    ['is_featured' => true]
+                ));
+            } else {
+                $book = Book::create(array_merge(
+                    $validator->validated(),
+                ));
+            }
 
             return response()->json([
                 "status" => true,
