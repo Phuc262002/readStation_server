@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Auth\PasswordController;
 use App\Http\Controllers\Api\Auth\VerifyEmailController;
 use App\Http\Controllers\Api\BotTelegram\GithubActionController;
+use App\Http\Controllers\Api\CheckSchedule\RemindReturnBookController;
 use App\Http\Controllers\Api\Client\AccountController;
 use App\Http\Controllers\Api\Client\CommentController;
 use App\Http\Controllers\Api\Client\OrderController;
@@ -167,5 +168,11 @@ Route::group([
         "prefix" => "telegram"
     ], function () {
         Route::post('/github-actions', [GithubActionController::class, 'githubActions']);
+    });
+
+    Route::group([
+        "prefix" => "check-schedule"
+    ], function () {
+        Route::get('/remind-return-book', [RemindReturnBookController::class, 'remindReturnBook']);
     });
 });
