@@ -39,7 +39,8 @@ class TelegramGithubActionNotification extends Notification
                 'message_thread_id' => '39',
                 'parse_mode' => 'HTML',
             ])
-            ->view('telegram.github_action', [
+            ->disableNotification()
+            ->view('telegram.github_push', [
                 'message' => $this->message,
             ]);
     }

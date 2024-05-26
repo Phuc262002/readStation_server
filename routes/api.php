@@ -8,7 +8,7 @@ use App\Http\Controllers\Api\Admin\PublishingCompanyController as AdminPublishin
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Auth\PasswordController;
 use App\Http\Controllers\Api\Auth\VerifyEmailController;
-use App\Http\Controllers\Api\BotTelegram\TestController;
+use App\Http\Controllers\Api\BotTelegram\GithubActionController;
 use App\Http\Controllers\Api\Client\AccountController;
 use App\Http\Controllers\Api\Client\CommentController;
 use App\Http\Controllers\Api\Client\OrderController;
@@ -166,6 +166,6 @@ Route::group([
     Route::group([
         "prefix" => "telegram"
     ], function () {
-        Route::post('/github-actions', [TestController::class, 'githubActions']);
+        Route::post('/github-actions', [GithubActionController::class, 'githubActions']);
     });
 });
