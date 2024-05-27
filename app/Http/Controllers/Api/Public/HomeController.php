@@ -36,6 +36,31 @@ use OpenApi\Attributes as OA;
     ]
 )]
 
+#[OA\Post(
+    path: 'https://n8n.warriorcode.online/webhook/46036883-4977-485d-9cb7-eb8b57cbcdf1',
+    tags: ['Public / Contact'],
+    operationId: 'sendContactEmail',
+    summary: 'Send contact email',
+    description: 'Gửi đúng theo URL https://n8n.warriorcode.online/webhook/46036883-4977-485d-9cb7-eb8b57cbcdf1',
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            required: ['name', 'email', 'content'],
+            properties: [
+                new OA\Property(property: 'name', type: 'string'),
+                new OA\Property(property: 'email', type: 'string', format: 'email'),
+                new OA\Property(property: 'content', type: 'string')
+            ]
+        )
+    ),
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Send contact email successfully!',
+        ),
+    ]
+)]
+
 class HomeController extends Controller
 {
     public function getFeaturedAuthor()

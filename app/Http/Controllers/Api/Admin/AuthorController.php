@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Validator;
 use OpenApi\Attributes as OA;
 
 #[OA\Get(
-    path: '/api/v1/authors/admim/get-all',
+    path: '/api/v1/authors/admin/get-all',
     tags: ['Admin / Author'],
     operationId: 'getAllAuthors',
     summary: 'Get all authors (admin)',

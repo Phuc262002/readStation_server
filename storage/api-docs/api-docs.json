@@ -2430,6 +2430,48 @@
                 }
             }
         },
+        "https://n8n.warriorcode.online/webhook/46036883-4977-485d-9cb7-eb8b57cbcdf1": {
+            "post": {
+                "tags": [
+                    "Public / Contact"
+                ],
+                "summary": "Send contact email",
+                "description": "Gửi đúng theo URL https://n8n.warriorcode.online/webhook/46036883-4977-485d-9cb7-eb8b57cbcdf1",
+                "operationId": "sendContactEmail",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "content"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "content": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Send contact email successfully!"
+                    }
+                }
+            }
+        },
         "/api/v1/posts": {
             "get": {
                 "tags": [
