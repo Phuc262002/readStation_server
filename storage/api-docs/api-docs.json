@@ -6,7 +6,7 @@
         "version": "1.0.0"
     },
     "paths": {
-        "/api/v1/authors/admim/get-all": {
+        "/api/v1/authors/admin/get-all": {
             "get": {
                 "tags": [
                     "Admin / Author"
@@ -404,7 +404,7 @@
                                         "type": "string"
                                     },
                                     "description": {
-                                        "type": "text"
+                                        "type": "string"
                                     },
                                     "is_featured": {
                                         "type": "boolean"
@@ -414,6 +414,153 @@
                                     },
                                     "shelve_id": {
                                         "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Create book successfully!"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Create book failed!"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/books/create-full": {
+            "post": {
+                "tags": [
+                    "Admin / Book"
+                ],
+                "summary": "Create full book",
+                "description": "Có thể tạo sách với nhiều chi tiết sách khác nhau theo dạng mảng book_detail",
+                "operationId": "createFullBook",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "sku",
+                                    "author_id",
+                                    "title",
+                                    "original_title",
+                                    "description_summary",
+                                    "description",
+                                    "category_id",
+                                    "book_detail"
+                                ],
+                                "properties": {
+                                    "sku": {
+                                        "type": "string"
+                                    },
+                                    "author_id": {
+                                        "type": "string"
+                                    },
+                                    "title": {
+                                        "type": "string"
+                                    },
+                                    "original_title": {
+                                        "type": "string"
+                                    },
+                                    "description_summary": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "is_featured": {
+                                        "type": "boolean"
+                                    },
+                                    "category_id": {
+                                        "type": "string"
+                                    },
+                                    "shelve_id": {
+                                        "type": "string"
+                                    },
+                                    "book_detail": {
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "poster",
+                                                "images",
+                                                "book_version",
+                                                "price",
+                                                "hire_percent",
+                                                "stock",
+                                                "publish_date",
+                                                "publishing_company_id",
+                                                "issuing_company",
+                                                "cardboard",
+                                                "total_page",
+                                                "language"
+                                            ],
+                                            "properties": {
+                                                "poster": {
+                                                    "type": "string"
+                                                },
+                                                "images": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "book_version": {
+                                                    "type": "string"
+                                                },
+                                                "price": {
+                                                    "type": "string"
+                                                },
+                                                "hire_percent": {
+                                                    "type": "string"
+                                                },
+                                                "stock": {
+                                                    "type": "string"
+                                                },
+                                                "publish_date": {
+                                                    "type": "string",
+                                                    "format": "date"
+                                                },
+                                                "publishing_company_id": {
+                                                    "type": "string"
+                                                },
+                                                "issuing_company": {
+                                                    "type": "string"
+                                                },
+                                                "cardboard": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "hard",
+                                                        "soft"
+                                                    ]
+                                                },
+                                                "total_page": {
+                                                    "type": "string"
+                                                },
+                                                "translator": {
+                                                    "type": "string"
+                                                },
+                                                "language": {
+                                                    "type": "string"
+                                                },
+                                                "book_size": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
                                     }
                                 },
                                 "type": "object"
@@ -1148,6 +1295,74 @@
                     },
                     "500": {
                         "description": "Delete category failed!"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/publishing-companies/admin/get-all": {
+            "get": {
+                "tags": [
+                    "Admin / Publishing Company"
+                ],
+                "summary": "Get all publishing companies",
+                "description": "Get all publishing companies",
+                "operationId": "getAllPublishingCompany",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Số trang hiện tại",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "pageSize",
+                        "in": "query",
+                        "description": "Số lượng mục trên mỗi trang",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Từ khóa tìm kiếm",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Trạng thái nhà xuất bản",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "active",
+                                "inactive",
+                                "deleted"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get all publishing companies successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
                     }
                 },
                 "security": [
@@ -2214,7 +2429,7 @@
         "/api/v1/authors": {
             "get": {
                 "tags": [
-                    "Public / Category"
+                    "Public / Author"
                 ],
                 "summary": "Get all authors public",
                 "description": "Get all authors",

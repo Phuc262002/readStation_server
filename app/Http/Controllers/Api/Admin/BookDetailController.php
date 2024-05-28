@@ -268,9 +268,7 @@ class BookDetailController extends Controller
             'translator' => "nullable",
             'language' => "required",
             'book_size' => "nullable",
-        ]);
-
-        $customMessages = [
+        ],[
             'book_id.required' => 'Trường book_id là bắt buộc.',
             'poster.required' => 'Trường poster là bắt buộc.',
             'images.required' => 'Trường images là bắt buộc.',
@@ -285,9 +283,7 @@ class BookDetailController extends Controller
             'total_page.required' => 'Trường total_page là bắt buộc.',
             'language.required' => 'Trường language là bắt buộc.',
             'images.array' => 'Trường images phải là một mảng.'
-        ];
-
-        $validator->setCustomMessages($customMessages);
+        ]);
 
         if ($validator->fails()) {
             return response()->json([
@@ -377,9 +373,7 @@ class BookDetailController extends Controller
             'translator' => "nullable|string",
             'language' => "required|string",
             'book_size' => "nullable|string",
-        ]);
-
-        $customMessages = [
+        ],[
             'id.required' => 'Trường id là bắt buộc.',
             'id.integer' => 'Id phải là một số nguyên.',
             'id.min' => 'Id phải lớn hơn hoặc bằng 1.',
@@ -403,9 +397,7 @@ class BookDetailController extends Controller
             'publishing_company_id.integer' => 'Trường publishing_company_id phải là một số.',
             'cardboard.in' => 'Trường cardboard phải là hard hoặc soft.',
             'total_page.integer' => 'Trường total_page phải là một số.'
-        ];
-
-        $validator->setCustomMessages($customMessages);
+        ]);
 
         if ($validator->fails()) {
             return response()->json([

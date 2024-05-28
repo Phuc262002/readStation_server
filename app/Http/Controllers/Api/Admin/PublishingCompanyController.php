@@ -8,6 +8,57 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use OpenApi\Attributes as OA;
 
+#[OA\Get(
+    path: '/api/v1/publishing-companies/admin/get-all',
+    tags: ['Admin / Publishing Company'],
+    operationId: 'getAllPublishingCompany',
+    summary: 'Get all publishing companies',
+    description: 'Get all publishing companies',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    parameters: [
+        new OA\Parameter(
+            name: 'page',
+            in: 'query',
+            required: false,
+            description: 'Số trang hiện tại',
+            schema: new OA\Schema(type: 'integer', default: 1)
+        ),
+        new OA\Parameter(
+            name: 'pageSize',
+            in: 'query',
+            required: false,
+            description: 'Số lượng mục trên mỗi trang',
+            schema: new OA\Schema(type: 'integer', default: 10)
+        ),
+        new OA\Parameter(
+            name: 'search',
+            in: 'query',
+            required: false,
+            description: 'Từ khóa tìm kiếm',
+            schema: new OA\Schema(type: 'string')
+        ),
+        new OA\Parameter(
+            name: 'status',
+            in: 'query',
+            required: false,
+            description: 'Trạng thái nhà xuất bản',
+            schema: new OA\Schema(type: 'string', enum: ['active', 'inactive', 'deleted'])
+        ),
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Get all publishing companies successfully',
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error',
+        ),
+    ],
+)]
+
 #[OA\Post(
     path: '/api/v1/publishing-companies/create',
     tags: ['Admin / Publishing Company'],
@@ -132,17 +183,66 @@ use OpenApi\Attributes as OA;
 
 class PublishingCompanyController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    
+    public function getAllPublishingCompany(Request $request)
     {
-        //
+        // Validate request parameters
+        $validator = Validator::make($request->all(), [
+            'page' => 'integer|min:1',
+            'pageSize' => 'integer|min:1',
+            'search' => 'string',
+            'status' => 'string|in:active,inactive,deleted',
+        ],[
+            'page.integer' => 'Trang phải là số nguyên.',
+            'page.min' => 'Trang phải lớn hơn hoặc bằng 1.',
+            'pageSize.integer' => 'Kích thước trang phải là số nguyên.',
+            'pageSize.min' => 'Kích thước trang phải lớn hơn hoặc bằng 1.',
+            'status.in' => 'Status phải là active, inactive hoặc deleted',
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                "staus" => false,
+                "message" => "Validation error",
+                "errors" => $validator->errors()
+            ], 400);
+        }
+
+        // Lấy giá trị page và pageSize từ query parameters
+        $page = $request->input('page', 1);
+        $pageSize = $request->input('pageSize', 10);
+        $search = $request->input('search');
+        $type = $request->input('author');
+        $status = $request->input('status');
+
+        // Tạo query ban đầu
+        $query = PublishingCompany::query();
+
+        // Lấy tổng số mục trong DB trước khi áp dụng bộ lọc tìm kiếm
+
+        // Áp dụng bộ lọc theo type
+        $totalItems = $query->count();
+        $query = $query->filter($status, true);
+
+        // Áp dụng bộ lọc tìm kiếm nếu có tham số tìm kiếm
+        $query = $query->search($search);
+
+        // Thực hiện phân trang
+        $publishingCompany = $query->paginate($pageSize, ['*'], 'page', $page);
+
+        return response()->json([
+            "status" => true,
+            "message" => "Get all publishing company successfully",
+            "data" => [
+                "publishing_companies" => $publishingCompany->items(),
+                "page" => $publishingCompany->currentPage(),
+                "pageSize" => $publishingCompany->perPage(),
+                "lastPage" => $publishingCompany->lastPage(),
+                "totalResults" => $publishingCompany->total(),
+                "total" => $totalItems
+            ],
+        ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [

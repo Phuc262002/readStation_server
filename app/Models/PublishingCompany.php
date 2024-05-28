@@ -23,6 +23,24 @@ class PublishingCompany extends Model
         return $this->hasMany(BookDetail::class, 'publishing_company_id');
     }
 
+    public function scopeSearch($query, $search)
+    {
+        return $query->where('name', 'like', '%' . $search . '%');
+    }
+
+    public function scopeFilter($query, $status, $is_admin = false)
+    {
+        if ($status && $is_admin) {
+            $query->where('status', $status);
+        } else if ($is_admin) {
+            $query->where('status', '!=', 'deleted');
+        } else {
+            $query->where('status', 'active');
+        }
+
+        return $query;
+    }
+
     public function delete()
     {
         $this->status = 'deleted';

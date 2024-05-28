@@ -113,7 +113,7 @@ class PostController extends Controller
         $query = Post::query()->with(['user', 'category']);
         $totalItems = $query->count();
 
-        $query->filter($category_id, null, false);
+        $query->filter($category_id, null);
 
         // Lấy tổng số mục trong DB trước khi áp dụng bộ lọc tìm kiếm
 

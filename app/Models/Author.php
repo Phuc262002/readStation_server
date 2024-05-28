@@ -43,7 +43,7 @@ class Author extends Model
         return $query->where('author', 'like', '%' . $search . '%');
     }
 
-    public function scopeFilter($query, $type, $status, $is_admin = false)
+    public function scopeFilter($query, $status, $is_admin = false)
     {
         if ($status && $is_admin) {
             $query->where('status', $status);

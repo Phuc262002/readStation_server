@@ -226,18 +226,14 @@ class AuthorController extends Controller
             'search' => 'string',
             'status' => 'string|in:active,inactive,deleted',
             'author' => 'string'
-        ]);
-
-        $customMessages = [
+        ],[
             'page.integer' => 'Trang phải là số nguyên.',
             'page.min' => 'Trang phải lớn hơn hoặc bằng 1.',
             'pageSize.integer' => 'Kích thước trang phải là số nguyên.',
             'pageSize.min' => 'Kích thước trang phải lớn hơn hoặc bằng 1.',
             'author.string' => 'Tác giả phải là một chuỗi.',
             'status.in' => 'Status phải là active, inactive hoặc deleted'
-        ];
-
-        $validator->setCustomMessages($customMessages);
+        ]);
 
         if ($validator->fails()) {
             return response()->json([
@@ -261,7 +257,7 @@ class AuthorController extends Controller
 
         // Áp dụng bộ lọc theo type
         $totalItems = $query->count();
-        $query = $query->filter($type, $status, true);
+        $query = $query->filter($status, true);
 
         // Áp dụng bộ lọc tìm kiếm nếu có tham số tìm kiếm
         $query = $query->search($search);

@@ -97,6 +97,7 @@ Route::group([
         Route::get('/', [PublishingCompanyController::class, 'index']);
 
         Route::group(["middleware" => ["auth:api"]], function () {
+            Route::get('/admin/get-all', [AdminPublishingCompanyController::class, 'getAllPublishingCompany']);
             Route::post('/create', [AdminPublishingCompanyController::class, 'store']);
             Route::put('/update/{id}', [AdminPublishingCompanyController::class, 'update']);
             Route::delete('/delete/{id}', [AdminPublishingCompanyController::class, 'destroy']);
@@ -112,6 +113,7 @@ Route::group([
         Route::group(["middleware" => ["auth:api"]], function () {
             Route::get('/admin/get-all', [AdminBookController::class, 'getAllBook']);
             Route::post('/create', [AdminBookController::class, 'store']);
+            Route::post('/create-full', [AdminBookController::class, 'createFullBook']);
             Route::put('/update/{id}', [AdminBookController::class, 'update']);
             Route::delete('/delete/{id}', [AdminBookController::class, 'destroy']);
         });

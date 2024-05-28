@@ -10,7 +10,7 @@ use OpenApi\Attributes as OA;
 
 #[OA\Get(
     path: '/api/v1/authors',
-    tags: ['Public / Category'],
+    tags: ['Public / Author'],
     operationId: 'getAllAuthorsPublic',
     summary: 'Get all authors public',
     description: 'Get all authors',
@@ -80,6 +80,8 @@ class AuthorController extends Controller
 
         // Áp dụng bộ lọc theo type
         $totalItems = $query->count();
+
+        $query->filter('active');
 
         // Thực hiện phân trang
         $authors = $query->paginate($pageSize, ['*'], 'page', $page);
