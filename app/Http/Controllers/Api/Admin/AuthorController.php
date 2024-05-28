@@ -46,13 +46,6 @@ use OpenApi\Attributes as OA;
             description: 'Trạng thái của tác giả',
             schema: new OA\Schema(type: 'string', enum: ['active', 'inactive', 'deleted'])
         ),
-        new OA\Parameter(
-            name: 'author',
-            in: 'query',
-            required: false,
-            description: 'Loại tác giả',
-            schema: new OA\Schema(type: 'string')
-        ),
     ],
     responses: [
         new OA\Response(
