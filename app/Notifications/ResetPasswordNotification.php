@@ -35,7 +35,7 @@ class ResetPasswordNotification extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $url = env('FE_URL', url('/')) . "/auth/reset-password?email={$notifiable->getEmailForPasswordReset()}&token={$this->token}";
+        $url = env('FE_URL', url('/')) . "/reset-password?email={$notifiable->getEmailForPasswordReset()}&token={$this->token}";
 
         $fullname = User::where([
             'email' => $notifiable->getEmailForPasswordReset(),
