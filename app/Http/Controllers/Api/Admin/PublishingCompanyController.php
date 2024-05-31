@@ -60,7 +60,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Get(
-    path: '/api/v1/publishing-companies/admin/get-one/{id}',
+    path: '/api/v1/publishing-companies/get-one/{id}',
     tags: ['Admin / Publishing Company'],
     operationId: 'getPublishingCompany',
     summary: 'Get a publishing company',

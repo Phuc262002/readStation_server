@@ -1363,7 +1363,7 @@
                 ]
             }
         },
-        "/api/v1/publishing-companies/admin/get/{id}": {
+        "/api/v1/publishing-companies/get-one/{id}": {
             "get": {
                 "tags": [
                     "Admin / Publishing Company"
