@@ -57,15 +57,6 @@
                                 "deleted"
                             ]
                         }
-                    },
-                    {
-                        "name": "author",
-                        "in": "query",
-                        "description": "Loại tác giả",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
                     }
                 ],
                 "responses": {
@@ -83,7 +74,7 @@
                 ]
             }
         },
-        "/api/v1/authors/{id}": {
+        "/api/v1/authors/get-one/{id}": {
             "get": {
                 "tags": [
                     "Admin / Author"
@@ -1363,6 +1354,43 @@
                     },
                     "400": {
                         "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/publishing-companies/admin/get/{id}": {
+            "get": {
+                "tags": [
+                    "Admin / Publishing Company"
+                ],
+                "summary": "Get a publishing company",
+                "description": "Get a publishing company",
+                "operationId": "getPublishingCompany",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID của nhà xuất bản",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get publishing company successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "404": {
+                        "description": "Publishing company not found!"
                     }
                 },
                 "security": [

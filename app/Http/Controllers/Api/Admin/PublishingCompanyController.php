@@ -59,6 +59,40 @@ use OpenApi\Attributes as OA;
     ],
 )]
 
+#[OA\Get(
+    path: '/api/v1/publishing-companies/admin/get-one/{id}',
+    tags: ['Admin / Publishing Company'],
+    operationId: 'getPublishingCompany',
+    summary: 'Get a publishing company',
+    description: 'Get a publishing company',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    parameters: [
+        new OA\Parameter(
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'ID của nhà xuất bản',
+            schema: new OA\Schema(type: 'integer')
+        ),
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Get publishing company successfully',
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error',
+        ),
+        new OA\Response(
+            response: 404,
+            description: 'Publishing company not found!',
+        ),
+    ],
+)]
+
 #[OA\Post(
     path: '/api/v1/publishing-companies/create',
     tags: ['Admin / Publishing Company'],
@@ -281,9 +315,40 @@ class PublishingCompanyController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(PublishingCompany $publishingCompany)
+    public function show(Request $request, PublishingCompany $publishingCompany)
     {
-        //
+        $id = $request->route('id');
+
+        $validator = Validator::make(['id' => $id], [
+            'id' => 'required|integer|min:1'
+        ],[
+            'id.required' => 'Trường id là bắt buộc.',
+            'id.integer' => 'Id phải là một số nguyên.',
+            'id.min' => 'Id phải lớn hơn hoặc bằng 1.'
+        ]);
+        
+        if ($validator->fails()) {
+            return response()->json([
+                "staus" => false,
+                "message" => "Validation error",
+                "errors" => $validator->errors()
+            ], 400);
+        }
+
+        $publishingCompany = PublishingCompany::find($id);
+
+        if (!$publishingCompany) {
+            return response()->json([
+                "status" => false,
+                "message" => "Publishing company not found!"
+            ], 404);
+        }
+
+        return response()->json([
+            "status" => true,
+            "message" => "Get publishing company successfully",
+            "data" => $publishingCompany
+        ], 200);
     }
 
     /**

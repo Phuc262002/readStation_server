@@ -330,16 +330,12 @@ class AuthorController extends Controller
 
         $validator = Validator::make(['id' => $id], [
             'id' => 'required|integer|min:1'
-        ]);
-
-        $customMessages = [
+        ],[
             'id.required' => 'Trường id là bắt buộc.',
             'id.integer' => 'Id phải là một số nguyên.',
             'id.min' => 'Id phải lớn hơn hoặc bằng 1.'
-        ];
-
-        $validator->setCustomMessages($customMessages);
-
+        ]);
+        
         if ($validator->fails()) {
             return response()->json([
                 "staus" => false,

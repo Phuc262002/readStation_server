@@ -98,6 +98,7 @@ Route::group([
 
         Route::group(["middleware" => ["auth:api"]], function () {
             Route::get('/admin/get-all', [AdminPublishingCompanyController::class, 'getAllPublishingCompany']);
+            Route::get('/get-one/{id}', [AdminPublishingCompanyController::class, 'show']);
             Route::post('/create', [AdminPublishingCompanyController::class, 'store']);
             Route::put('/update/{id}', [AdminPublishingCompanyController::class, 'update']);
             Route::delete('/delete/{id}', [AdminPublishingCompanyController::class, 'destroy']);
