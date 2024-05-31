@@ -84,7 +84,7 @@ class AuthorController extends Controller
         $query->filter('active');
 
         // Thực hiện phân trang
-        $authors = $query->paginate($pageSize, ['*'], 'page', $page);
+        $authors = $query->orderBy('created_at', 'desc')->paginate($pageSize, ['*'], 'page', $page);
 
         return response()->json([
             "status" => true,

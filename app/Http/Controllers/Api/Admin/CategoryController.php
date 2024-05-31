@@ -270,7 +270,7 @@ class CategoryController extends Controller
         $query = $query->search($search);
 
         // Thực hiện phân trang
-        $categories = $query->paginate($pageSize, ['*'], 'page', $page);
+        $categories = $query->orderBy('created_at', 'desc')->paginate($pageSize, ['*'], 'page', $page);
 
         return response()->json([
             "status" => true,

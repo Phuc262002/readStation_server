@@ -77,7 +77,7 @@ class PublishingCompanyController extends Controller
         $totalItems = $query->count();
 
         // Thực hiện phân trang
-        $publishing_companies = $query->paginate($pageSize, ['*'], 'page', $page);
+        $publishing_companies = $query->orderBy('created_at', 'desc')->paginate($pageSize, ['*'], 'page', $page);
 
         return response()->json([
             "status" => true,
