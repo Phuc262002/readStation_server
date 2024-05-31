@@ -371,9 +371,7 @@ class AuthorController extends Controller
             'description' => 'nullable|string',
             'is_featured' => 'nullable|boolean',
             'dob' => 'nullable|date',
-        ]);
-
-        $customMessages = [
+        ],[
             'id.required' => 'Trường id là bắt buộc.',
             'id.integer' => 'Id phải là một số nguyên.',
             'id.min' => 'Id phải lớn hơn hoặc bằng 1.',
@@ -383,9 +381,7 @@ class AuthorController extends Controller
             'description.string' => 'Mô tả phải là một chuỗi.',
             'is_featured.boolean' => 'Is featured phải là một boolean.',
             'dob.date' => 'Ngày sinh phải là một ngày.'
-        ];
-
-        $validator->setCustomMessages($customMessages);
+        ]);
 
         if ($validator->fails()) {
             return response()->json([
@@ -402,6 +398,11 @@ class AuthorController extends Controller
                 "status" => false,
                 "message" => "Author not found!"
             ], 404);
+        } elseif ($author->is_featured === true && $request->status === 'inactive') {
+            return response()->json([
+                "status" => false,
+                "message" => "Không thể chuyển tác giả nổi bật sang trạng thái không hoạt động!"
+            ], 400);
         }
 
 
@@ -421,12 +422,15 @@ class AuthorController extends Controller
             } else {
                 return response()->json([
                     "status" => false,
-                    "message" => "At least one author must be featured!"
+                    "message" => "Phải có ít nhất một tác giả nổi bật!"
                 ], 400);
             }
 
 
-            $author->update($validator->validated());
+            $author->update(array_merge(
+                $validator->validated(),
+                ['is_featured' => $request->boolean('is_featured')]
+            ));
 
             return response()->json([
                 "status" => true,
