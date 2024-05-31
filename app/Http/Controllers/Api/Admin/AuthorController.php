@@ -60,7 +60,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Get(
-    path: '/api/v1/authors/{id}',
+    path: '/api/v1/authors/get-one/{id}',
     tags: ['Admin / Author'],
     operationId: 'getAuthor',
     summary: 'Get author by id',
