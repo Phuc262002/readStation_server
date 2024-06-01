@@ -179,7 +179,7 @@ class PostController extends Controller
                 "message" => "Post not found",
             ], 404);
         } else {
-            $post->increment('views');
+            $post->increment('view');
         }
 
         return response()->json([
