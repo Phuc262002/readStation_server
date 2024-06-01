@@ -219,7 +219,7 @@ class AuthorController extends Controller
             'search' => 'string',
             'status' => 'string|in:active,inactive,deleted',
             'author' => 'string'
-        ],[
+        ], [
             'page.integer' => 'Trang phải là số nguyên.',
             'page.min' => 'Trang phải lớn hơn hoặc bằng 1.',
             'pageSize.integer' => 'Kích thước trang phải là số nguyên.',
@@ -330,12 +330,12 @@ class AuthorController extends Controller
 
         $validator = Validator::make(['id' => $id], [
             'id' => 'required|integer|min:1'
-        ],[
+        ], [
             'id.required' => 'Trường id là bắt buộc.',
             'id.integer' => 'Id phải là một số nguyên.',
             'id.min' => 'Id phải lớn hơn hoặc bằng 1.'
         ]);
-        
+
         if ($validator->fails()) {
             return response()->json([
                 "staus" => false,
@@ -371,7 +371,7 @@ class AuthorController extends Controller
             'description' => 'nullable|string',
             'is_featured' => 'nullable|boolean',
             'dob' => 'nullable|date',
-        ],[
+        ], [
             'id.required' => 'Trường id là bắt buộc.',
             'id.integer' => 'Id phải là một số nguyên.',
             'id.min' => 'Id phải lớn hơn hoặc bằng 1.',
@@ -398,25 +398,18 @@ class AuthorController extends Controller
                 "status" => false,
                 "message" => "Author not found!"
             ], 404);
-        } elseif ($author->is_featured === true && $request->status === 'inactive') {
-            return response()->json([
-                "status" => false,
-                "message" => "Không thể chuyển tác giả nổi bật sang trạng thái không hoạt động!"
-            ], 400);
         }
 
         try {
             if ($request->input('is_featured') == true) {
-                if ($request->boolean('is_featured')) {
-                    Author::query()->update(['is_featured' => false]);
-                    $author->update(array_merge(
-                        $validator->validated(),
-                        [
-                            'is_featured' => true,
-                            'status' => 'active'
-                        ]
-                    ));
-                }
+                Author::query()->where('id', '!=', $id)->update(['is_featured' => false]);
+                $author->update(array_merge(
+                    $validator->validated(),
+                    [
+                        'is_featured' => true,
+                        'status' => 'active'
+                    ]
+                ));
             } else {
                 if (Author::where('is_featured', true)->count() == 0) {
                     $author->update(array_merge(
