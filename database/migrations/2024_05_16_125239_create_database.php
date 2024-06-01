@@ -125,7 +125,7 @@ return new class extends Migration
             $table->text('summary');
             $table->string('image');
             $table->string('slug')->unique();
-            $table->string('view')->default(0);
+            $table->integer('view')->default(0);
             $table->enum('status', ['wating_approve','draft', 'published','hidden', 'deleted'])->default('published');
             $table->timestamps();
 
@@ -250,7 +250,7 @@ return new class extends Migration
             $table->decimal('deposit_fee', 20, 8)->default(0);
             $table->decimal('fine_fee', 20, 8)->default(0);
             $table->decimal('total_fee', 20, 8)->default(0);
-            $table->enum('status', ['pending', 'hiring', 'completed', 'canceled', 'out_of_date'])->default('pending');
+            $table->enum('status', ['pending', 'approved', 'wating_take_book', 'hiring', 'increasing', 'wating_return', 'completed', 'canceled', 'out_of_date'])->default('pending');
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
