@@ -405,32 +405,31 @@ class AuthorController extends Controller
             ], 400);
         }
 
-
-        if ($validator->fails()) {
-            return response()->json([
-                "staus" => false,
-                "message" => "Validation error",
-                "errors" => $validator->errors()
-            ], 400);
-        }
-
         try {
             if ($request->input('is_featured') == true) {
                 if ($request->boolean('is_featured')) {
                     Author::query()->update(['is_featured' => false]);
+                    $author->update(array_merge(
+                        $validator->validated(),
+                        [
+                            'is_featured' => true,
+                            'status' => 'active'
+                        ]
+                    ));
                 }
             } else {
-                return response()->json([
-                    "status" => false,
-                    "message" => "Phải có ít nhất một tác giả nổi bật!"
-                ], 400);
+                if (Author::where('is_featured', true)->count() == 0) {
+                    $author->update(array_merge(
+                        $validator->validated(),
+                        [
+                            'is_featured' => true,
+                            'status' => 'active'
+                        ]
+                    ));
+                } else {
+                    $author->update($validator->validated());
+                }
             }
-
-
-            $author->update(array_merge(
-                $validator->validated(),
-                ['is_featured' => $request->boolean('is_featured')]
-            ));
 
             return response()->json([
                 "status" => true,
