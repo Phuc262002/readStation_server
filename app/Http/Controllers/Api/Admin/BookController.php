@@ -580,13 +580,13 @@ class BookController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'sku' => "required|string",
-            'author_id' => "required|string",
+            'author_id' => "required",
             'title' => "required|string",
             'original_title' => "required|string",
             'description_summary' => "required|string",
             'description' => "required|string",
             'is_featured' => 'nullable|boolean',
-            'category_id' => "required|string",
+            'category_id' => "required",
             'shelve_id' => "nullable",
             'book_detail' => "required|array",
             'book_detail.*.poster' => "required",
