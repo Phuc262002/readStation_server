@@ -356,6 +356,43 @@
                 ]
             }
         },
+        "/api/v1/books/admin/get-one/{id}": {
+            "get": {
+                "tags": [
+                    "Admin / Book"
+                ],
+                "summary": "Show book",
+                "description": "Show book",
+                "operationId": "showBook",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id của sách",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get book detail successfully!"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "404": {
+                        "description": "Book detail not found!"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/books/create": {
             "post": {
                 "tags": [
@@ -713,6 +750,116 @@
                 ]
             }
         },
+        "/api/v1/book-details": {
+            "get": {
+                "tags": [
+                    "Admin / BookDetail"
+                ],
+                "summary": "Get all book details",
+                "description": "Get all book details",
+                "operationId": "getAllBookDetails",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "pageSize",
+                        "in": "query",
+                        "description": "Number of items per page",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search keyword",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "category_id",
+                        "in": "query",
+                        "description": "Category id",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "author_id",
+                        "in": "query",
+                        "description": "Author id",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Status",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get all book details successfully!"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/book-details/get-one/{id}": {
+            "get": {
+                "tags": [
+                    "Admin / BookDetail"
+                ],
+                "summary": "Get book detail",
+                "description": "Get book detail",
+                "operationId": "getBookDetail",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id of book detail",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get book detail successfully!"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "404": {
+                        "description": "Book detail not found!"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/book-details/create": {
             "post": {
                 "tags": [
@@ -810,43 +957,6 @@
                     },
                     "500": {
                         "description": "Create book detail failed!"
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/api/v1/book-details/get-one/{id}": {
-            "get": {
-                "tags": [
-                    "Admin / BookDetail"
-                ],
-                "summary": "Get book detail",
-                "description": "Get book detail",
-                "operationId": "getBookDetail",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "Id of book detail",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Get book detail successfully!"
-                    },
-                    "400": {
-                        "description": "Validation error"
-                    },
-                    "404": {
-                        "description": "Book detail not found!"
                     }
                 },
                 "security": [
@@ -1974,7 +2084,8 @@
                             "schema": {
                                 "required": [
                                     "bookcase_id",
-                                    "category_id"
+                                    "category_id",
+                                    "description"
                                 ],
                                 "properties": {
                                     "bookcase_id": {
@@ -1985,6 +2096,9 @@
                                     },
                                     "category_id": {
                                         "type": "integer"
+                                    },
+                                    "description": {
+                                        "type": "string"
                                     }
                                 },
                                 "type": "object"
@@ -2035,7 +2149,9 @@
                                 "required": [
                                     "bookcase_id",
                                     "bookshelf_code",
-                                    "category_id"
+                                    "category_id",
+                                    "description",
+                                    "status"
                                 ],
                                 "properties": {
                                     "bookcase_id": {
@@ -2048,6 +2164,9 @@
                                         "type": "integer"
                                     },
                                     "status": {
+                                        "type": "string"
+                                    },
+                                    "description": {
                                         "type": "string"
                                     }
                                 },
@@ -3116,7 +3235,7 @@
                 "tags": [
                     "Public / Book"
                 ],
-                "summary": "Get one book by ID or slug",
+                "summary": "Get one book by slug",
                 "description": "Get one book",
                 "operationId": "getOneBook",
                 "parameters": [
@@ -3319,8 +3438,8 @@
                 "tags": [
                     "Public / Post"
                 ],
-                "summary": "Get a post by ID or slug",
-                "description": "Get a post by ID or slug",
+                "summary": "Get a post by slug",
+                "description": "Get a post by slug",
                 "operationId": "getPost",
                 "parameters": [
                     {

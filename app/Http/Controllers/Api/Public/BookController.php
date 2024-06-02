@@ -67,7 +67,7 @@ use OpenApi\Attributes as OA;
     path: '/api/v1/books/get-one/{book}',
     tags: ['Public / Book'],
     operationId: 'getOneBook',
-    summary: 'Get one book by ID or slug',
+    summary: 'Get one book by slug',
     description: 'Get one book',
     parameters: [
         new OA\Parameter(
@@ -199,20 +199,16 @@ class BookController extends Controller
         ], 200);
     }
 
-    public function show(Request $request, Book $book)
+    public function show(Request $request)
     {
         $this->checkBookDetail();
-        $id = $request->route('book');
+        $slug = $request->route('slug');
 
-        $validator = Validator::make(['book' => $id], [
-            'book' => 'required'
+        $validator = Validator::make(['slug' => $slug], [
+            'slug' => 'required'
+        ], [
+            'slug.required' => 'Slug không được để trống.'
         ]);
-
-        $customMessages = [
-            'id.required' => 'Phải có id hoặc slug để lấy thông tin sách.',
-        ];
-
-        $validator->setCustomMessages($customMessages);
 
         if ($validator->fails()) {
             return response()->json([
@@ -222,11 +218,7 @@ class BookController extends Controller
             ], 400);
         }
 
-        if (is_numeric($id)) {
-            $book = Book::with('category', 'author', 'bookDetail')->find($id);
-        } else {
-            $book = Book::with('category', 'author', 'bookDetail')->where('slug', $id)->first();
-        }
+        $book = Book::with('category', 'author', 'bookDetail', 'shelve', 'shelve.bookcase', 'shelve.category')->where('slug', $slug)->first();
 
         if (!$book) {
             return response()->json([

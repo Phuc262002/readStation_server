@@ -52,16 +52,6 @@ class Bookcase extends Model
         return $this->hasManyThrough(Book::class, Shelve::class);
     }
 
-    public function categories()
-    {
-        return $this->hasManyThrough(Category::class, Shelve::class);
-    }
-
-    public function bookcases()
-    {
-        return $this->hasManyThrough(Bookcase::class, Shelve::class);
-    }
-
     public function delete()
     {
         $this->status = 'deleted';

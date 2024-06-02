@@ -73,6 +73,40 @@ use OpenApi\Attributes as OA;
     ],
 )]
 
+#[OA\Get(
+    path: '/api/v1/books/admin/get-one/{id}',
+    tags: ['Admin / Book'],
+    operationId: 'showBook',
+    summary: 'Show book',
+    description: 'Show book',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    parameters: [
+        new OA\Parameter(
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Id của sách',
+            schema: new OA\Schema(type: 'integer')
+        ),
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Get book detail successfully!',
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error',
+        ),
+        new OA\Response(
+            response: 404,
+            description: 'Book detail not found!',
+        ),
+    ],
+)]
+
 #[OA\Post(
     path: '/api/v1/books/create',
     tags: ['Admin / Book'],
@@ -398,7 +432,7 @@ class BookController extends Controller
 
         // Tạo query ban đầu
         $query = Book::query()
-            ->with(['category', 'author', 'bookDetail' => function ($query) {
+            ->with(['category', 'author', 'shelve', 'shelve.bookcase', 'shelve.category', 'bookDetail' => function ($query) {
                 $query->where('status', '!=', 'deleted');
             }])
             ->whereHas('bookDetail', function ($q) {
@@ -427,6 +461,46 @@ class BookController extends Controller
                 "totalResults" => $books->total(),
                 "total" => $totalItems
             ],
+        ], 200);
+    }
+
+    public function show(Request $request)
+    {
+        $this->checkBookDetail();
+        $id = $request->route('id');
+
+        $validator = Validator::make(['id' => $id], [
+            'id' => 'required|integer|min:1'
+        ]);
+
+        $customMessages = [
+            'id.required' => 'Trường id là bắt buộc.',
+            'id.integer' => 'Id phải là một số nguyên.',
+            'id.min' => 'Id phải lớn hơn hoặc bằng 1.'
+        ];
+
+        $validator->setCustomMessages($customMessages);
+
+        if ($validator->fails()) {
+            return response()->json([
+                "staus" => false,
+                "message" => "Validation error",
+                "errors" => $validator->errors()
+            ], 400);
+        }
+
+        $bookdetail = Book::with('bookDetail', 'category', 'author', 'shelve', 'shelve.bookcase', 'shelve.category')->find($id);
+        if (!$bookdetail) {
+            return response()->json([
+                "status" => false,
+                "message" => "Book detail not found!"
+            ], 404);
+        }
+
+        return response()->json([
+            "status" => true,
+            "message" => "Get book detail successfully!",
+            "data" => $bookdetail
         ], 200);
     }
 

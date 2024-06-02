@@ -53,8 +53,8 @@ use OpenApi\Attributes as OA;
     path: '/api/v1/posts/get-one/{post}',
     tags: ['Public / Post'],
     operationId: 'getPost',
-    summary: 'Get a post by ID or slug',
-    description: 'Get a post by ID or slug',
+    summary: 'Get a post by slug',
+    description: 'Get a post by slug',
     parameters: [
         new OA\Parameter(
             name: 'post',
@@ -142,14 +142,14 @@ class PostController extends Controller
     public function show(Request $request)
     {
 
-        $post = $request->route('post');
+        $slug = $request->route('slug');
 
-        $validator = Validator::make(['post' => $post], [
-            'post' => 'required',
+        $validator = Validator::make(['slug' => $slug], [
+            'slug' => 'required',
         ]);
 
         $customMessages = [
-            'post.required' => 'Post không được để trống.',
+            'slug.required' => 'Slug không được để trống.',
         ];
 
         $validator->setCustomMessages($customMessages);
@@ -161,12 +161,7 @@ class PostController extends Controller
                 "errors" => $validator->errors()
             ], 400);
         }
-
-        if (is_numeric($request->post)) {
-            $post = Post::with('user', 'category')->find($request->post);
-        } else {
-            $post = Post::with('user', 'category')->where('slug', $request->post)->first();
-        }
+        $post = Post::with('user', 'category')->where('slug', $slug)->first();
 
         if (!$post) {
             return response()->json([

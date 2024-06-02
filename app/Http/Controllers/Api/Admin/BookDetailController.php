@@ -9,6 +9,99 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use OpenApi\Attributes as OA;
 
+#[OA\Get(
+    path: '/api/v1/book-details',
+    tags: ['Admin / BookDetail'],
+    operationId: 'getAllBookDetails',
+    summary: 'Get all book details',
+    description: 'Get all book details',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    parameters: [
+        new OA\Parameter(
+            name: 'page',
+            in: 'query',
+            description: 'Page number',
+            schema: new OA\Schema(type: 'integer')
+        ),
+        new OA\Parameter(
+            name: 'pageSize',
+            in: 'query',
+            description: 'Number of items per page',
+            schema: new OA\Schema(type: 'integer')
+        ),
+        new OA\Parameter(
+            name: 'search',
+            in: 'query',
+            description: 'Search keyword',
+            schema: new OA\Schema(type: 'string')
+        ),
+        new OA\Parameter(
+            name: 'category_id',
+            in: 'query',
+            description: 'Category id',
+            schema: new OA\Schema(type: 'integer')
+        ),
+        new OA\Parameter(
+            name: 'author_id',
+            in: 'query',
+            description: 'Author id',
+            schema: new OA\Schema(type: 'integer')
+        ),
+        new OA\Parameter(
+            name: 'status',
+            in: 'query',
+            description: 'Status',
+            schema: new OA\Schema(type: 'string')
+        )
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Get all book details successfully!'
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error'
+        )
+    ],
+)]
+
+#[OA\Get(
+    path: '/api/v1/book-details/get-one/{id}',
+    tags: ['Admin / BookDetail'],
+    operationId: 'getBookDetail',
+    summary: 'Get book detail',
+    description: 'Get book detail',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    parameters: [
+        new OA\Parameter(
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Id of book detail',
+            schema: new OA\Schema(type: 'string')
+        )
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Get book detail successfully!'
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error'
+        ),
+        new OA\Response(
+            response: 404,
+            description: 'Book detail not found!'
+        )
+    ],
+)]
+
 #[OA\Post(
     path: '/api/v1/book-details/create',
     tags: ['Admin / BookDetail'],
@@ -69,40 +162,6 @@ use OpenApi\Attributes as OA;
         new OA\Response(
             response: 500,
             description: 'Create book detail failed!'
-        )
-    ],
-)]
-
-#[OA\Get(
-    path: '/api/v1/book-details/get-one/{id}',
-    tags: ['Admin / BookDetail'],
-    operationId: 'getBookDetail',
-    summary: 'Get book detail',
-    description: 'Get book detail',
-    security: [
-        ['bearerAuth' => []]
-    ],
-    parameters: [
-        new OA\Parameter(
-            name: 'id',
-            in: 'path',
-            required: true,
-            description: 'Id of book detail',
-            schema: new OA\Schema(type: 'string')
-        )
-    ],
-    responses: [
-        new OA\Response(
-            response: 200,
-            description: 'Get book detail successfully!'
-        ),
-        new OA\Response(
-            response: 400,
-            description: 'Validation error'
-        ),
-        new OA\Response(
-            response: 404,
-            description: 'Book detail not found!'
         )
     ],
 )]
@@ -224,6 +283,87 @@ use OpenApi\Attributes as OA;
 
 class BookDetailController extends Controller
 {
+    public function index(Request $request)
+    {
+        $this->checkBookDetail();
+        $validator = Validator::make($request->all(), [
+            'page' => 'integer|min:1',
+            'pageSize' => 'integer|min:1',
+            'search' => 'string',
+            'category_id' => 'integer',
+            'author_id' => 'integer',
+            'status' => 'string|in:active,inactive,deleted',
+        ], [
+            'page.integer' => 'Trang phải là số nguyên.',
+            'page.min' => 'Trang phải lớn hơn hoặc bằng 1.',
+            'pageSize.integer' => 'Kích thước trang phải là số nguyên.',
+            'pageSize.min' => 'Kích thước trang phải lớn hơn hoặc bằng 1.',
+            'category_id.integer' => 'Category_id phải là một số nguyên.',
+            'author_id.integer' => 'Author_id phải là một số nguyên.',
+            'status.in' => 'Status phải là active, inactive hoặc deleted.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                "staus" => false,
+                "message" => "Validation error",
+                "errors" => $validator->errors()
+            ], 400);
+        }
+
+        // Lấy giá trị page và pageSize từ query parameters
+        $page = $request->input('page', 1);
+        $pageSize = $request->input('pageSize', 10);
+        $search = $request->input('search');
+        $category_id = $request->input('category_id');
+        $author_id = $request->input('author_id');
+        $status = $request->input('status');
+
+        $query = BookDetail::with('book', 'book.category', 'book.author', 'book.shelve', 'book.shelve.bookcase');
+
+        $totalItems = $query->count();
+        // Apply filters
+        if ($search) {
+            $query->whereHas('book', function ($q) use ($search) {
+                $q->where('title', 'like', '%' . $search . '%')
+                    ->orWhere('original_title', 'like', '%' . $search . '%');
+            });
+        }
+
+        if ($category_id) {
+            $query->whereHas('book.category', function ($q) use ($category_id) {
+                $q->where('id', $category_id);
+            });
+        }
+
+        if ($author_id) {
+            $query->whereHas('book.author', function ($q) use ($author_id) {
+                $q->where('id', $author_id);
+            });
+        }
+
+        if ($status) {
+            $query->where('status', $status);
+        } else {
+            $query->where('status', '!=', 'deleted');
+        }
+
+        $bookdetails = $query->orderBy('created_at', 'desc')->paginate($pageSize, ['*'], 'page', $page);
+
+        return response()->json([
+            "status" => true,
+            "message" => "Get all bookdetails successfully!",
+            "data" => [
+                "books" => $bookdetails->items(),
+                "page" => $bookdetails->currentPage(),
+                "pageSize" => $bookdetails->perPage(),
+                "lastPage" => $bookdetails->lastPage(),
+                "totalResults" => $bookdetails->total(),
+                "total" => $totalItems
+            ],
+        ], 200);
+    }
+
     public function checkBookDetail()
     {
         // Find books without a bookDetail or with an inactive bookDetail
@@ -273,7 +413,7 @@ class BookDetailController extends Controller
             'translator' => "nullable",
             'language' => "required",
             'book_size' => "nullable",
-        ],[
+        ], [
             'book_id.required' => 'Trường book_id là bắt buộc.',
             'sku_origin.required' => 'Trường sku_origin là bắt buộc.',
             'poster.required' => 'Trường poster là bắt buộc.',
@@ -343,7 +483,7 @@ class BookDetailController extends Controller
             ], 400);
         }
 
-        $bookdetail = BookDetail::with('book')->find($id);
+        $bookdetail = BookDetail::with('book', 'book.category', 'book.author', 'book.shelve', 'book.shelve.bookcase')->find($id);
         if (!$bookdetail) {
             return response()->json([
                 "status" => false,
@@ -380,7 +520,7 @@ class BookDetailController extends Controller
             'translator' => "nullable|string",
             'language' => "required|string",
             'book_size' => "nullable|string",
-        ],[
+        ], [
             'id.required' => 'Trường id là bắt buộc.',
             'id.integer' => 'Id phải là một số nguyên.',
             'id.min' => 'Id phải lớn hơn hoặc bằng 1.',

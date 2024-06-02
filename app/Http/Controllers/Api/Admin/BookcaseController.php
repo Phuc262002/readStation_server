@@ -247,7 +247,7 @@ class BookcaseController extends Controller
         $status = $request->input('status');
 
         // Tạo query ban đầu
-        $query = Bookcase::query();
+        $query = Bookcase::query()->with(['shelves', 'books']);
 
         // Lấy tổng số mục trong DB trước khi áp dụng bộ lọc tìm kiếm
 
@@ -324,7 +324,7 @@ class BookcaseController extends Controller
             ], 400);
         }
 
-        $bookcase = Bookcase::find($id);
+        $bookcase = Bookcase::with(['shelves','shelves.books', 'books'])->find($id);
 
         if (!$bookcase) {
             return response()->json([

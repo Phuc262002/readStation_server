@@ -17,6 +17,11 @@ class Shelve extends Model
         'status',
     ];
 
+    protected $hidden = [
+        'bookcase_id',
+        'category_id'
+    ];
+
     protected static function boot()
     {
         parent::boot();

@@ -133,9 +133,10 @@ Route::group([
         "prefix" => "books"
     ], function () {
         Route::get('/', [BookController::class, 'index']);
-        Route::get('/get-one/{book}', [BookController::class, 'show']);
+        Route::get('/get-one/{slug}', [BookController::class, 'show']);
 
         Route::group(["middleware" => ["auth:api"]], function () {
+            Route::get('/admin/get-one/{id}', [AdminBookController::class, 'show']);
             Route::get('/admin/get-all', [AdminBookController::class, 'getAllBook']);
             Route::post('/create', [AdminBookController::class, 'store']);
             Route::post('/create-full', [AdminBookController::class, 'createFullBook']);
@@ -148,7 +149,7 @@ Route::group([
         "prefix" => "posts"
     ], function () {
         Route::get('/', [PublicPostController::class, 'index']);
-        Route::get('/get-one/{post}', [PublicPostController::class, 'show']);
+        Route::get('/get-one/{slug}', [PublicPostController::class, 'show']);
 
         Route::group(["middleware" => ["auth:api"]], function () {
             Route::post('/create', [PostController::class, 'store']);
@@ -171,6 +172,7 @@ Route::group([
         "prefix" => "book-details",
         "middleware" => ["auth:api"]
     ], function () {
+        Route::get('/', [BookDetailController::class, 'index']);
         Route::get('/get-one/{id}', [BookDetailController::class, 'show']);
         Route::post('/create', [BookDetailController::class, 'store']);
         Route::put('/update/{id}', [BookDetailController::class, 'update']);

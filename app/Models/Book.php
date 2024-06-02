@@ -27,6 +27,7 @@ class Book extends Model
     protected $hidden = [
         'category_id',
         'author_id',
+        'shelve_id',
     ];
 
     protected static function boot()
@@ -48,8 +49,6 @@ class Book extends Model
         return $this->belongsTo(Author::class);
     }
 
-    
-
     public function category()
     {
         return $this->belongsTo(Category::class);
@@ -60,14 +59,14 @@ class Book extends Model
         return $this->hasMany(BookDetail::class);
     }
 
-    // public function shelve()
-    // {
-    //     return $this->belongsTo(Shelve::class);
-    // }
+    public function shelve()
+    {
+        return $this->belongsTo(Shelve::class);
+    }
 
     public function scopeSearch($query, $search)
     {
-        return $query->where('title', 'like', '%' . $search . '%');
+        return $query->where('title', 'like', '%' . $search . '%')->orWhere('original_title', 'like', '%' . $search . '%');
     }
 
     public function scopeFilter($query, $category_id, $status, $author_id, $is_admin = false)
