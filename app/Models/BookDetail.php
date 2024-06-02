@@ -13,6 +13,7 @@ class BookDetail extends Model
 
     protected $fillable = [
         'book_id',
+        'sku_origin',
         'poster',
         'images',
         'book_version',

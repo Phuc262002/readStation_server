@@ -370,7 +370,7 @@
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "sku",
+                                    "sku_generated",
                                     "author_id",
                                     "title",
                                     "original_title",
@@ -379,7 +379,7 @@
                                     "category_id"
                                 ],
                                 "properties": {
-                                    "sku": {
+                                    "sku_generated": {
                                         "type": "string"
                                     },
                                     "author_id": {
@@ -444,7 +444,6 @@
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "sku",
                                     "author_id",
                                     "title",
                                     "original_title",
@@ -454,9 +453,6 @@
                                     "book_detail"
                                 ],
                                 "properties": {
-                                    "sku": {
-                                        "type": "string"
-                                    },
                                     "author_id": {
                                         "type": "string"
                                     },
@@ -485,6 +481,7 @@
                                         "type": "array",
                                         "items": {
                                             "required": [
+                                                "sku_origin",
                                                 "poster",
                                                 "images",
                                                 "book_version",
@@ -499,6 +496,9 @@
                                                 "language"
                                             ],
                                             "properties": {
+                                                "sku_origin": {
+                                                    "type": "string"
+                                                },
                                                 "poster": {
                                                     "type": "string"
                                                 },
@@ -602,7 +602,7 @@
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "sku",
+                                    "sku_generated",
                                     "author_id",
                                     "title",
                                     "original_title",
@@ -614,7 +614,7 @@
                                     "status"
                                 ],
                                 "properties": {
-                                    "sku": {
+                                    "sku_generated": {
                                         "type": "string"
                                     },
                                     "author_id": {
@@ -728,6 +728,7 @@
                             "schema": {
                                 "required": [
                                     "book_id",
+                                    "sku_origin",
                                     "poster",
                                     "images",
                                     "book_version",
@@ -743,6 +744,9 @@
                                 ],
                                 "properties": {
                                     "book_id": {
+                                        "type": "string"
+                                    },
+                                    "sku_origin": {
                                         "type": "string"
                                     },
                                     "poster": {
@@ -878,6 +882,7 @@
                             "schema": {
                                 "required": [
                                     "book_id",
+                                    "sku_origin",
                                     "poster",
                                     "images",
                                     "book_version",
@@ -893,6 +898,9 @@
                                 ],
                                 "properties": {
                                     "book_id": {
+                                        "type": "string"
+                                    },
+                                    "sku_origin": {
                                         "type": "string"
                                     },
                                     "poster": {
@@ -999,6 +1007,267 @@
                     },
                     "500": {
                         "description": "Delete book detail failed!"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/bookcases": {
+            "get": {
+                "tags": [
+                    "Admin / Bookcase"
+                ],
+                "summary": "Get all bookcases",
+                "description": "Get all bookcases with pagination, search and filter",
+                "operationId": "getAllBookcases",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Số trang hiện tại",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "pageSize",
+                        "in": "query",
+                        "description": "Số lượng mục trên mỗi trang",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Loại trạng thái",
+                        "required": false,
+                        "schema": {
+                            "enum": [
+                                "active",
+                                "inactive",
+                                "deleted"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Từ khóa tìm kiếm",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get all bookcases successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/bookcases/create": {
+            "post": {
+                "tags": [
+                    "Admin / Bookcase"
+                ],
+                "summary": "Create new bookcase",
+                "description": "Create new bookcase",
+                "operationId": "createBookcase",
+                "requestBody": {
+                    "description": "Create new bookcase",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "bookcase_code",
+                                    "description"
+                                ],
+                                "properties": {
+                                    "bookcase_code": {
+                                        "type": "string",
+                                        "default": null,
+                                        "nullable": true
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Create bookcase successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/bookcases/get-one/{id}": {
+            "get": {
+                "tags": [
+                    "Admin / Bookcase"
+                ],
+                "summary": "Get bookcase by id",
+                "description": "Get bookcase by id",
+                "operationId": "getBookcase",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id của bookcase",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get bookcase successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "404": {
+                        "description": "Bookcase not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/bookcases/update/{id}": {
+            "put": {
+                "tags": [
+                    "Admin / Bookcase"
+                ],
+                "summary": "Update bookcase by id",
+                "description": "Update bookcase by id",
+                "operationId": "updateBookcase",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id của bookcase",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Update bookcase",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "description"
+                                ],
+                                "properties": {
+                                    "bookcase_code": {
+                                        "type": "string",
+                                        "default": null,
+                                        "nullable": true
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "default": null,
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Update bookcase successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "404": {
+                        "description": "Bookcase not found"
+                    },
+                    "500": {
+                        "description": "Update bookcase failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/bookcases/delete/{id}": {
+            "delete": {
+                "tags": [
+                    "Admin / Bookcase"
+                ],
+                "summary": "Delete bookcase by id",
+                "description": "Delete bookcase by id",
+                "operationId": "deleteBookcase",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id của bookcase",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Delete bookcase successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "404": {
+                        "description": "Bookcase not found"
+                    },
+                    "500": {
+                        "description": "Delete bookcase failed"
                     }
                 },
                 "security": [
@@ -1558,6 +1827,140 @@
                     },
                     "500": {
                         "description": "Delete publishing company failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/shelves": {
+            "get": {
+                "tags": [
+                    "Admin / Shelve"
+                ],
+                "summary": "Danh sách kệ sách",
+                "description": "Lấy danh sách kệ sách",
+                "operationId": "getAllShelves",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Số trang hiện tại",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "pageSize",
+                        "in": "query",
+                        "description": "Số lượng mục trên mỗi trang",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Loại trạng thái",
+                        "required": false,
+                        "schema": {
+                            "enum": [
+                                "active",
+                                "inactive",
+                                "deleted"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Từ khóa tìm kiếm",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "category_id",
+                        "in": "query",
+                        "description": "ID danh mục",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "bookcase_id",
+                        "in": "query",
+                        "description": "ID kệ sách",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get all shelve successfully!"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/shelves/create": {
+            "post": {
+                "tags": [
+                    "Admin / Shelve"
+                ],
+                "summary": "Tạo kệ sách",
+                "description": "Tạo mới một kệ sách",
+                "operationId": "createShelve",
+                "requestBody": {
+                    "description": "Create new shelve",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "bookcase_id",
+                                    "category_id"
+                                ],
+                                "properties": {
+                                    "bookcase_id": {
+                                        "type": "integer"
+                                    },
+                                    "bookshelf_code": {
+                                        "type": "string"
+                                    },
+                                    "category_id": {
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Create shelve successfully!"
+                    },
+                    "400": {
+                        "description": "Validation error"
                     }
                 },
                 "security": [

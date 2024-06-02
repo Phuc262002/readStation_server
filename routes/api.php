@@ -1,10 +1,12 @@
 <?php
 
 use App\Http\Controllers\Api\Admin\AuthorController as AdminAuthorController;
+use App\Http\Controllers\Api\Admin\BookcaseController;
 use App\Http\Controllers\Api\Admin\BookController as AdminBookController;
 use App\Http\Controllers\Api\Admin\BookDetailController;
 use App\Http\Controllers\Api\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Api\Admin\PublishingCompanyController as AdminPublishingCompanyController;
+use App\Http\Controllers\Api\Admin\ShelveController;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Auth\PasswordController;
 use App\Http\Controllers\Api\Auth\VerifyEmailController;
@@ -103,6 +105,28 @@ Route::group([
             Route::put('/update/{id}', [AdminPublishingCompanyController::class, 'update']);
             Route::delete('/delete/{id}', [AdminPublishingCompanyController::class, 'destroy']);
         });
+    });
+
+    Route::group([
+        "prefix" => "bookcases",
+        "middleware" => ["auth:api"]
+    ], function () {
+        Route::get('/', [BookcaseController::class, 'index']);
+        Route::get('/get-one/{id}', [BookcaseController::class, 'show']);
+        Route::post('/create', [BookcaseController::class, 'store']);
+        Route::put('/update/{id}', [BookcaseController::class, 'update']);
+        Route::delete('/delete/{id}', [BookcaseController::class, 'destroy']);
+    });
+
+    Route::group([
+        "prefix" => "shelves",
+        "middleware" => ["auth:api"]
+    ], function () {
+        Route::get('/', [ShelveController::class, 'index']);
+        Route::get('/get-one/{id}', [ShelveController::class, 'show']);
+        Route::post('/create', [ShelveController::class, 'store']);
+        Route::put('/update/{id}', [ShelveController::class, 'update']);
+        Route::delete('/delete/{id}', [ShelveController::class, 'destroy']);
     });
 
     Route::group([

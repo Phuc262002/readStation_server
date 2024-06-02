@@ -11,7 +11,7 @@ class Book extends Model
     use HasFactory;
 
     protected $fillable = [
-        'sku',
+        'sku_generated',
         'author_id',
         'title',
         'original_title',
@@ -35,6 +35,7 @@ class Book extends Model
 
         static::creating(function ($model) {
             $model->slug = Str::slug($model->title.'-'.Str::random(5));
+            $model->sku_generated = strtoupper(substr(md5(uniqid()), 0, 10));
         });
 
         static::updating(function ($model) {

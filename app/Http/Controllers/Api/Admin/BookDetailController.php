@@ -23,6 +23,7 @@ use OpenApi\Attributes as OA;
         content: new OA\JsonContent(
             required: [
                 'book_id',
+                'sku_origin',
                 'poster',
                 'images',
                 'book_version',
@@ -38,6 +39,7 @@ use OpenApi\Attributes as OA;
             ],
             properties: [
                 new OA\Property(property: 'book_id', type: 'string'),
+                new OA\Property(property: 'sku_origin', type: 'string'),
                 new OA\Property(property: 'poster', type: 'string'),
                 new OA\Property(property: 'images', type: 'array', items: new OA\Items(type: 'string')),
                 new OA\Property(property: 'book_version', type: 'string'),
@@ -128,6 +130,7 @@ use OpenApi\Attributes as OA;
         content: new OA\JsonContent(
             required: [
                 'book_id',
+                'sku_origin',
                 'poster',
                 'images',
                 'book_version',
@@ -143,6 +146,7 @@ use OpenApi\Attributes as OA;
             ],
             properties: [
                 new OA\Property(property: 'book_id', type: 'string'),
+                new OA\Property(property: 'sku_origin', type: 'string'),
                 new OA\Property(property: 'poster', type: 'string'),
                 new OA\Property(property: 'images', type: 'array', items: new OA\Items(type: 'string')),
                 new OA\Property(property: 'book_version', type: 'string'),
@@ -254,6 +258,7 @@ class BookDetailController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'book_id' => "required",
+            'sku_origin' => 'required|string',
             'poster' => "required",
             'images' => "required|array",
             'book_version' => "required",
@@ -270,6 +275,7 @@ class BookDetailController extends Controller
             'book_size' => "nullable",
         ],[
             'book_id.required' => 'Trường book_id là bắt buộc.',
+            'sku_origin.required' => 'Trường sku_origin là bắt buộc.',
             'poster.required' => 'Trường poster là bắt buộc.',
             'images.required' => 'Trường images là bắt buộc.',
             'book_version.required' => 'Trường book_version là bắt buộc.',
@@ -359,17 +365,18 @@ class BookDetailController extends Controller
         $validator = Validator::make(array_merge(['id' => $id], $request->all()), [
             'id' => 'required|integer|min:1',
             'book_id' => "required|integer",
+            'sku_origin' => 'required|string',
             'poster' => "required|string",
             'images' => "required|array",
             'book_version' => "required|string",
-            'price' => "required|integer",
-            'hire_percent' => "required|integer",
-            'stock' => "required|integer",
+            'price' => "required",
+            'hire_percent' => "required",
+            'stock' => "required",
             'publish_date' => "required|date",
-            'publishing_company_id' => "required|integer",
+            'publishing_company_id' => "required",
             'issuing_company' => "required|string",
             'cardboard' => "required|string|in:hard,soft",
-            'total_page' => "required|integer",
+            'total_page' => "required",
             'translator' => "nullable|string",
             'language' => "required|string",
             'book_size' => "nullable|string",
@@ -378,6 +385,7 @@ class BookDetailController extends Controller
             'id.integer' => 'Id phải là một số nguyên.',
             'id.min' => 'Id phải lớn hơn hoặc bằng 1.',
             'book_id.required' => 'Trường book_id là bắt buộc.',
+            'sku_origin.required' => 'Trường sku_origin là bắt buộc.',
             'poster.required' => 'Trường poster là bắt buộc.',
             'images.required' => 'Trường images là bắt buộc.',
             'book_version.required' => 'Trường book_version là bắt buộc.',
@@ -391,12 +399,7 @@ class BookDetailController extends Controller
             'total_page.required' => 'Trường total_page là bắt buộc.',
             'language.required' => 'Trường language là bắt buộc.',
             'images.array' => 'Trường images phải là một mảng.',
-            'price.integer' => 'Trường price phải là một số.',
-            'hire_percent.integer' => 'Trường hire_percent phải là một số.',
-            'stock.integer' => 'Trường stock phải là một số.',
-            'publishing_company_id.integer' => 'Trường publishing_company_id phải là một số.',
             'cardboard.in' => 'Trường cardboard phải là hard hoặc soft.',
-            'total_page.integer' => 'Trường total_page phải là một số.'
         ]);
 
         if ($validator->fails()) {

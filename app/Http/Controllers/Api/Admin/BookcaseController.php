@@ -3,17 +3,17 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Category;
+use App\Models\Bookcase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use OpenApi\Attributes as OA;
 
 #[OA\Get(
-    path: '/api/v1/categories/admin/get-all',
-    tags: ['Admin / Category'],
-    operationId: 'getAllCategory',
-    summary: 'Get all categories (admin)',
-    description: 'Get all categories',
+    path: '/api/v1/bookcases',
+    tags: ['Admin / Bookcase'],
+    operationId: 'getAllBookcases',
+    summary: 'Get all bookcases',
+    description: 'Get all bookcases with pagination, search and filter',
     security: [
         ['bearerAuth' => []]
     ],
@@ -33,17 +33,10 @@ use OpenApi\Attributes as OA;
             schema: new OA\Schema(type: 'integer', default: 10)
         ),
         new OA\Parameter(
-            name: 'type',
-            in: 'query',
-            required: true,
-            description: 'Loại danh mục',
-            schema: new OA\Schema(enum: ['book', 'post'], default: 'book')
-        ),
-        new OA\Parameter(
             name: 'status',
             in: 'query',
             required: false,
-            description: 'Loại danh mục',
+            description: 'Loại trạng thái',
             schema: new OA\Schema(enum: ['active', 'inactive', 'deleted'])
         ),
         new OA\Parameter(
@@ -57,7 +50,39 @@ use OpenApi\Attributes as OA;
     responses: [
         new OA\Response(
             response: 200,
-            description: 'Get all categories successfully!',
+            description: 'Get all bookcases successfully',
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error',
+        ),
+    ],
+)]
+
+#[OA\Post(
+    path: '/api/v1/bookcases/create',
+    tags: ['Admin / Bookcase'],
+    operationId: 'createBookcase',
+    summary: 'Create new bookcase',
+    description: 'Create new bookcase',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    requestBody: new OA\RequestBody(
+        required: true,
+        description: 'Create new bookcase',
+        content: new OA\JsonContent(
+            required: ['bookcase_code', 'description'],
+            properties: [
+                new OA\Property(property: 'bookcase_code', type: 'string', default: null, nullable: true),
+                new OA\Property(property: 'description', type: 'string'),
+            ]
+        )
+    ),
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Create bookcase successfully',
         ),
         new OA\Response(
             response: 400,
@@ -67,11 +92,11 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Get(
-    path: '/api/v1/categories/get-one/{id}',
-    tags: ['Admin / Category'],
-    operationId: 'getCategory',
-    summary: 'Get a category',
-    description: 'Get a category',
+    path: '/api/v1/bookcases/get-one/{id}',
+    tags: ['Admin / Bookcase'],
+    operationId: 'getBookcase',
+    summary: 'Get bookcase by id',
+    description: 'Get bookcase by id',
     security: [
         ['bearerAuth' => []]
     ],
@@ -80,14 +105,14 @@ use OpenApi\Attributes as OA;
             name: 'id',
             in: 'path',
             required: true,
-            description: 'ID của danh mục',
+            description: 'Id của bookcase',
             schema: new OA\Schema(type: 'integer')
         ),
     ],
     responses: [
         new OA\Response(
             response: 200,
-            description: 'Get category successfully!',
+            description: 'Get bookcase successfully',
         ),
         new OA\Response(
             response: 400,
@@ -95,49 +120,17 @@ use OpenApi\Attributes as OA;
         ),
         new OA\Response(
             response: 404,
-            description: 'Category not found!',
-        ),
-    ],
-)]
-
-#[OA\Post(
-    path: '/api/v1/categories/create',
-    tags: ['Admin / Category'],
-    operationId: 'createCategory',
-    summary: 'Create a category',
-    description: 'Create a category',
-    security: [
-        ['bearerAuth' => []]
-    ],
-    requestBody: new OA\RequestBody(
-        required: true,
-        content: new OA\JsonContent(
-            required: ['name', 'type'],
-            properties: [
-                new OA\Property(property: 'name', type: 'string'),
-                new OA\Property(property: 'description', type: 'string'),
-                new OA\Property(property: 'type', type: 'string', enum: ['book', 'post'])
-            ]
-        )
-    ),
-    responses: [
-        new OA\Response(
-            response: 200,
-            description: 'Create category successfully!',
-        ),
-        new OA\Response(
-            response: 400,
-            description: 'Validation error',
+            description: 'Bookcase not found',
         ),
     ],
 )]
 
 #[OA\Put(
-    path: '/api/v1/categories/update/{id}',
-    tags: ['Admin / Category'],
-    operationId: 'updateCategory',
-    summary: 'Update a category',
-    description: 'Update a category',
+    path: '/api/v1/bookcases/update/{id}',
+    tags: ['Admin / Bookcase'],
+    operationId: 'updateBookcase',
+    summary: 'Update bookcase by id',
+    description: 'Update bookcase by id',
     security: [
         ['bearerAuth' => []]
     ],
@@ -146,26 +139,26 @@ use OpenApi\Attributes as OA;
             name: 'id',
             in: 'path',
             required: true,
-            description: 'ID của danh mục',
+            description: 'Id của bookcase',
             schema: new OA\Schema(type: 'integer')
         ),
     ],
     requestBody: new OA\RequestBody(
         required: true,
+        description: 'Update bookcase',
         content: new OA\JsonContent(
-            required: ['name', 'type', 'status'],
+            required: ['description'],
             properties: [
-                new OA\Property(property: 'name', type: 'string'),
+                new OA\Property(property: 'bookcase_code', type: 'string', default: null, nullable: true),
                 new OA\Property(property: 'description', type: 'string'),
-                new OA\Property(property: 'type', type: 'string', enum: ['book', 'post']),
-                new OA\Property(property: 'status', type: 'string', enum: ['active', 'inactive', 'deleted'])
+                new OA\Property(property: 'status', type: 'string', default: null, nullable: true),
             ]
         )
     ),
     responses: [
         new OA\Response(
             response: 200,
-            description: 'Update category successfully!',
+            description: 'Update bookcase successfully',
         ),
         new OA\Response(
             response: 400,
@@ -173,21 +166,21 @@ use OpenApi\Attributes as OA;
         ),
         new OA\Response(
             response: 404,
-            description: 'Category not found!',
+            description: 'Bookcase not found',
         ),
         new OA\Response(
             response: 500,
-            description: 'Update category failed!',
+            description: 'Update bookcase failed',
         ),
     ],
 )]
 
 #[OA\Delete(
-    path: '/api/v1/categories/delete/{id}',
-    tags: ['Admin / Category'],
-    operationId: 'deleteCategory',
-    summary: 'Delete a category',
-    description: 'Delete a category',
+    path: '/api/v1/bookcases/delete/{id}',
+    tags: ['Admin / Bookcase'],
+    operationId: 'deleteBookcase',
+    summary: 'Delete bookcase by id',
+    description: 'Delete bookcase by id',
     security: [
         ['bearerAuth' => []]
     ],
@@ -196,14 +189,14 @@ use OpenApi\Attributes as OA;
             name: 'id',
             in: 'path',
             required: true,
-            description: 'ID của danh mục',
+            description: 'Id của bookcase',
             schema: new OA\Schema(type: 'integer')
         ),
     ],
     responses: [
         new OA\Response(
             response: 200,
-            description: 'Delete category successfully!',
+            description: 'Delete bookcase successfully',
         ),
         new OA\Response(
             response: 400,
@@ -211,18 +204,18 @@ use OpenApi\Attributes as OA;
         ),
         new OA\Response(
             response: 404,
-            description: 'Category not found!',
+            description: 'Bookcase not found',
         ),
         new OA\Response(
             response: 500,
-            description: 'Delete category failed!',
+            description: 'Delete bookcase failed',
         ),
     ],
 )]
 
-class CategoryController extends Controller
+class BookcaseController extends Controller
 {
-    public function getAllCategory(Request $request)
+    public function index(Request $request)
     {
         // Validate request parameters
         $validator = Validator::make($request->all(), [
@@ -230,16 +223,12 @@ class CategoryController extends Controller
             'pageSize' => 'integer|min:1',
             'search' => 'string',
             'status' => 'string|in:active,inactive,deleted',
-            'type' => 'required|string|in:book,post'
         ],[
             'page.integer' => 'Trang phải là số nguyên.',
             'page.min' => 'Trang phải lớn hơn hoặc bằng 1.',
             'pageSize.integer' => 'Kích thước trang phải là số nguyên.',
             'pageSize.min' => 'Kích thước trang phải lớn hơn hoặc bằng 1.',
             'search.string' => 'Tìm kiếm phải là chuỗi.',
-            'type.required' => 'Trường type là bắt buộc.',
-            'type.string' => 'Type phải là một chuỗi.',
-            'type.in' => 'Type phải là book hoặc post.',
             'status.in' => 'Status phải là active, inactive hoặc deleted'
         ]);
 
@@ -255,33 +244,32 @@ class CategoryController extends Controller
         $page = $request->input('page', 1);
         $pageSize = $request->input('pageSize', 10);
         $search = $request->input('search');
-        $type = $request->input('type');
         $status = $request->input('status');
 
         // Tạo query ban đầu
-        $query = Category::query();
+        $query = Bookcase::query();
 
         // Lấy tổng số mục trong DB trước khi áp dụng bộ lọc tìm kiếm
 
         // Áp dụng bộ lọc theo type
         $totalItems = $query->count();
-        $query = $query->filter($type, $status, true);
+        $query = $query->filter($status);
 
         // Áp dụng bộ lọc tìm kiếm nếu có tham số tìm kiếm
         $query = $query->search($search);
 
         // Thực hiện phân trang
-        $categories = $query->orderBy('created_at', 'desc')->paginate($pageSize, ['*'], 'page', $page);
+        $bookcases = $query->orderBy('created_at', 'desc')->paginate($pageSize, ['*'], 'page', $page);
 
         return response()->json([
             "status" => true,
-            "message" => "Get all categories successfully!",
+            "message" => "Get all bookcases successfully!",
             "data" => [
-                "categories" => $categories->items(),
-                "page" => $categories->currentPage(),
-                "pageSize" => $categories->perPage(),
-                "lastPage" => $categories->lastPage(),
-                "totalResults" => $categories->total(),
+                "bookcases" => $bookcases->items(),
+                "page" => $bookcases->currentPage(),
+                "pageSize" => $bookcases->perPage(),
+                "lastPage" => $bookcases->lastPage(),
+                "totalResults" => $bookcases->total(),
                 "total" => $totalItems
             ],
         ], 200);
@@ -290,15 +278,83 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string',
-            'description' => 'nullable|string',
-            'type' => 'required|string|in:book,post'
+            'bookcase_code' => 'nullable|string',
+            'description' => 'required|string',
         ],[
-            'name.required' => 'Trường name là bắt buộc.',
-            'name.string' => 'Name phải là một chuỗi.',
-            'type.required' => 'Trường type là bắt buộc.',
-            'type.string' => 'Type phải là một chuỗi.',
-            'type.in' => 'Type phải là book hoặc post.',
+            'description.required' => 'Mô tả không được để trống.',
+            'description.string' => 'Mô tả phải là chuỗi.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                "staus" => false,
+                "message" => "Validation error",
+                "errors" => $validator->errors()
+            ], 400);
+        }
+
+        $bookcase = Bookcase::create(array_merge(
+            $validator->validated(),
+        ));
+
+        return response()->json([
+            "status" => true,
+            "message" => "Create bookcase successfully!",
+            "data" => $bookcase
+        ], 200);
+    }
+
+    public function show(Request $request)
+    {
+        $id = $request->route('id');
+
+        $validator = Validator::make(['id' => $id], [
+            'id' => 'required|integer|min:1'
+        ],[
+            'id.required' => 'Trường id là bắt buộc.',
+            'id.integer' => 'Id phải là một số nguyên.',
+            'id.min' => 'Id phải lớn hơn hoặc bằng 1.'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                "staus" => false,
+                "message" => "Validation error",
+                "errors" => $validator->errors()
+            ], 400);
+        }
+
+        $bookcase = Bookcase::find($id);
+
+        if (!$bookcase) {
+            return response()->json([
+                "status" => false,
+                "message" => "Bookcase not found!"
+            ], 404);
+        }
+
+        return response()->json([
+            "status" => true,
+            "message" => "Get bookcase successfully!",
+            "data" => $bookcase
+        ], 200);
+    }
+
+    public function update(Request $request)
+    {
+        $id = $request->route('id');
+
+        $validator = Validator::make(array_merge(['id' => $id], $request->all()), [
+            'id' => 'required|integer|min:1',
+            'bookcase_code' => 'nullable|string',
+            'description' => 'required|string',
+            'status' => 'nullable|string|in:active,inactive,deleted',
+        ],[
+            'id.required' => 'Trường id là bắt buộc.',
+            'id.integer' => 'Id phải là một số nguyên.',
+            'id.min' => 'Id phải lớn hơn hoặc bằng 1.',
+            'bookcase_code.string' => 'Mã kệ sách phải là chuỗi.',
+            'description.string' => 'Mô tả phải là chuỗi.',
             'status.in' => 'Status phải là active, inactive hoặc deleted'
         ]);
 
@@ -310,92 +366,12 @@ class CategoryController extends Controller
             ], 400);
         }
 
-        $category = Category::create(array_merge(
-            $validator->validated(),
-        ));
+        $bookcase = Bookcase::find($id);
 
-        return response()->json([
-            "status" => true,
-            "message" => "Create category successfully!",
-            "data" => $category
-        ], 200);
-    }
-
-    public function show(Request $request, Category $category)
-    {
-        $id = $request->route('id');
-
-        $validator = Validator::make(['id' => $id], [
-            'id' => 'required|integer|min:1'
-        ],[
-            'id.required' => 'Trường id là bắt buộc.',
-            'id.integer' => 'Id phải là một số nguyên.',
-            'id.min' => 'Id phải lớn hơn hoặc bằng 1.'
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                "staus" => false,
-                "message" => "Validation error",
-                "errors" => $validator->errors()
-            ], 400);
-        }
-
-        $category = Category::find($id);
-
-        if (!$category) {
+        if (!$bookcase) {
             return response()->json([
                 "status" => false,
-                "message" => "Category not found!"
-            ], 404);
-        }
-
-        return response()->json([
-            "status" => true,
-            "message" => "Get category successfully!",
-            "data" => $category
-        ], 200);
-    }
-
-    public function update(Request $request, Category $category)
-    {
-        $id = $request->route('id');
-
-        $validator = Validator::make(array_merge(['id' => $id], $request->all()), [
-            'id' => 'required|integer|min:1',
-            'name' => 'required|string',
-            'type' => 'required|string|in:book,post',
-            'description' => 'nullable|string',
-            'status' => 'required|string|in:active,inactive,deleted',
-        ],[
-            'id.required' => 'Trường id là bắt buộc.',
-            'id.integer' => 'Id phải là một số nguyên.',
-            'id.min' => 'Id phải lớn hơn hoặc bằng 1.',
-            'name.required' => 'Trường name là bắt buộc.',
-            'name.string' => 'Name phải là một chuỗi.',
-            'type.required' => 'Trường type là bắt buộc.',
-            'type.string' => 'Type phải là một chuỗi.',
-            'type.in' => 'Type phải là book hoặc post.',
-            'status.in' => 'Status phải là active, inactive hoặc deleted',
-            'status.required' => 'Trường status là bắt buộc.',
-            'status.string' => 'Status phải là một chuỗi.',
-            'description.string' => 'Description phải là một chuỗi.'
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                "staus" => false,
-                "message" => "Validation error",
-                "errors" => $validator->errors()
-            ], 400);
-        }
-
-        $category = Category::find($id);
-
-        if (!$category) {
-            return response()->json([
-                "status" => false,
-                "message" => "Category not found!"
+                "message" => "Bookcase not found!"
             ], 404);
         }
 
@@ -409,22 +385,22 @@ class CategoryController extends Controller
         }
 
         try {
-            $category->update($validator->validated());
+            $bookcase->update($validator->validated());
 
             return response()->json([
                 "status" => true,
-                "message" => "Update category successfully!",
-                "data" => $category
+                "message" => "Update bookcase successfully!",
+                "data" => $bookcase
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
                 "status" => false,
-                "message" => "Update category failed!"
+                "message" => "Update bookcase failed!"
             ], 500);
         }
     }
 
-    public function destroy(Request $request, Category $category)
+    public function destroy(Request $request)
     {
         $id = $request->route('id');
 
@@ -444,32 +420,32 @@ class CategoryController extends Controller
             ], 400);
         }
 
-        $category = Category::find($id);
+        $bookcase = Bookcase::find($id);
 
-        if (!$category) {
+        if (!$bookcase) {
             return response()->json([
                 "status" => false,
-                "message" => "Category not found!"
+                "message" => "Bookcase not found!"
             ], 404);
-        } else if ($category->status == 'deleted') {
+        } else if ($bookcase->status == 'deleted') {
             return response()->json([
                 "status" => false,
-                "message" => "Category is not exist!"
+                "message" => "Bookcase is not exist!"
             ], 400);
         }
 
         try {
-            $category->delete();
+            $bookcase->delete();
         } catch (\Throwable $th) {
             return response()->json([
                 "status" => false,
-                "message" => "Delete category failed!"
+                "message" => "Delete bookcase failed!"
             ], 500);
         }
 
         return response()->json([
             "status" => true,
-            "message" => "Delete category successfully!",
+            "message" => "Delete bookcase successfully!",
         ], 200);
     }
 }

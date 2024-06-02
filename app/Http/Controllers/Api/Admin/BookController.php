@@ -85,9 +85,9 @@ use OpenApi\Attributes as OA;
     requestBody: new OA\RequestBody(
         required: true,
         content: new OA\JsonContent(
-            required: ['sku', 'author_id', 'title', 'original_title', 'description_summary', 'description', 'category_id'],
+            required: ['sku_generated', 'author_id', 'title', 'original_title', 'description_summary', 'description', 'category_id'],
             properties: [
-                new OA\Property(property: 'sku', type: 'string'),
+                new OA\Property(property: 'sku_generated', type: 'string'),
                 new OA\Property(property: 'author_id', type: 'string'),
                 new OA\Property(property: 'title', type: 'string'),
                 new OA\Property(property: 'original_title', type: 'string'),
@@ -128,9 +128,8 @@ use OpenApi\Attributes as OA;
     requestBody: new OA\RequestBody(
         required: true,
         content: new OA\JsonContent(
-            required: ['sku', 'author_id', 'title', 'original_title', 'description_summary', 'description', 'category_id', 'book_detail'],
+            required: ['author_id', 'title', 'original_title', 'description_summary', 'description', 'category_id', 'book_detail'],
             properties: [
-                new OA\Property(property: 'sku', type: 'string'),
                 new OA\Property(property: 'author_id', type: 'string'),
                 new OA\Property(property: 'title', type: 'string'),
                 new OA\Property(property: 'original_title', type: 'string'),
@@ -145,11 +144,12 @@ use OpenApi\Attributes as OA;
                     items: new OA\Items(
                         type: 'object',
                         required: [
-                            'poster', 'images', 'book_version', 'price', 'hire_percent', 'stock',
+                            'sku_origin','poster', 'images', 'book_version', 'price', 'hire_percent', 'stock',
                             'publish_date', 'publishing_company_id', 'issuing_company', 'cardboard',
                             'total_page', 'language'
                         ],
                         properties: [
+                            new OA\Property(property: 'sku_origin', type: 'string'),
                             new OA\Property(property: 'poster', type: 'string'),
                             new OA\Property(property: 'images', type: 'array', items: new OA\Items(type: 'string')), // Specify the type of items in the array
                             new OA\Property(property: 'book_version', type: 'string'),
@@ -208,9 +208,9 @@ use OpenApi\Attributes as OA;
     requestBody: new OA\RequestBody(
         required: true,
         content: new OA\JsonContent(
-            required: ['sku', 'author_id', 'title', 'original_title', 'description_summary', 'description', 'category_id', 'shelve_id', 'is_featured', 'status'],
+            required: ['sku_generated', 'author_id', 'title', 'original_title', 'description_summary', 'description', 'category_id', 'shelve_id', 'is_featured', 'status'],
             properties: [
-                new OA\Property(property: 'sku', type: 'string'),
+                new OA\Property(property: 'sku_generated', type: 'string'),
                 new OA\Property(property: 'author_id', type: 'string'),
                 new OA\Property(property: 'title', type: 'string'),
                 new OA\Property(property: 'original_title', type: 'string'),
@@ -282,7 +282,6 @@ class BookController extends Controller
     public function checkStoreValidator($request)
     {
         $validator = Validator::make($request->all(), [
-            'sku' => "required|string",
             'author_id' => "required|string",
             'title' => "required|string",
             'original_title' => "required|string",
@@ -290,12 +289,9 @@ class BookController extends Controller
             'description' => "required|string",
             'is_featured' => 'nullable|boolean',
             'category_id' => "required|string",
-            'shelve_id' => "nullable|number",
+            'shelve_id' => "nullable",
         ], [
-            'sku.required' => 'Trường sku là bắt buộc.',
-            'sku.string' => 'Sku phải là một chuỗi.',
             'author_id.required' => 'Trường author_id là bắt buộc.',
-            'author_id.number' => 'Author_id phải là một số.',
             'title.required' => 'Trường title là bắt buộc.',
             'title.string' => 'Title phải là một chuỗi.',
             'original_title.required' => 'Trường original_title là bắt buộc.',
@@ -306,8 +302,6 @@ class BookController extends Controller
             'description.string' => 'Description phải là một chuỗi.',
             'category_id.required' => 'Trường category_id là bắt buộc.',
             'is_featured.boolean' => 'Is featured phải là một boolean.',
-            'category_id.number' => 'Category_id phải là một số.',
-            'shelve_id.number' => 'Shelve_id phải là một số.',
         ]);
 
         return $validator;
@@ -317,22 +311,19 @@ class BookController extends Controller
     {
         $validator = Validator::make(array_merge(['id' => $id], $request->all()), [
             'id' => 'required|integer|min:1',
-            'sku' => "required|string",
             'author_id' => "required|string",
             'title' => "required|string",
             'original_title' => "required|string",
             'description_summary' => "required|string",
             'description' => "required|string",
             'category_id' => "required|string",
-            'shelve_id' => "string",
+            'shelve_id' => "nullable",
             'is_featured' => 'nullable|boolean',
             "status" => "string|in:active,inactive,deleted",
         ], [
             'id.required' => 'Trường id là bắt buộc.',
             'id.integer' => 'Id phải là một số nguyên.',
             'id.min' => 'Id phải lớn hơn hoặc bằng 1.',
-            'sku.required' => 'Trường sku là bắt buộc.',
-            'sku.string' => 'Sku phải là một chuỗi.',
             'author_id.required' => 'Trường author_id là bắt buộc.',
             'author_id.string' => 'Author_id phải là một chuỗi.',
             'title.required' => 'Trường title là bắt buộc.',
@@ -344,8 +335,6 @@ class BookController extends Controller
             'description.required' => 'Trường description là bắt buộc.',
             'description.string' => 'Description phải là một chuỗi.',
             'category_id.required' => 'Trường category_id là bắt buộc.',
-            'category_id.number' => 'Category_id phải là một số.',
-            'shelve_id.number' => 'Shelve_id phải là một số.',
             'status.in' => 'Status phải là active, inactive hoặc deleted.',
             'is_featured.boolean' => 'Is featured phải là một boolean.',
             'status.required' => 'Trường status là bắt buộc.'
@@ -579,7 +568,7 @@ class BookController extends Controller
     public function createFullBook(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'sku' => "required|string",
+            'sku_generated' => "nullable|string",
             'author_id' => "required",
             'title' => "required|string",
             'original_title' => "required|string",
@@ -589,6 +578,7 @@ class BookController extends Controller
             'category_id' => "required",
             'shelve_id' => "nullable",
             'book_detail' => "required|array",
+            'book_detail.*.sku_origin' => "required",
             'book_detail.*.poster' => "required",
             'book_detail.*.images' => "required|array",
             'book_detail.*.book_version' => "required",
@@ -605,8 +595,8 @@ class BookController extends Controller
             'book_detail.*.book_size' => "nullable",
 
         ], [
-            'sku.required' => 'Trường sku là bắt buộc.',
-            'sku.string' => 'Sku phải là một chuỗi.',
+            'sku_generated.required' => 'Trường sku_generated là bắt buộc.',
+            'sku_generated.string' => 'Sku_generated phải là một chuỗi.',
             'author_id.required' => 'Trường author_id là bắt buộc.',
             'title.required' => 'Trường title là bắt buộc.',
             'title.string' => 'Title phải là một chuỗi.',
@@ -620,6 +610,7 @@ class BookController extends Controller
             'is_featured.boolean' => 'Is featured phải là một boolean.',
             'book_detail.required' => 'Trường book_detail là bắt buộc.',
             'book_detail.array' => 'Book_detail phải là một mảng.',
+            'book_detail.*.sku_origin.required' => 'Trường sku_origin là bắt buộc.',
             'book_detail.*.poster.required' => 'Trường poster là bắt buộc.',
             'book_detail.*.images.required' => 'Trường images là bắt buộc.',
             'book_detail.*.book_version.required' => 'Trường book_version là bắt buộc.',

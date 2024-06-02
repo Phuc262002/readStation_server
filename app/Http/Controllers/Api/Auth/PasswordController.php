@@ -115,7 +115,7 @@ class PasswordController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'old_password' => 'required|string|min:8',
-            'new_password' => 'required|string|confirmed|min:8|regex:/^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])[A-Za-z\d]{8,}$/',
+            'new_password' => 'required|string|confirmed|min:8',
         ]);
 
         $customMessages = [
@@ -126,7 +126,6 @@ class PasswordController extends Controller
             'new_password.string' => 'Mật khẩu mới phải là một chuỗi.',
             'new_password.confirmed' => 'Mật khẩu mới không khớp.',
             'new_password.min' => 'Mật khẩu mới phải có ít nhất 8 ký tự.',
-            'new_password.regex' => 'Mật khẩu mới phải có ít nhất 1 chữ hoa, 1 chữ thường và 1 số.',
         ];
 
         $validator->setCustomMessages($customMessages);
@@ -252,7 +251,7 @@ class PasswordController extends Controller
         $validator = Validator::make($request->all(), [
             'email' => 'required|string|email|exists:users,email',
             'token' => 'required|string',
-            'password' => 'required|string|confirmed|min:8|regex:/^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])[A-Za-z\d]{8,}$/',
+            'password' => 'required|string|confirmed|min:8',
         ], [
             'email.required' => 'Email không được để trống',
             'email.string' => 'Email phải là một chuỗi',
@@ -264,7 +263,6 @@ class PasswordController extends Controller
             'password.string' => 'Mật khẩu phải là một chuỗi',
             'password.confirmed' => 'Mật khẩu không khớp',
             'password.min' => 'Mật khẩu phải có ít nhất 8 ký tự',
-            'password.regex' => 'Mật khẩu phải có ít nhất 1 chữ hoa, 1 chữ thường và 1 số',
         ]);
 
         if ($validator->fails()) {

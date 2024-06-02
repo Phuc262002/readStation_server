@@ -172,6 +172,7 @@ return new class extends Migration
             $table->id();
             $table->string('bookcase_code');
             $table->text('description')->nullable();
+            $table->enum('status', ['active', 'inactive', 'deleted'])->default('active');
             $table->timestamps();
         });
 
@@ -180,6 +181,7 @@ return new class extends Migration
             $table->unsignedBigInteger('bookcase_id');
             $table->string('bookshelf_code');
             $table->unsignedBigInteger('category_id');
+            $table->enum('status', ['active', 'inactive', 'deleted'])->default('active');
             $table->timestamps();
 
             // Foreign key constraints
@@ -189,7 +191,7 @@ return new class extends Migration
 
         Schema::create('books', function (Blueprint $table) {
             $table->id();
-            $table->string('sku');
+            $table->string('sku_generated')->unique()->nullable();
             $table->unsignedBigInteger('author_id');
             $table->string('title');
             $table->string('original_title');
@@ -201,7 +203,7 @@ return new class extends Migration
             $table->boolean('is_featured')->default(false);
             $table->string('slug')->unique();
             $table->timestamps();
-            
+        
             $table->foreign('author_id')->references('id')->on('authors')->onDelete('cascade');
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
             $table->foreign('shelve_id')->references('id')->on('shelves')->onDelete('set null');
@@ -209,6 +211,7 @@ return new class extends Migration
 
         Schema::create('book_details', function (Blueprint $table) {
             $table->id();
+            $table->string('sku_origin');
             $table->unsignedBigInteger('book_id');
             $table->string('poster');
             $table->json('images')->nullable();
