@@ -1921,6 +1921,43 @@
                 ]
             }
         },
+        "/api/v1/shelves/get-one/{id}": {
+            "get": {
+                "tags": [
+                    "Admin / Shelve"
+                ],
+                "summary": "Chi tiết kệ sách",
+                "description": "Lấy thông tin chi tiết của một kệ sách",
+                "operationId": "getShelve",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID kệ sách",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get shelve successfully!"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "404": {
+                        "description": "Shelve not found!"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/shelves/create": {
             "post": {
                 "tags": [
@@ -1961,6 +1998,116 @@
                     },
                     "400": {
                         "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/shelves/update/{id}": {
+            "put": {
+                "tags": [
+                    "Admin / Shelve"
+                ],
+                "summary": "Cập nhật kệ sách",
+                "description": "Cập nhật thông tin của một kệ sách",
+                "operationId": "updateShelve",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID kệ sách",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Update shelve",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "bookcase_id",
+                                    "bookshelf_code",
+                                    "category_id"
+                                ],
+                                "properties": {
+                                    "bookcase_id": {
+                                        "type": "integer"
+                                    },
+                                    "bookshelf_code": {
+                                        "type": "string"
+                                    },
+                                    "category_id": {
+                                        "type": "integer"
+                                    },
+                                    "status": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Update shelve successfully!"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "404": {
+                        "description": "Shelve not found!"
+                    },
+                    "500": {
+                        "description": "Update shelve failed!"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/shelves/delete/{id}": {
+            "delete": {
+                "tags": [
+                    "Admin / Shelve"
+                ],
+                "summary": "Xóa kệ sách",
+                "description": "Xóa một kệ sách",
+                "operationId": "deleteShelve",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID kệ sách",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Delete shelve successfully!"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "404": {
+                        "description": "Shelve not found!"
+                    },
+                    "500": {
+                        "description": "Delete shelve failed!"
                     }
                 },
                 "security": [

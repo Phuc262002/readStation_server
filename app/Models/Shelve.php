@@ -65,5 +65,11 @@ class Shelve extends Model
     {
         return $this->hasMany(Book::class);
     }
+
+    public function delete()
+    {
+        $this->status = 'deleted';
+        $this->save();
+    }
    
 }

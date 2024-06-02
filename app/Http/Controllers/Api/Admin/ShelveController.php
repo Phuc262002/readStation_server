@@ -73,6 +73,40 @@ use OpenApi\Attributes as OA;
     ],
 )]
 
+#[OA\Get(
+    path: '/api/v1/shelves/get-one/{id}',
+    tags: ['Admin / Shelve'],
+    operationId: 'getShelve',
+    summary: 'Chi tiết kệ sách',
+    description: 'Lấy thông tin chi tiết của một kệ sách',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    parameters: [
+        new OA\Parameter(
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'ID kệ sách',
+            schema: new OA\Schema(type: 'integer')
+        ),
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Get shelve successfully!',
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error',
+        ),
+        new OA\Response(
+            response: 404,
+            description: 'Shelve not found!',
+        ),
+    ],
+)]
+
 #[OA\Post(
     path: '/api/v1/shelves/create',
     tags: ['Admin / Shelve'],
@@ -105,6 +139,96 @@ use OpenApi\Attributes as OA;
         ),
     ],
 )]
+
+#[OA\Put(
+    path: '/api/v1/shelves/update/{id}',
+    tags: ['Admin / Shelve'],
+    operationId: 'updateShelve',
+    summary: 'Cập nhật kệ sách',
+    description: 'Cập nhật thông tin của một kệ sách',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    parameters: [
+        new OA\Parameter(
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'ID kệ sách',
+            schema: new OA\Schema(type: 'integer')
+        ),
+    ],
+    requestBody: new OA\RequestBody(
+        required: true,
+        description: 'Update shelve',
+        content: new OA\JsonContent(
+            required: ['bookcase_id', 'bookshelf_code', 'category_id'],
+            properties: [
+                new OA\Property(property: 'bookcase_id', type: 'integer'),
+                new OA\Property(property: 'bookshelf_code', type: 'string'),
+                new OA\Property(property: 'category_id', type: 'integer'),
+                new OA\Property(property: 'status', type: 'string'),
+            ]
+        )
+    ),
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Update shelve successfully!',
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error',
+        ),
+        new OA\Response(
+            response: 404,
+            description: 'Shelve not found!',
+        ),
+        new OA\Response(
+            response: 500,
+            description: 'Update shelve failed!',
+        ),
+    ],
+)]
+
+#[OA\Delete(
+    path: '/api/v1/shelves/delete/{id}',
+    tags: ['Admin / Shelve'],
+    operationId: 'deleteShelve',
+    summary: 'Xóa kệ sách',
+    description: 'Xóa một kệ sách',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    parameters: [
+        new OA\Parameter(
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'ID kệ sách',
+            schema: new OA\Schema(type: 'integer')
+        ),
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Delete shelve successfully!',
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error',
+        ),
+        new OA\Response(
+            response: 404,
+            description: 'Shelve not found!',
+        ),
+        new OA\Response(
+            response: 500,
+            description: 'Delete shelve failed!',
+        ),
+    ],
+)]
+
 
 class ShelveController extends Controller
 {
@@ -205,35 +329,150 @@ class ShelveController extends Controller
         ], 200);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Shelve $shelve)
+    public function show(Request $request)
     {
-        //
+        $id = $request->route('id');
+
+        $validator = Validator::make(['id' => $id], [
+            'id' => 'required|integer|min:1'
+        ],[
+            'id.required' => 'Trường id là bắt buộc.',
+            'id.integer' => 'Id phải là một số nguyên.',
+            'id.min' => 'Id phải lớn hơn hoặc bằng 1.'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                "staus" => false,
+                "message" => "Validation error",
+                "errors" => $validator->errors()
+            ], 400);
+        }
+
+        $shelve = Shelve::find($id);
+
+        if (!$shelve) {
+            return response()->json([
+                "status" => false,
+                "message" => "Shelve not found!"
+            ], 404);
+        }
+
+        return response()->json([
+            "status" => true,
+            "message" => "Get shelve successfully!",
+            "data" => $shelve
+        ], 200);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Shelve $shelve)
+    public function update(Request $request)
     {
-        //
+        $id = $request->route('id');
+
+        $validator = Validator::make(array_merge(['id' => $id], $request->all()), [
+            'id' => 'required|integer|min:1',
+            'bookcase_id' => 'required',
+            'bookshelf_code' => 'required|string',
+            'category_id' => 'required',
+            'status' => 'string|in:active,inactive,deleted'
+        ],[
+            'id.required' => 'Trường id là bắt buộc.',
+            'id.integer' => 'Id phải là một số nguyên.',
+            'id.min' => 'Id phải lớn hơn hoặc bằng 1.',
+            'bookcase_id.required' => 'Bookcase_id không được để trống.',
+            'bookshelf_code.string' => 'Bookshelf_code phải là chuỗi.',
+            'category_id.required' => 'Category_id không được để trống.',
+            'status.in' => 'Status phải là active, inactive hoặc deleted'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                "staus" => false,
+                "message" => "Validation error",
+                "errors" => $validator->errors()
+            ], 400);
+        }
+
+        $shelve = Shelve::find($id);
+
+        if (!$shelve) {
+            return response()->json([
+                "status" => false,
+                "message" => "Shelve not found!"
+            ], 404);
+        }
+
+
+        if ($validator->fails()) {
+            return response()->json([
+                "staus" => false,
+                "message" => "Validation error",
+                "errors" => $validator->errors()
+            ], 400);
+        }
+
+        try {
+            $shelve->update($validator->validated());
+
+            return response()->json([
+                "status" => true,
+                "message" => "Update shelve successfully!",
+                "data" => $shelve
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => false,
+                "message" => "Update shelve failed!"
+            ], 500);
+        }
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Shelve $shelve)
+    public function destroy(Request $request)
     {
-        //
-    }
+        $id = $request->route('id');
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Shelve $shelve)
-    {
-        //
+        $validator = Validator::make(['id' => $id], [
+            'id' => 'required|integer|min:1'
+        ],[
+            'id.required' => 'Trường id là bắt buộc.',
+            'id.integer' => 'Id phải là một số nguyên.',
+            'id.min' => 'Id phải lớn hơn hoặc bằng 1.'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                "staus" => false,
+                "message" => "Validation error",
+                "errors" => $validator->errors()
+            ], 400);
+        }
+
+        $shelve = Shelve::find($id);
+
+        if (!$shelve) {
+            return response()->json([
+                "status" => false,
+                "message" => "Shelve not found!"
+            ], 404);
+        } else if ($shelve->status == 'deleted') {
+            return response()->json([
+                "status" => false,
+                "message" => "Shelve is not exist!"
+            ], 400);
+        }
+
+        try {
+            $shelve->delete();
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => false,
+                "message" => "Delete shelve failed!"
+            ], 500);
+        }
+
+        return response()->json([
+            "status" => true,
+            "message" => "Delete shelve successfully!",
+        ], 200);
     }
 }
