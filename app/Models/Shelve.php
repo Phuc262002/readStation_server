@@ -13,6 +13,7 @@ class Shelve extends Model
         'bookcase_id',
         'bookshelf_code',
         'category_id',
+        'description',
         'status',
     ];
 
