@@ -45,18 +45,26 @@ class Post extends Model
         return $query->where('title', 'like', '%' . $search . '%');
     }
 
-    public function scopeFilter($query, $category_id, $status, $is_admin = false)
+    public function scopeFilter($query, $category_id, $status, $type)
     {
         if ($category_id) {
             $query->where('category_id', $category_id);
         }
 
-        if ($status && $is_admin) {
+        if ($status) {
             $query->where('status', $status);
-        } else if ($is_admin) {
-            $query->where('status', '!=', 'deleted');
         } else {
-            $query->where('status', 'published');
+            $query->where('status', '!=', 'deleted');
+        }
+
+        if ($type === 'member') {
+            $query->whereHas('user', function ($q) use ($type) {
+                $q->where('role_id', 1)->orWhere('role_id', 2);
+            });
+        } elseif ($type === 'manager') {
+            $query->whereHas('user', function ($q) use ($type) {
+                $q->where('role_id', 3)->orWhere('role_id', 4);
+            });
         }
 
         return $query;

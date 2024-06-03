@@ -96,7 +96,7 @@ class OrderController extends Controller
         if ($status) {
             $query->where('status', $status);
         } else {
-            $query->whereIn('status', ['pending', 'hiring', 'completed', 'canceled', 'out_of_date']);
+            $query->whereIn('status', ['pending', 'approved', 'wating_take_book', 'hiring', 'increasing', 'wating_return', 'completed', 'canceled', 'out_of_date']);
         } 
 
         if ($search) {

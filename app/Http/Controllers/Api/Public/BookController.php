@@ -145,7 +145,7 @@ class BookController extends Controller
 
         // Tạo query ban đầu
         $query = Book::query()
-            ->with(['category', 'author', 'bookDetail' => function ($query) {
+            ->with(['category', 'author', 'shelve', 'shelve.bookcase', 'shelve.category', 'bookDetail' => function ($query) {
                 $query->where('status', '!=', 'deleted')->with('order_details');
             }])
             ->whereHas('bookDetail', function ($q) {

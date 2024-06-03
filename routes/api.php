@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\Admin\BookcaseController;
 use App\Http\Controllers\Api\Admin\BookController as AdminBookController;
 use App\Http\Controllers\Api\Admin\BookDetailController;
 use App\Http\Controllers\Api\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\Api\Admin\PostController as AdminPostController;
 use App\Http\Controllers\Api\Admin\PublishingCompanyController as AdminPublishingCompanyController;
 use App\Http\Controllers\Api\Admin\ShelveController;
 use App\Http\Controllers\Api\Auth\AuthController;
@@ -61,6 +62,8 @@ Route::group([
 
         Route::get('/', [OrderController::class, 'index']);
         Route::get('/get-one/{order}', [OrderController::class, 'show']);
+
+        Route::get('/get-posts', [PostController::class, 'getPostAccount']);
 
         Route::group([
             "prefix" => "order"
@@ -153,8 +156,12 @@ Route::group([
 
         Route::group(["middleware" => ["auth:api"]], function () {
             Route::post('/create', [PostController::class, 'store']);
+            Route::get('/get/{id}', [PostController::class, 'show']);
             Route::put('/update/{id}', [PostController::class, 'update']);
             Route::delete('/delete/{id}', [PostController::class, 'destroy']);
+
+            Route::get('/admin/get-all', [AdminPostController::class, 'index']);
+            Route::put('/admin/update/{id}', [AdminPostController::class, 'update']);
         });
     });
 

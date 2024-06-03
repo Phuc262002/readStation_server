@@ -113,13 +113,18 @@ class PostController extends Controller
         $query = Post::query()->with(['user', 'category']);
         $totalItems = $query->count();
 
-        $query->filter($category_id, null);
+        $query->where('status', 'published');
+
+        if ($category_id) {
+            $query->where('category_id', $category_id);
+        }
 
         // Lấy tổng số mục trong DB trước khi áp dụng bộ lọc tìm kiếm
 
         $posts = $query->orderBy('created_at', 'desc')->paginate($pageSize, ['*'], 'page', $page);
 
         $posts->getCollection()->transform(function ($post) {
+            unset($post->content);
             return array_merge($post->toArray(), [
                 "user" => $post->user->only(['fullname', 'avatar', 'gender', 'job', 'story']),
             ]);
@@ -161,7 +166,7 @@ class PostController extends Controller
                 "errors" => $validator->errors()
             ], 400);
         }
-        $post = Post::with('user', 'category')->where('slug', $slug)->first();
+        $post = Post::with('user', 'category')->where('slug', $slug)->where('status', 'published')->first();
 
         if (!$post) {
             return response()->json([

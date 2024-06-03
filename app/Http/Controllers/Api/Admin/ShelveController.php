@@ -123,7 +123,7 @@ use OpenApi\Attributes as OA;
             required: ['bookcase_id', 'category_id', 'description'],
             properties: [
                 new OA\Property(property: 'bookcase_id', type: 'integer'),
-                new OA\Property(property: 'bookshelf_code', type: 'string'),
+                new OA\Property(property: 'bookshelf_code', type: 'string', nullable: true, default: null),
                 new OA\Property(property: 'category_id', type: 'integer'),
                 new OA\Property(property: 'description', type: 'string'),
             ]
