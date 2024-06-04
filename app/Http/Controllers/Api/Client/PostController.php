@@ -407,27 +407,21 @@ class PostController extends Controller
             ["id" => $id]
         ), [
             'id' => 'required|exists:posts,id',
-            'category_id' => 'required|string',
-            'title' => 'required|string|max:255',
-            "content" => "required|string",
-            "summary" => "required|string",
-            "image" => "required|string",
+            'category_id' => 'string',
+            'title' => 'string',
+            "content" => "string",
+            "summary" => "string",
+            "image" => "string",
             "status" => "string|in:wating_approve,draft,published",
         ], [
             'id.required' => 'ID không được để trống.',
             'id.exists' => 'ID không tồn tại.',
-            'category_id.required' => 'Category_id không được để trống.',
             'category_id.string' => 'Category_id phải là một chuỗi.',
-            'title.required' => 'Title không được để trống.',
             'title.string' => 'Title phải là một chuỗi.',
             'title.max' => 'Title không được vượt quá 255 ký tự.',
-            'content.required' => 'Content không được để trống.',
             'content.string' => 'Content phải là một chuỗi.',
-            'summary.required' => 'Summary không được để trống.',
             'summary.string' => 'Summary phải là một chuỗi.',
-            'image.required' => 'Image không được để trống.',
             'image.string' => 'Image phải là một chuỗi.',
-            'status.required' => 'Status không được để trống.',
             'status.in' => 'Status phải là published hoặc draft.',
         ]);
 

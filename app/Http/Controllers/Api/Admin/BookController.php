@@ -178,7 +178,7 @@ use OpenApi\Attributes as OA;
                     items: new OA\Items(
                         type: 'object',
                         required: [
-                            'sku_origin','poster', 'images', 'book_version', 'price', 'hire_percent', 'stock',
+                            'sku_origin', 'poster', 'images', 'book_version', 'price', 'hire_percent', 'stock',
                             'publish_date', 'publishing_company_id', 'issuing_company', 'cardboard',
                             'total_page', 'language'
                         ],
@@ -345,12 +345,12 @@ class BookController extends Controller
     {
         $validator = Validator::make(array_merge(['id' => $id], $request->all()), [
             'id' => 'required|integer|min:1',
-            'author_id' => "required|string",
-            'title' => "required|string",
-            'original_title' => "required|string",
-            'description_summary' => "required|string",
-            'description' => "required|string",
-            'category_id' => "required|string",
+            'author_id' => "string",
+            'title' => "string",
+            'original_title' => "string",
+            'description_summary' => "string",
+            'description' => "string",
+            'category_id' => "string",
             'shelve_id' => "nullable",
             'is_featured' => 'nullable|boolean',
             "status" => "string|in:active,inactive,deleted",
@@ -358,20 +358,13 @@ class BookController extends Controller
             'id.required' => 'Trường id là bắt buộc.',
             'id.integer' => 'Id phải là một số nguyên.',
             'id.min' => 'Id phải lớn hơn hoặc bằng 1.',
-            'author_id.required' => 'Trường author_id là bắt buộc.',
             'author_id.string' => 'Author_id phải là một chuỗi.',
-            'title.required' => 'Trường title là bắt buộc.',
             'title.string' => 'Title phải là một chuỗi.',
-            'original_title.required' => 'Trường original_title là bắt buộc.',
             'original_title.string' => 'Original_title phải là một chuỗi.',
-            'description_summary.required' => 'Trường description_summary là bắt buộc.',
             'description_summary.string' => 'Description_summary phải là một chuỗi.',
-            'description.required' => 'Trường description là bắt buộc.',
             'description.string' => 'Description phải là một chuỗi.',
-            'category_id.required' => 'Trường category_id là bắt buộc.',
             'status.in' => 'Status phải là active, inactive hoặc deleted.',
             'is_featured.boolean' => 'Is featured phải là một boolean.',
-            'status.required' => 'Trường status là bắt buộc.'
         ]);
         return $validator;
     }
@@ -379,11 +372,7 @@ class BookController extends Controller
     public function checkBookDetail()
     {
         // Find books without a bookDetail or with an inactive bookDetail
-        $booksWithoutDetail = Book::doesntHave('bookDetail')
-            ->orWhereHas('bookDetail', function ($q) {
-                $q->where('status', '!=', 'active');
-            })
-            ->get();
+        $booksWithoutDetail = Book::doesntHave('bookDetail')->get();
 
         // Update the status of these books to 'needUpdateDetail'
         $booksWithoutDetail->each(function ($book) {
@@ -403,7 +392,7 @@ class BookController extends Controller
             'search' => 'string',
             'category_id' => 'integer',
             'author_id' => 'integer',
-            'status' => 'string|in:active,inactive,deleted',
+            'status' => 'string|in:active,inactive,deleted,needUpdateDetail',
         ], [
             'page.integer' => 'Trang phải là số nguyên.',
             'page.min' => 'Trang phải lớn hơn hoặc bằng 1.',
@@ -411,7 +400,7 @@ class BookController extends Controller
             'pageSize.min' => 'Kích thước trang phải lớn hơn hoặc bằng 1.',
             'category_id.integer' => 'Category_id phải là một số nguyên.',
             'author_id.integer' => 'Author_id phải là một số nguyên.',
-            'status.in' => 'Status phải là active, inactive hoặc deleted.',
+            'status.in' => 'Status phải là active, inactive, needUpdateDetail hoặc deleted.',
         ]);
 
         if ($validator->fails()) {
@@ -432,17 +421,10 @@ class BookController extends Controller
 
         // Tạo query ban đầu
         $query = Book::query()
-            ->with(['category', 'author', 'shelve', 'shelve.bookcase', 'shelve.category', 'bookDetail' => function ($query) {
-                $query->where('status', '!=', 'deleted');
-            }])
-            ->whereHas('bookDetail', function ($q) {
-                $q->whereNotNull('id')
-                    ->whereNotNull('status')
-                    ->where('status', '=', 'active');
-            });
+            ->with(['category', 'author', 'shelve', 'shelve.bookcase', 'shelve.category', 'bookDetail']);
 
         $totalItems = $query->count();
-        $query = $query->filter($category_id, $status, $author_id);
+        $query = $query->filter($category_id, $status, $author_id, true);
 
         // Áp dụng bộ lọc tìm kiếm nếu có tham số tìm kiếm
         $query = $query->search($search);
@@ -571,7 +553,13 @@ class BookController extends Controller
         }
 
         try {
+
             $book->update($validator->validated());
+
+            if ($book->status == 'inactive') {
+                $book->bookDetail()->update(['status' => 'inactive']);
+            }
+
             $this->checkBookDetail();
             return response()->json([
                 "status" => true,

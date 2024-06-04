@@ -250,8 +250,6 @@ class ShelveController extends Controller
             'pageSize.integer' => 'Kích thước trang phải là số nguyên.',
             'pageSize.min' => 'Kích thước trang phải lớn hơn hoặc bằng 1.',
             'search.string' => 'Tìm kiếm phải là chuỗi.',
-            'category_id.integer' => 'Category_id phải là số nguyên.',
-            'bookcase_id.integer' => 'Bookcase_id phải là số nguyên.',
             'status.in' => 'Status phải là active, inactive hoặc deleted'
         ]);
 
@@ -375,20 +373,17 @@ class ShelveController extends Controller
 
         $validator = Validator::make(array_merge(['id' => $id], $request->all()), [
             'id' => 'required|integer|min:1',
-            'bookcase_id' => 'required',
-            'bookshelf_code' => 'required|string',
-            'category_id' => 'required',
+            'bookcase_id' => 'nullable',
+            'bookshelf_code' => 'string',
+            'category_id' => 'nullable',
             'status' => 'string|in:active,inactive,deleted',
-            'description' => 'required|string',
+            'description' => 'string',
         ],[
             'id.required' => 'Trường id là bắt buộc.',
             'id.integer' => 'Id phải là một số nguyên.',
             'id.min' => 'Id phải lớn hơn hoặc bằng 1.',
-            'bookcase_id.required' => 'Bookcase_id không được để trống.',
             'bookshelf_code.string' => 'Bookshelf_code phải là chuỗi.',
-            'category_id.required' => 'Category_id không được để trống.',
             'status.in' => 'Status phải là active, inactive hoặc deleted',
-            'description.required' => 'Description không được để trống.',
         ]);
 
         if ($validator->fails()) {

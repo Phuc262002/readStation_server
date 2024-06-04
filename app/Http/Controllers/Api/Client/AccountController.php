@@ -87,7 +87,7 @@ class AccountController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'avatar' => 'nullable|string',
-            'fullname' => 'required|string|between:2,100',
+            'fullname' => 'string|between:2,100',
             'job' => 'nullable|string',
             'story' => 'nullable|string',
             'gender' => 'nullable|string|in:male,female',
@@ -97,15 +97,13 @@ class AccountController extends Controller
             'district' => 'nullable|string',
             'ward' => 'nullable|string',
             'address_detail' => 'nullable|string',
-            'phone' => 'required|string|min:10|max:11',
+            'phone' => 'string|min:10|max:11',
         ], [
             'gender.in' => 'Giới tính phải là male hoặc female.',
             'dob.date' => 'Ngày sinh phải là một ngày.',
-            'phone.required' => 'Số điện thoại không được để trống.',
             'phone.string' => 'Số điện thoại phải là một chuỗi.',
             'phone.min' => 'Số điện thoại phải có ít nhất 10 ký tự.',
             'phone.max' => 'Số điện thoại không được quá 11 ký tự.',
-            'fullname.required' => 'Tên không được để trống.',
         ]);
 
         if ($validator->fails()) {

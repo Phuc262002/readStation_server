@@ -380,23 +380,19 @@ class CategoryController extends Controller
 
         $validator = Validator::make(array_merge(['id' => $id], $request->all()), [
             'id' => 'required|integer|min:1',
-            'name' => 'required|string',
-            'type' => 'required|string|in:book,post',
+            'name' => 'string',
+            'type' => 'string|in:book,post',
             'is_featured' => 'boolean',
             'image' => 'nullable|string',
             'description' => 'nullable|string',
             'status' => 'string|in:active,inactive,deleted',
         ],[
-            'id.required' => 'Trường id là bắt buộc.',
             'id.integer' => 'Id phải là một số nguyên.',
             'id.min' => 'Id phải lớn hơn hoặc bằng 1.',
-            'name.required' => 'Trường name là bắt buộc.',
             'name.string' => 'Name phải là một chuỗi.',
-            'type.required' => 'Trường type là bắt buộc.',
             'type.string' => 'Type phải là một chuỗi.',
             'type.in' => 'Type phải là book hoặc post.',
             'status.in' => 'Status phải là active, inactive hoặc deleted',
-            'status.required' => 'Trường status là bắt buộc.',
             'status.string' => 'Status phải là một chuỗi.',
             'description.string' => 'Description phải là một chuỗi.'
         ]);

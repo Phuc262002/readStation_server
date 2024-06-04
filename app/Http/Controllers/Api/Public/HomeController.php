@@ -211,8 +211,8 @@ class HomeController extends Controller
 
     public function statisticHome(Request $request)
     {
-        $totalBooks = Book::count();
-        $totalAuthors = Author::count();
+        $totalBooks = Book::where('status', 'active')->count();
+        $totalAuthors = Author::where('status', 'active')->count();
         $totalBookOrders = OrderDetail::select('book_details_id')
         ->groupBy('book_details_id')
         ->orderByRaw('COUNT(book_details_id) DESC')

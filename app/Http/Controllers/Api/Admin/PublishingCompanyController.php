@@ -360,15 +360,13 @@ class PublishingCompanyController extends Controller
 
         $validator = Validator::make(array_merge(['id' => $id], $request->all()), [
             'id' => 'required|integer|min:1',
-            'name' => 'required|string',
+            'name' => 'string',
             'logo_company' => 'nullable|string',
             'description' => 'nullable|string',
             'status' => 'string|in:active,inactive,deleted',
         ],[
-            'id.required' => 'Trường id là bắt buộc.',
             'id.integer' => 'Id phải là một số nguyên.',
             'id.min' => 'Id phải lớn hơn hoặc bằng 1.',
-            'name.required' => 'Trường name là bắt buộc.',
             'name.string' => 'Name phải là một chuỗi.',
             'logo_company.string' => 'Logo nhà xuất bản phải là chuỗi.',
             'description.string' => 'Mô tả nhà xuất bản phải là chuỗi.',
