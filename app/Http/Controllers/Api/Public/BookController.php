@@ -4,9 +4,12 @@ namespace App\Http\Controllers\Api\Public;
 
 use App\Http\Controllers\Controller;
 use App\Models\Book;
+use App\Models\BookDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use OpenApi\Attributes as OA;
+
+use function PHPSTORM_META\map;
 
 #[OA\Get(
     path: '/api/v1/books',
@@ -50,6 +53,20 @@ use OpenApi\Attributes as OA;
             description: 'Id của author',
             schema: new OA\Schema(type: 'integer')
         ),
+        new OA\Parameter(
+            name: 'publishing_company_id',
+            in: 'query',
+            required: false,
+            description: 'Id của publishing company',
+            schema: new OA\Schema(type: 'integer')
+        ),
+        new OA\Parameter(
+            name: 'sort',
+            in: 'query',
+            required: false,
+            description: 'Sắp xếp theo thứ tự',
+            schema: new OA\Schema(type: 'string', enum: ['asc', 'desc', 'popular'], default: 'asc')
+        ),
     ],
     responses: [
         new OA\Response(
@@ -64,17 +81,17 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Get(
-    path: '/api/v1/books/get-one/{book}',
+    path: '/api/v1/books/get-one/{slug}',
     tags: ['Public / Book'],
     operationId: 'getOneBook',
     summary: 'Get one book by slug',
     description: 'Get one book',
     parameters: [
         new OA\Parameter(
-            name: 'id',
+            name: 'slug',
             in: 'path',
             required: true,
-            description: 'Id hoặc slug của sách',
+            description: 'Slug của sách',
             schema: new OA\Schema(type: 'string')
         ),
     ],
@@ -119,6 +136,8 @@ class BookController extends Controller
             'search' => 'string',
             'category_id' => 'integer',
             'author_id' => 'integer',
+            'publishing_company_id' => 'integer',
+            'sort' => 'string|in:asc,desc,popular',
         ], [
             'page.integer' => 'Trang phải là số nguyên.',
             'page.min' => 'Trang phải lớn hơn hoặc bằng 1.',
@@ -126,6 +145,9 @@ class BookController extends Controller
             'pageSize.min' => 'Kích thước trang phải lớn hơn hoặc bằng 1.',
             'category_id.integer' => 'Category_id phải là một số nguyên.',
             'author_id.integer' => 'Author_id phải là một số nguyên.',
+            'publishing_company_id.integer' => 'Publishing_company_id phải là một số nguyên.',
+            'sort.string' => 'Sort phải là một chuỗi.',
+            'sort.in' => 'Sort phải là một trong các giá trị: asc, desc, popular.',
         ]);
 
         if ($validator->fails()) {
@@ -142,20 +164,35 @@ class BookController extends Controller
         $search = $request->input('search');
         $category_id = $request->input('category_id');
         $author_id = $request->input('author_id');
+        $publishing_company_id = $request->input('publishing_company_id');
+        $sort = $request->input('sort', 'asc');
 
         // Tạo query ban đầu
-        $query = Book::query()
-            ->with(['category', 'author', 'shelve', 'shelve.bookcase', 'shelve.category', 'bookDetail' => function ($query) {
-                $query->where('status', '!=', 'deleted')->with('order_details');
-            }])
-            ->whereHas('bookDetail', function ($q) {
-                $q->whereNotNull('id')
-                    ->whereNotNull('status')
-                    ->where('status', '=', 'active');
-            });
+        $query = BookDetail::with([
+            'publishingCompany',
+            'order_details',
+            'book.category',
+            'book.author',
+            'book.shelve',
+            'book.shelve.bookcase',
+            'book.shelve.category',
+            'book'
+        ])
+            ->whereHas('book', function ($query) {
+                $query->where('status', 'active');
+            })
+            ->where('status', 'active');
+
 
         $totalItems = $query->count();
-        $query = $query->filter($category_id, null, $author_id);
+
+        if ($sort == 'popular') {
+            $query = $query->groupBy('id')->orderByRaw('COUNT(id) DESC');
+        } else {
+            $query = $query->orderBy('publish_date', $sort);
+        }
+
+        $query = $query->filter($category_id, $author_id, $publishing_company_id);
 
         // Áp dụng bộ lọc tìm kiếm nếu có tham số tìm kiếm
         $query = $query->search($search);
@@ -164,25 +201,17 @@ class BookController extends Controller
         $books = $query->orderBy('created_at', 'desc')->paginate($pageSize, ['*'], 'page', $page);
 
         $books->getCollection()->transform(function ($book) {
-            $bookDetails = $book->bookDetail->map(function ($bookDetail) {
-                $averageRate = $bookDetail->order_details()
-                    ->where('status_cmt', 'active')
-                    ->where('status_od', 'completed')
-                    ->avg('rate');
-
-                $averageRateRounded = round($averageRate, 1);
-
-                $bookDetailArray = $bookDetail->toArray();
-                $bookDetailArray['average_rate'] = $averageRateRounded;
-                unset($bookDetailArray['order_details']);
-
-                return $bookDetailArray;
-            });
-
-            $bookArray = $book->toArray();
-            $bookArray['book_detail'] = $bookDetails;
-
-            return $bookArray;
+            $averageRate = $book->order_details
+                ->where('status_cmt', 'active')
+                ->where('status_od', 'completed')
+                ->avg('rate');
+            $averageRateRounded = round($averageRate, 1);
+            $book->average_rate = $averageRateRounded;
+            $book->rating_total = $book->order_details
+                ->where('status_cmt', 'active')
+                ->where('status_od', 'completed')->count();
+            unset($book->order_details);
+            return $book;
         });
 
         return response()->json([
@@ -218,7 +247,49 @@ class BookController extends Controller
             ], 400);
         }
 
-        $book = Book::with('category', 'author', 'bookDetail', 'shelve', 'shelve.bookcase', 'shelve.category')->where('slug', $slug)->first();
+        $book = BookDetail::with([
+            'publishingCompany',
+            'order_details',
+            'order_details.order',
+            'order_details.order.user',
+            'book.category',
+            'book.author',
+            'book.shelve',
+            'book.shelve.bookcase',
+        ])
+            ->whereHas('book', function ($query) use ($slug) {
+                $query->where('status', 'active')
+                    ->where('slug', $slug);
+            })
+            ->where('status', 'active')
+            ->first();
+
+        $averageRate = $book->order_details
+            ->where('status_cmt', 'active')
+            ->where('status_od', 'completed')
+            ->avg('rate');
+        $averageRateRounded = round($averageRate, 1);
+        $book->average_rate = $averageRateRounded;
+
+
+        $book->rating_total = $book->order_details
+            ->where('status_cmt', 'active')
+            ->where('status_od', 'completed')->count();
+        $rating_comments = $book->order_details->map(function ($orderDetail) {
+            $orderDetail->only(['rate', 'comment', 'date_rate', 'order']);
+
+            return [
+                'rate' => $orderDetail->rate,
+                'comment' => $orderDetail->comment,
+                'date_rate' => $orderDetail->date_rate,
+                'user' => $orderDetail->order->user->only(['fullname', 'avatar'])
+            ];
+        });
+
+        $book->rating_comments = $rating_comments;
+
+        unset($book->order_details);
+
 
         if (!$book) {
             return response()->json([

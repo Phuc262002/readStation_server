@@ -60,6 +60,39 @@ class BookDetail extends Model
         return $this->belongsTo(PublishingCompany::class, 'publishing_company_id');
     }
 
+    public function scopeSearch($query, $search)
+    {
+        if ($search) {
+            $query->whereHas('book', function ($query) use ($search) {
+                $query->where('title', 'like', '%' . $search . '%')
+                    ->orWhere('original_title', 'like', '%' . $search . '%');
+            });
+        }
+
+        return $query;
+    }
+
+    public function scopeFilter($query, $category_id, $author_id, $publishing_company_id)
+    {
+        if ($category_id) {
+            $query->whereHas('book', function ($query) use ($category_id) {
+                $query->where('category_id', $category_id);
+            });
+        }
+
+        if ($author_id) {
+            $query->whereHas('book', function ($query) use ($author_id) {
+                $query->where('author_id', $author_id);
+            });
+        }
+
+        if ($publishing_company_id) {
+            $query->where('publishing_company_id', $publishing_company_id);
+        }
+
+        return $query;
+    }
+
     public function delete()
     {
         $this->status = 'deleted';

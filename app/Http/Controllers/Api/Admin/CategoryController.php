@@ -116,7 +116,9 @@ use OpenApi\Attributes as OA;
             properties: [
                 new OA\Property(property: 'name', type: 'string'),
                 new OA\Property(property: 'description', type: 'string'),
-                new OA\Property(property: 'type', type: 'string', enum: ['book', 'post'])
+                new OA\Property(property: 'type', type: 'string', enum: ['book', 'post']),
+                new OA\Property(property: 'is_featured', type: 'boolean', default: false),
+                new OA\Property(property: 'image', type: 'string'),
             ]
         )
     ),
@@ -158,7 +160,9 @@ use OpenApi\Attributes as OA;
                 new OA\Property(property: 'name', type: 'string'),
                 new OA\Property(property: 'description', type: 'string'),
                 new OA\Property(property: 'type', type: 'string', enum: ['book', 'post']),
-                new OA\Property(property: 'status', type: 'string', enum: ['active', 'inactive', 'deleted'])
+                new OA\Property(property: 'status', type: 'string', enum: ['active', 'inactive', 'deleted']),
+                new OA\Property(property: 'is_featured', type: 'boolean', default: false),
+                new OA\Property(property: 'image', type: 'string'),
             ]
         )
     ),
@@ -292,6 +296,8 @@ class CategoryController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string',
             'description' => 'nullable|string',
+            'is_featured' => 'boolean',
+            'image' => 'nullable|string',
             'type' => 'required|string|in:book,post'
         ],[
             'name.required' => 'Trường name là bắt buộc.',
@@ -299,7 +305,6 @@ class CategoryController extends Controller
             'type.required' => 'Trường type là bắt buộc.',
             'type.string' => 'Type phải là một chuỗi.',
             'type.in' => 'Type phải là book hoặc post.',
-            'status.in' => 'Status phải là active, inactive hoặc deleted'
         ]);
 
         if ($validator->fails()) {
@@ -309,6 +314,18 @@ class CategoryController extends Controller
                 "errors" => $validator->errors()
             ], 400);
         }
+
+        if ($request->is_featured == true && $request->image == null) {
+            return response()->json([
+                "status" => false,
+                "message" => "Image is required when is_featured is true!"
+            ], 400);
+        } else if ($request->is_featured == true && Category::where('is_featured', true)->where('type', 'book')->count() >= 6) {
+            return response()->json([
+                "status" => false,
+                "message" => "Only 6 categories can be featured!"
+            ], 400);
+        } 
 
         $category = Category::create(array_merge(
             $validator->validated(),
@@ -365,8 +382,10 @@ class CategoryController extends Controller
             'id' => 'required|integer|min:1',
             'name' => 'required|string',
             'type' => 'required|string|in:book,post',
+            'is_featured' => 'boolean',
+            'image' => 'nullable|string',
             'description' => 'nullable|string',
-            'status' => 'required|string|in:active,inactive,deleted',
+            'status' => 'string|in:active,inactive,deleted',
         ],[
             'id.required' => 'Trường id là bắt buộc.',
             'id.integer' => 'Id phải là một số nguyên.',
@@ -398,6 +417,18 @@ class CategoryController extends Controller
                 "message" => "Category not found!"
             ], 404);
         }
+
+        if ($request->is_featured == true && $request->image == null) {
+            return response()->json([
+                "status" => false,
+                "message" => "Image is required when is_featured is true!"
+            ], 400);
+        } else if ($request->is_featured == true && Category::where('is_featured', true)->count() >= 6) {
+            return response()->json([
+                "status" => false,
+                "message" => "Only 6 categories can be featured!"
+            ], 400);
+        } 
 
 
         if ($validator->fails()) {
@@ -455,6 +486,11 @@ class CategoryController extends Controller
             return response()->json([
                 "status" => false,
                 "message" => "Category is not exist!"
+            ], 400);
+        } elseif ($category->is_featured == true) {
+            return response()->json([
+                "status" => false,
+                "message" => "Cannot delete featured category!"
             ], 400);
         }
 

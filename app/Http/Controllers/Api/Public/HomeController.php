@@ -5,8 +5,40 @@ namespace App\Http\Controllers\Api\Public;
 use App\Http\Controllers\Controller;
 use App\Models\Author;
 use App\Models\Book;
+use App\Models\BookDetail;
+use App\Models\Category;
+use App\Models\OrderDetail;
+use App\Models\User;
 use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
+
+#[OA\Get(
+    path: '/api/v1/home/get-feautured-category',
+    tags: ['Public / Home'],
+    operationId: 'getFeaturedCategory',
+    summary: 'Get featured categories',
+    description: 'Get featured categories',
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Get all categories successfully!',
+        ),
+    ]
+)]
+
+#[OA\Get(
+    path: '/api/v1/home/get-feautured-book',
+    tags: ['Public / Home'],
+    operationId: 'getFeaturedBook',
+    summary: 'Get featured books',
+    description: 'Get featured books',
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Get all categories successfully!',
+        ),
+    ]
+)]
 
 #[OA\Get(
     path: '/api/v1/home/get-feautured-author',
@@ -23,11 +55,39 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Get(
-    path: '/api/v1/home/get-feautured-book',
+    path: '/api/v1/home/get-recommend-book',
     tags: ['Public / Home'],
-    operationId: 'getFeaturedBook',
-    summary: 'Get featured books',
-    description: 'Get featured books',
+    operationId: 'bookRecommend',
+    summary: 'Get recommended books',
+    description: 'Get recommended books',
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Get all categories successfully!',
+        ),
+    ]
+)]
+
+#[OA\Get(
+    path: '/api/v1/home/get-book-lastest',
+    tags: ['Public / Home'],
+    operationId: 'bookLatest',
+    summary: 'Get latest books',
+    description: 'Get latest books',
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Get all categories successfully!',
+        ),
+    ]
+)]
+
+#[OA\Get(
+    path: '/api/v1/home/get-statistic',
+    tags: ['Public / Home'],
+    operationId: 'statisticHome',
+    summary: 'Get statistic home',
+    description: 'Get statistic home',
     responses: [
         new OA\Response(
             response: 200,
@@ -63,16 +123,14 @@ use OpenApi\Attributes as OA;
 
 class HomeController extends Controller
 {
-    public function getFeaturedAuthor()
+    public function getFeaturedCategory(Request $request)
     {
-        $authors = Author::with(['books' => function ($query) {
-            $query->whereHas('bookDetail')->with(['category', 'bookDetail']);
-        }])->where('is_featured', true)->get();
+        $categories = Category::where('is_featured', true)->get();
 
         return response()->json([
             'status' => true,
-            'message' => 'Featured authors and their books',
-            'data' => $authors
+            'message' => 'Featured categories',
+            'data' => $categories
         ]);
     }
 
@@ -100,4 +158,78 @@ class HomeController extends Controller
             'data' => $books
         ]);
     }
+
+    public function getFeaturedAuthor()
+    {
+        $authors = Author::with(['books' => function ($query) {
+            $query->whereHas('bookDetail')->with(['category', 'bookDetail']);
+        }])->where('is_featured', true)->get();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Featured authors and their books',
+            'data' => $authors
+        ]);
+    }
+
+    public function bookRecommend(Request $request)
+    {
+        $orderDetails = OrderDetail::select('book_details_id')
+            ->groupBy('book_details_id')
+            ->orderByRaw('COUNT(book_details_id) DESC')
+            ->limit(16)
+            ->get();
+
+        $books = BookDetail::with([ 'book.category', 'book.author', 'book.shelve', 'book.shelve.bookcase', 'book' => function ($query) {
+            $query->where('status', 'active');
+        }])
+        ->whereIn('id', $orderDetails->pluck('book_details_id'))
+        ->get();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Recommended books',
+            'data' => $books
+        ]);
+    }
+
+    public function bookLatest(Request $request)
+    {
+        $books = BookDetail::with(['book.category', 'book.author', 'book.shelve', 'book.shelve.bookcase', 'book' => function ($query) {
+            $query->where('status', 'active');
+        }])
+        ->orderBy('publish_date', 'desc')
+        ->limit(16)
+        ->get();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Latest books',
+            'data' => $books
+        ]);
+    }
+
+    public function statisticHome(Request $request)
+    {
+        $totalBooks = Book::count();
+        $totalAuthors = Author::count();
+        $totalBookOrders = OrderDetail::select('book_details_id')
+        ->groupBy('book_details_id')
+        ->orderByRaw('COUNT(book_details_id) DESC')
+        ->count();
+        $totalUsers = User::count();
+
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Statistic home',
+            'data' => [
+                'total_books' => $totalBooks,
+                'total_authors' => $totalAuthors,
+                'total_book_orders' => $totalBookOrders,
+                'total_users' => $totalUsers
+            ]
+        ]);
+    }
+
 }

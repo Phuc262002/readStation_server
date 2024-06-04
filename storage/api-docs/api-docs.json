@@ -1534,6 +1534,13 @@
                                             "book",
                                             "post"
                                         ]
+                                    },
+                                    "is_featured": {
+                                        "type": "boolean",
+                                        "default": false
+                                    },
+                                    "image": {
+                                        "type": "string"
                                     }
                                 },
                                 "type": "object"
@@ -1606,6 +1613,13 @@
                                             "inactive",
                                             "deleted"
                                         ]
+                                    },
+                                    "is_featured": {
+                                        "type": "boolean",
+                                        "default": false
+                                    },
+                                    "image": {
+                                        "type": "string"
                                     }
                                 },
                                 "type": "object"
@@ -3430,6 +3444,30 @@
                         "schema": {
                             "type": "integer"
                         }
+                    },
+                    {
+                        "name": "publishing_company_id",
+                        "in": "query",
+                        "description": "Id của publishing company",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sắp xếp theo thứ tự",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "asc",
+                            "enum": [
+                                "asc",
+                                "desc",
+                                "popular"
+                            ]
+                        }
                     }
                 ],
                 "responses": {
@@ -3442,7 +3480,7 @@
                 }
             }
         },
-        "/api/v1/books/get-one/{book}": {
+        "/api/v1/books/get-one/{slug}": {
             "get": {
                 "tags": [
                     "Public / Book"
@@ -3452,9 +3490,9 @@
                 "operationId": "getOneBook",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "slug",
                         "in": "path",
-                        "description": "Id hoặc slug của sách",
+                        "description": "Slug của sách",
                         "required": true,
                         "schema": {
                             "type": "string"
@@ -3524,14 +3562,14 @@
                 }
             }
         },
-        "/api/v1/home/get-feautured-author": {
+        "/api/v1/home/get-feautured-category": {
             "get": {
                 "tags": [
                     "Public / Home"
                 ],
-                "summary": "Get featured authors",
-                "description": "Get featured authors and their books",
-                "operationId": "getFeaturedAuthor",
+                "summary": "Get featured categories",
+                "description": "Get featured categories",
+                "operationId": "getFeaturedCategory",
                 "responses": {
                     "200": {
                         "description": "Get all categories successfully!"
@@ -3547,6 +3585,66 @@
                 "summary": "Get featured books",
                 "description": "Get featured books",
                 "operationId": "getFeaturedBook",
+                "responses": {
+                    "200": {
+                        "description": "Get all categories successfully!"
+                    }
+                }
+            }
+        },
+        "/api/v1/home/get-feautured-author": {
+            "get": {
+                "tags": [
+                    "Public / Home"
+                ],
+                "summary": "Get featured authors",
+                "description": "Get featured authors and their books",
+                "operationId": "getFeaturedAuthor",
+                "responses": {
+                    "200": {
+                        "description": "Get all categories successfully!"
+                    }
+                }
+            }
+        },
+        "/api/v1/home/get-recommend-book": {
+            "get": {
+                "tags": [
+                    "Public / Home"
+                ],
+                "summary": "Get recommended books",
+                "description": "Get recommended books",
+                "operationId": "bookRecommend",
+                "responses": {
+                    "200": {
+                        "description": "Get all categories successfully!"
+                    }
+                }
+            }
+        },
+        "/api/v1/home/get-book-lastest": {
+            "get": {
+                "tags": [
+                    "Public / Home"
+                ],
+                "summary": "Get latest books",
+                "description": "Get latest books",
+                "operationId": "bookLatest",
+                "responses": {
+                    "200": {
+                        "description": "Get all categories successfully!"
+                    }
+                }
+            }
+        },
+        "/api/v1/home/get-statistic": {
+            "get": {
+                "tags": [
+                    "Public / Home"
+                ],
+                "summary": "Get statistic home",
+                "description": "Get statistic home",
+                "operationId": "statisticHome",
                 "responses": {
                     "200": {
                         "description": "Get all categories successfully!"

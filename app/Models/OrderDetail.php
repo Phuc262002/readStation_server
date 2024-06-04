@@ -18,6 +18,7 @@ class OrderDetail extends Model
         'current_extensions',
         'extension_dates',
         'expired_date',
+        'date_rate',
         'rate',
         'comment',
         'status_cmt',

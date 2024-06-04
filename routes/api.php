@@ -80,6 +80,10 @@ Route::group([
     ], function () {
         Route::get('/get-feautured-author', [PublicHomeController::class, 'getFeaturedAuthor']);
         Route::get('/get-feautured-book', [PublicHomeController::class, 'getFeaturedBook']);
+        Route::get('/get-feautured-category', [PublicHomeController::class, 'getFeaturedCategory']);
+        Route::get('/get-recommend-book', [PublicHomeController::class, 'bookRecommend']);
+        Route::get('/get-book-lastest', [PublicHomeController::class, 'bookLatest']);
+        Route::get('/get-statistic', [PublicHomeController::class, 'statisticHome']);
     });
 
     Route::group([

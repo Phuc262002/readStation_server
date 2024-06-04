@@ -111,6 +111,8 @@ return new class extends Migration
             $table->enum('type', ['book', 'post']);
             $table->string('name');
             $table->text('description')->nullable();
+            $table->boolean('is_featured')->default(false);
+            $table->string('image')->nullable();
             $table->string('slug')->unique();
             $table->enum('status', ['active', 'inactive', 'deleted'])->default('active');
             $table->timestamps();
@@ -272,6 +274,7 @@ return new class extends Migration
             $table->json('extension_dates')->nullable();
             $table->date('expired_date')->nullable();
             $table->integer('rate')->default(5);
+            $table->date('date_rate')->nullable();
             $table->text('comment')->nullable();
             $table->enum('status_cmt', ['hiring', 'rating_yet', 'active', 'hide', 'canceled'])->default('hiring');
             $table->enum('status_od', ['pending', 'hiring', 'completed', 'canceled', 'out_of_date'])->default('pending');
