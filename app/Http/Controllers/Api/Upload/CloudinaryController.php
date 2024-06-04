@@ -37,7 +37,7 @@ use OpenApi\Attributes as OA;
     responses: [
         new OA\Response(
             response: 200,
-            description: 'Upload images successfully'
+            description: 'Upload image successfully'
         ),
         new OA\Response(
             response: 400,
@@ -82,8 +82,10 @@ class CloudinaryController extends Controller
 
             return response()->json([
                 "status" => true,
-                "message" => "Get book successfully!",
-                'url' => $uploadedFileUrl
+                "message" => "Upload image successfully",
+                'data' => [
+                    'url' => $uploadedFileUrl
+                ]
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
