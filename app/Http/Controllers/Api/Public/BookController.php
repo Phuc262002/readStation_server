@@ -286,6 +286,7 @@ class BookController extends Controller
             ];
         });
 
+        $book->order_count = $book->order_details->where('status_od', 'completed')->count();
         $book->rating_comments = $rating_comments;
 
         unset($book->order_details);
