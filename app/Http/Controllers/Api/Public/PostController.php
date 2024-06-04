@@ -36,6 +36,13 @@ use OpenApi\Attributes as OA;
             description: 'ID của category',
             schema: new OA\Schema(type: 'integer')
         ),
+        new OA\Parameter(
+            name: 'sort',
+            in: 'query',
+            required: false,
+            description: 'Sắp xếp theo thời gian tạo hoặc lượt xem',
+            schema: new OA\Schema(type: 'string', enum: ['asc', 'desc', 'popular'], default: 'desc')
+        ),
     ],
     responses: [
         new OA\Response(
@@ -60,7 +67,7 @@ use OpenApi\Attributes as OA;
             name: 'post',
             in: 'path',
             required: true,
-            description: 'ID của post',
+            description: 'Slug của post',
             schema: new OA\Schema(type: 'string')
         ),
     ],
@@ -84,17 +91,16 @@ class PostController extends Controller
             'page' => 'integer|min:1',
             'pageSize' => 'integer|min:1',
             'category_id' => 'integer',
-        ]);
-
-        $customMessages = [
+            'sort' => 'string:in:asc,desc,popular'
+        ],[
             'page.integer' => 'Trang phải là số nguyên.',
             'page.min' => 'Trang phải lớn hơn hoặc bằng 1.',
             'pageSize.integer' => 'Kích thước trang phải là số nguyên.',
             'pageSize.min' => 'Kích thước trang phải lớn hơn hoặc bằng 1.',
             'category_id.integer' => 'Category_id phải là một số nguyên.',
-        ];
-
-        $validator->setCustomMessages($customMessages);
+            'sort.string' => 'Sort phải là một chuỗi.',
+            'sort.in' => 'Sort phải là một trong các giá trị: asc, desc, popular.'
+        ]);
 
         if ($validator->fails()) {
             return response()->json([
@@ -108,6 +114,7 @@ class PostController extends Controller
         $page = $request->input('page', 1);
         $pageSize = $request->input('pageSize', 10);
         $category_id = $request->input('category_id');
+        $sort = $request->input('sort', 'desc');
 
         // Tạo query ban đầu
         $query = Post::query()->with(['user', 'category']);
@@ -117,6 +124,12 @@ class PostController extends Controller
 
         if ($category_id) {
             $query->where('category_id', $category_id);
+        }
+
+        if ($sort === 'popular') {
+            $query->orderBy('view', 'desc');
+        } else {
+            $query->orderBy('created_at', $sort);
         }
 
         // Lấy tổng số mục trong DB trước khi áp dụng bộ lọc tìm kiếm

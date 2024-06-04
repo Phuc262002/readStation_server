@@ -3731,6 +3731,21 @@
                         "schema": {
                             "type": "integer"
                         }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sắp xếp theo thời gian tạo hoặc lượt xem",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "desc",
+                            "enum": [
+                                "asc",
+                                "desc",
+                                "popular"
+                            ]
+                        }
                     }
                 ],
                 "responses": {
