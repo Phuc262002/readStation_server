@@ -295,7 +295,7 @@ class PostController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'category_id' => 'required|string',
+            'category_id' => 'required',
             'title' => 'required|string|max:255',
             "content" => "required|string",
             "summary" => "required|string",
