@@ -3770,7 +3770,7 @@
                     {
                         "name": "post",
                         "in": "path",
-                        "description": "ID của post",
+                        "description": "Slug của post",
                         "required": true,
                         "schema": {
                             "type": "string"
@@ -3824,6 +3824,54 @@
                         "description": "Validation error"
                     }
                 }
+            }
+        },
+        "/api/v1/upload/image": {
+            "post": {
+                "tags": [
+                    "Upload"
+                ],
+                "summary": "Upload image",
+                "description": "Upload image",
+                "operationId": "upload",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "image"
+                                ],
+                                "properties": {
+                                    "image": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "binary"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Upload images successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Upload error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         }
     },

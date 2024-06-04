@@ -23,6 +23,7 @@ use App\Http\Controllers\Api\Public\CategoryController;
 use App\Http\Controllers\Api\Public\HomeController as PublicHomeController;
 use App\Http\Controllers\Api\Public\PostController as PublicPostController;
 use App\Http\Controllers\Api\Public\PublishingCompanyController;
+use App\Http\Controllers\Api\Upload\CloudinaryController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -214,5 +215,12 @@ Route::group([
         "prefix" => "check-schedule"
     ], function () {
         Route::get('/remind-return-book', [RemindReturnBookController::class, 'remindReturnBook']);
+    });
+
+    Route::group([
+        "prefix" => "upload",
+        "middleware" => ["auth:api"]
+    ], function () {
+       Route::post('/image', [CloudinaryController::class, 'upload']);
     });
 });
