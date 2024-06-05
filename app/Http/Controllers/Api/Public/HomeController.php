@@ -145,7 +145,7 @@ class HomeController extends Controller
                 ->whereNotNull('status')
                 ->where('status', 'active');
         })
-        ->get();
+        ->limit(7)->get();
 
         // Format response to ensure bookDetail is an array with data
         $books->each(function ($book) {
@@ -162,7 +162,7 @@ class HomeController extends Controller
     public function getFeaturedAuthor()
     {
         $authors = Author::with(['books' => function ($query) {
-            $query->whereHas('bookDetail')->with(['category', 'bookDetail']);
+            $query->whereHas('bookDetail')->with(['category', 'bookDetail'])->limit(4);
         }])->where('is_featured', true)->get();
 
         return response()->json([
