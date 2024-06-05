@@ -221,7 +221,7 @@ class BookController extends Controller
                 "books" => $books->items(),
                 "page" => $books->currentPage(),
                 "pageSize" => $books->perPage(),
-                "lastPage" => $books->lastPage(),
+                "totalPages" => $books->lastPage(),
                 "totalResults" => $books->total(),
                 "total" => $totalItems
             ],

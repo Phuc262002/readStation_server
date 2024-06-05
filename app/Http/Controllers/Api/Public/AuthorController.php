@@ -93,7 +93,7 @@ class AuthorController extends Controller
                 "authors" => $authors->items(),
                 "page" => $authors->currentPage(),
                 "pageSize" => $authors->perPage(),
-                "lastPage" => $authors->lastPage(),
+                "totalPages" => $authors->lastPage(),
                 "totalResults" => $authors->total(),
                 "total" => $totalItems
             ],

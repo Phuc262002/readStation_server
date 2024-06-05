@@ -270,7 +270,7 @@ class PublishingCompanyController extends Controller
                 "publishing_companies" => $publishingCompany->items(),
                 "page" => $publishingCompany->currentPage(),
                 "pageSize" => $publishingCompany->perPage(),
-                "lastPage" => $publishingCompany->lastPage(),
+                "totalPages" => $publishingCompany->lastPage(),
                 "totalResults" => $publishingCompany->total(),
                 "total" => $totalItems
             ],

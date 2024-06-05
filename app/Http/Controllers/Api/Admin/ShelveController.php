@@ -291,7 +291,7 @@ class ShelveController extends Controller
                 "shelves" => $shelve->items(),
                 "page" => $shelve->currentPage(),
                 "pageSize" => $shelve->perPage(),
-                "lastPage" => $shelve->lastPage(),
+                "totalPages" => $shelve->lastPage(),
                 "totalResults" => $shelve->total(),
                 "total" => $totalItems
             ],

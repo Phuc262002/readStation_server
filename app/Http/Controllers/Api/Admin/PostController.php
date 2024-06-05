@@ -132,7 +132,7 @@ class PostController extends Controller
                 "posts" => $posts->items(),
                 "page" => $posts->currentPage(),
                 "pageSize" => $posts->perPage(),
-                "lastPage" => $posts->lastPage(),
+                "totalPages" => $posts->lastPage(),
                 "totalResults" => $posts->total(),
                 "total" => $totalItems
             ],

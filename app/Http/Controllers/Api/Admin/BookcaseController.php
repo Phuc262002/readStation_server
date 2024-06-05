@@ -268,7 +268,7 @@ class BookcaseController extends Controller
                 "bookcases" => $bookcases->items(),
                 "page" => $bookcases->currentPage(),
                 "pageSize" => $bookcases->perPage(),
-                "lastPage" => $bookcases->lastPage(),
+                "totalPages" => $bookcases->lastPage(),
                 "totalResults" => $bookcases->total(),
                 "total" => $totalItems
             ],

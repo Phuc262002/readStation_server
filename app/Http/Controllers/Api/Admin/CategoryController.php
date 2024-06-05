@@ -284,7 +284,7 @@ class CategoryController extends Controller
                 "categories" => $categories->items(),
                 "page" => $categories->currentPage(),
                 "pageSize" => $categories->perPage(),
-                "lastPage" => $categories->lastPage(),
+                "totalPages" => $categories->lastPage(),
                 "totalResults" => $categories->total(),
                 "total" => $totalItems
             ],

@@ -112,7 +112,7 @@ class OrderController extends Controller
                 "books" => $orders->items(),
                 "page" => $orders->currentPage(),
                 "pageSize" => $orders->perPage(),
-                "lastPage" => $orders->lastPage(),
+                "totalPages" => $orders->lastPage(),
                 "totalResults" => $orders->total(),
                 "total" => $totalItems
             ],
