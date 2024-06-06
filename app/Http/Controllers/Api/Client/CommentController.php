@@ -206,7 +206,7 @@ class CommentController extends Controller
                 ->where('status', 'published')
                 ->where('parent_id', $parentId)
                 ->with(['user' => function ($query) {
-                    $query->select('id', 'fullname', 'avatar');
+                    $query->select('id', 'fullname', 'avatar', 'email');
                 }])
                 ->select('id', 'parent_id', 'content', 'created_at', 'updated_at', 'user_id')
                 ->orderBy('created_at', 'desc');
