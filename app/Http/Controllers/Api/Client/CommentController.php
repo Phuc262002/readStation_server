@@ -225,7 +225,8 @@ class CommentController extends Controller
                     'updated_at' => $comment->updated_at,
                     'user' => [
                         'fullname' => $comment->user->fullname,
-                        'avatar' => $comment->user->avatar
+                        'avatar' => $comment->user->avatar,
+                        'email' => $comment->user->email,
                     ]
                 ];
 
