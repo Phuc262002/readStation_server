@@ -68,7 +68,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Delete(
-    path: '/api/v1/upload/images/{publicId}',
+    path: '/api/v1/upload/images/delete/{publicId}',
     operationId: 'deleteImage',
     tags: ['Upload'],
     summary: 'Delete image',

@@ -3944,7 +3944,25 @@
                 }
             }
         },
-        "/api/v1/upload/image": {
+        "/api/v1/upload/images": {
+            "get": {
+                "tags": [
+                    "Upload"
+                ],
+                "summary": "Get all images",
+                "description": "Get all images",
+                "operationId": "getAllImages",
+                "responses": {
+                    "200": {
+                        "description": "Get all files successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
             "post": {
                 "tags": [
                     "Upload"
@@ -3983,6 +4001,40 @@
                     },
                     "500": {
                         "description": "Upload error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/upload/images/{publicId}": {
+            "delete": {
+                "tags": [
+                    "Upload"
+                ],
+                "summary": "Delete image",
+                "description": "Delete image",
+                "operationId": "deleteImage",
+                "parameters": [
+                    {
+                        "name": "publicId",
+                        "in": "path",
+                        "description": "Public ID of image",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Delete image successfully"
+                    },
+                    "500": {
+                        "description": "Delete image error"
                     }
                 },
                 "security": [
