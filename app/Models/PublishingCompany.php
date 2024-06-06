@@ -43,7 +43,13 @@ class PublishingCompany extends Model
 
     public function delete()
     {
-        $this->status = 'deleted';
-        $this->save();
+        if ($this->book_details()->count() > 0) {
+            $this->status = 'deleted';
+            $this->save();
+        } else {
+            parent::delete();
+        }
+
+        return true;
     }
 }

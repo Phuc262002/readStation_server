@@ -447,15 +447,17 @@ class PublishingCompanyController extends Controller
                 "status" => false,
                 "message" => "Publish company not found!"
             ], 404);
-        } else if ($publishingCompany->status == 'deleted') {
-            return response()->json([
-                "status" => false,
-                "message" => "Publish company has been deleted!"
-            ], 400);
         }
 
         try {
             $publishingCompany->delete();
+
+            if ($publishingCompany->status == 'deleted') {
+                return response()->json([
+                    "status" => false,
+                    "message" => "Nhau xuất bản đã được thêm vào thùng rác. Bạn có thể khôi phục lại sau này!",
+                ], 500);
+            }
         } catch (\Throwable $th) {
             return response()->json([
                 "status" => false,
@@ -465,7 +467,7 @@ class PublishingCompanyController extends Controller
 
         return response()->json([
             "status" => true,
-            "message" => "Delete publish company successfully",
+            "message" => "Nhà xuất bản đã được xóa vĩnh viễn. Bạn không thể khôi phục lại sau này!",
         ], 200);
     }
 }

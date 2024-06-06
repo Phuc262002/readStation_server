@@ -4010,7 +4010,7 @@
                 ]
             }
         },
-        "/api/v1/upload/images/{publicId}": {
+        "/api/v1/upload/images/delete/{publicId}": {
             "delete": {
                 "tags": [
                     "Upload"

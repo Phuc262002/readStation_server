@@ -43,6 +43,11 @@ class Category extends Model
         return $this->hasMany(Book::class);
     }
 
+    public function shelves()
+    {
+        return $this->hasMany(Shelve::class);
+    }
+
     public function scopeSearch($query, $search)
     {
         return $query->where('name', 'like', '%' . $search . '%');
@@ -67,7 +72,7 @@ class Category extends Model
 
     public function delete()
     {
-        if ($this->books()->count() > 0 || $this->posts()->count() > 0){
+        if ($this->books()->count() > 0 || $this->posts()->count() > 0 || $this->shelves()->count() > 0){
             $this->status = 'deleted';
             $this->save();
         } else {
