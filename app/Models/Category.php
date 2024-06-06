@@ -67,7 +67,13 @@ class Category extends Model
 
     public function delete()
     {
-        $this->status = 'deleted';
-        $this->save();
+        if ($this->books()->count() > 0 || $this->posts()->count() > 0){
+            $this->status = 'deleted';
+            $this->save();
+        } else {
+            parent::delete();
+        }
+
+        return true;
     }
 }

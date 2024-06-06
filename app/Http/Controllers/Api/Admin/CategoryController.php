@@ -478,20 +478,22 @@ class CategoryController extends Controller
                 "status" => false,
                 "message" => "Category not found!"
             ], 404);
-        } else if ($category->status == 'deleted') {
-            return response()->json([
-                "status" => false,
-                "message" => "Category is not exist!"
-            ], 400);
         } elseif ($category->is_featured == true) {
             return response()->json([
                 "status" => false,
-                "message" => "Cannot delete featured category!"
+                "message" => "Không thể xóa danh mục nổi bật!"
             ], 400);
         }
 
         try {
             $category->delete();
+
+            if ($category->status == 'deleted') {
+                return response()->json([
+                    "status" => true,
+                    "message" => "Danh mục đã thêm vào thùng rác! Bạn có thể khôi phục lại sau này!",
+                ], 200);
+            }
         } catch (\Throwable $th) {
             return response()->json([
                 "status" => false,
@@ -501,7 +503,7 @@ class CategoryController extends Controller
 
         return response()->json([
             "status" => true,
-            "message" => "Delete category successfully!",
+            "message" => "Danh mục đã được xóa vĩnh viễn! Bạn không thể khôi phục lại sau này!",
         ], 200);
     }
 }

@@ -67,6 +67,13 @@ use function PHPSTORM_META\map;
             description: 'Sắp xếp theo thứ tự',
             schema: new OA\Schema(type: 'string', enum: ['asc', 'desc', 'popular'], default: 'asc')
         ),
+        new OA\Parameter(
+            name: 'rating',
+            in: 'query',
+            required: false,
+            description: 'Đánh giá sách',
+            schema: new OA\Schema(type: 'integer', enum: [1, 2, 3, 4, 5])
+        ),
     ],
     responses: [
         new OA\Response(
@@ -137,6 +144,7 @@ class BookController extends Controller
             'category_id' => 'integer',
             'author_id' => 'integer',
             'publishing_company_id' => 'integer',
+            'rating' => 'integer',
             'sort' => 'string|in:asc,desc,popular',
         ], [
             'page.integer' => 'Trang phải là số nguyên.',
@@ -165,6 +173,7 @@ class BookController extends Controller
         $category_id = $request->input('category_id');
         $author_id = $request->input('author_id');
         $publishing_company_id = $request->input('publishing_company_id');
+        $rating = $request->input('rating');
         $sort = $request->input('sort', 'asc');
 
         // Tạo query ban đầu
@@ -200,7 +209,7 @@ class BookController extends Controller
         // Thực hiện phân trang
         $books = $query->orderBy('created_at', 'desc')->paginate($pageSize, ['*'], 'page', $page);
 
-        $books->getCollection()->transform(function ($book) {
+        $filteredBooks = $books->getCollection()->filter(function ($book) use ($rating) {
             $averageRate = $book->order_details
                 ->where('status_cmt', 'active')
                 ->where('status_od', 'completed')
@@ -209,10 +218,20 @@ class BookController extends Controller
             $book->average_rate = $averageRateRounded;
             $book->rating_total = $book->order_details
                 ->where('status_cmt', 'active')
-                ->where('status_od', 'completed')->count();
+                ->where('status_od', 'completed')
+                ->count();
             unset($book->order_details);
-            return $book;
+        
+            if ($rating) {
+                return $averageRateRounded >= $rating && $averageRateRounded <= $rating + 1;
+            }
+        
+            return true; // Nếu không có rating, giữ lại tất cả các sách
         });
+        
+        // Cập nhật lại bộ sưu tập với những sách đã lọc
+        $books->setCollection($filteredBooks);
+        
 
         return response()->json([
             "status" => true,

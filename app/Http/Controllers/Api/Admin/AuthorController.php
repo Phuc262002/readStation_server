@@ -468,11 +468,6 @@ class AuthorController extends Controller
                 "status" => false,
                 "message" => "Author not found!"
             ], 404);
-        } elseif ($author->is_featured) {
-            return response()->json([
-                "status" => false,
-                "message" => "Cannot delete featured author!"
-            ], 400);
         } elseif ($author->status == 'deleted') {
             return response()->json([
                 "status" => false,
@@ -482,6 +477,13 @@ class AuthorController extends Controller
 
         try {
             $author->delete();
+
+            if ($author->status == 'deleted') {
+                return response()->json([
+                    "status" => true,
+                    "message" => "Tác giả đạ thêm vào thùng rác! Bạn có thể khôi phục lại sau này!",
+                ], 200);
+            }
         } catch (\Throwable $th) {
             return response()->json([
                 "status" => false,
@@ -491,7 +493,7 @@ class AuthorController extends Controller
 
         return response()->json([
             "status" => true,
-            "message" => "Delete author successfully!",
+            "message" => "Danh mục đã được xóa vĩnh viễn! Bạn không thể khôi phục lại sau này!",
         ], 200);
     }
 }

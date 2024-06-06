@@ -84,6 +84,92 @@ use OpenApi\Attributes as OA;
     ]
 )]
 
+#[OA\Put(
+    path: '/api/v1/comments/update/{id}',
+    operationId: 'updateComment',
+    tags: ['Comment'],
+    summary: 'Update comment',
+    description: 'Update comment',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    parameters: [
+        new OA\Parameter(
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Id của bình luận',
+            schema: new OA\Schema(type: 'integer')
+        ),
+    ],
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            required: ['content', 'status'],
+            properties: [
+                new OA\Property(property: 'content', type: 'string'),
+                new OA\Property(property: 'status', type: 'string')
+            ]
+        )
+    ),
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Comment updated successfully'
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error'
+        ),
+        new OA\Response(
+            response: 403,
+            description: 'Bạn không có quyền cập nhật bình luận này'
+        ),
+        new OA\Response(
+            response: 500,
+            description: 'Comment updated failed'
+        )
+    ]
+)]
+
+#[OA\Delete(
+    path: '/api/v1/comments/delete/{id}',
+    operationId: 'deleteComment',
+    tags: ['Comment'],
+    summary: 'Delete comment',
+    description: 'Delete comment',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    parameters: [
+        new OA\Parameter(
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Id của bình luận',
+            schema: new OA\Schema(type: 'integer')
+        ),
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Comment deleted successfully'
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error'
+        ),
+        new OA\Response(
+            response: 403,
+            description: 'Bạn không có quyền xóa bình luận này'
+        ),
+        new OA\Response(
+            response: 500,
+            description: 'Comment deleted failed'
+        )
+    ]
+)]
+
 class CommentController extends Controller
 {
     /**
@@ -225,35 +311,144 @@ class CommentController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Comment $comment)
+    public function update(Request $request)
     {
-        //
+        $id = $request->route('id');
+        $validator = validator(array_merge(
+            $request->all(),
+            ['id' => $id]
+        ), [
+            'id' => 'required|exists:comments,id',
+            'content' => 'string',
+            'status' => 'in:published,banned,hidden,delete'
+        ], [
+            'id.required' => 'Id là bắt buộc',
+            'id.exists' => 'Id không tồn tại',
+            'content.required' => 'Nội dung bình luận là bắt buộc',
+            'content.string' => 'Nội dung bình luận phải là chuỗi',
+            'status.in' => 'Trạng thái phải là published, banned, hidden, delete',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                "status" => false,
+                "message" => "Validation error",
+                "errors" => $validator->errors()
+            ], 400);
+        }
+
+        try {
+            $comment = Comment::with(['user', 'post'])->find($request->id);
+
+            if (auth()->user()->role->name == 'admin' || auth()->user()->role->name == 'manager') {
+                $comment->update([
+                    'status' => $request->status,
+                    'content' => $request->content,
+                ]);
+
+                return response()->json([
+                    "status" => true,
+                    "message" => "Comment updated successfully",
+                    "data" => $comment
+                ]);
+            } else {
+                if ($comment->user_id == auth()->user()->id) {
+                    $comment->update([
+                        'status' => $request->status,
+                        'content' => $request->content,
+                    ]);
+
+                    return response()->json([
+                        "status" => true,
+                        "message" => "Comment updated successfully",
+                        "data" => $comment
+                    ]);
+                } elseif ($comment->user_id != auth()->user()->id && $comment->post->user_id == auth()->user()->id) {
+                    $comment->update([
+                        'status' => $request->status,
+                    ]);
+
+                    return response()->json([
+                        "status" => true,
+                        "message" => "Comment updated successfully",
+                        "data" => $comment
+                    ]);
+                } else {
+                    return response()->json([
+                        "status" => false,
+                        "message" => "Bạn không có quyền cập nhật bình luận này"
+                    ], 403);
+                }
+            }
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => false,
+                "message" => "Comment updated failed",
+                "errors" => $th->getMessage()
+            ], 500);
+        }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Comment $comment)
+    public function destroy(Request $request)
     {
-        //
-    }
+        $id = $request->route('id');
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Comment $comment)
-    {
-        //
-    }
+        $validator = validator(array_merge(
+            $request->all(),
+            ['id' => $id]
+        ), [
+            'id' => 'required|exists:comments,id',
+        ], [
+            'id.required' => 'Id là bắt buộc',
+            'id.exists' => 'Id không tồn tại',
+        ]);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Comment $comment)
-    {
-        //
+        if ($validator->fails()) {
+            return response()->json([
+                "status" => false,
+                "message" => "Validation error",
+                "errors" => $validator->errors()
+            ], 400);
+        }
+
+        try {
+            $comment = Comment::with(['user', 'post'])->find($request->id);
+
+            if (auth()->user()->role->name == 'admin' || auth()->user()->role->name == 'manager') {
+                $comment->delete();
+
+                return response()->json([
+                    "status" => true,
+                    "message" => "Comment deleted successfully",
+                ]);
+            } else {
+                if ($comment->user_id == auth()->user()->id) {
+                    $comment->delete();
+
+                    return response()->json([
+                        "status" => true,
+                        "message" => "Comment deleted successfully",
+                    ]);
+                } elseif ($comment->user_id != auth()->user()->id && $comment->post->user_id == auth()->user()->id) {
+                    $comment->delete();
+
+                    return response()->json([
+                        "status" => true,
+                        "message" => "Comment deleted successfully",
+                    ]);
+                } else {
+                    return response()->json([
+                        "status" => false,
+                        "message" => "Bạn không có quyền xóa bình luận này"
+                    ], 403);
+                }
+            }
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => false,
+                "message" => "Comment deleted failed",
+                "errors" => $th->getMessage()
+            ], 500);
+        }
     }
 }

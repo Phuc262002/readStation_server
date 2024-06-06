@@ -177,6 +177,8 @@ Route::group([
 
         Route::group(["middleware" => ["auth:api"]], function () {
             Route::post('/create', [CommentController::class, 'store']);
+            Route::put('/update/{id}', [CommentController::class, 'update']);
+            Route::delete('/delete/{id}', [CommentController::class, 'destroy']);
         });
     });
 
@@ -221,6 +223,8 @@ Route::group([
         "prefix" => "upload",
         "middleware" => ["auth:api"]
     ], function () {
-       Route::post('/image', [CloudinaryController::class, 'upload']);
+        Route::get('/images', [CloudinaryController::class, 'getAllImages']);
+        Route::post('/images', [CloudinaryController::class, 'upload']);
+        Route::delete('/images/delete/{publicId}', [CloudinaryController::class, 'deleteImage']);
     });
 });

@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Validator;
 use OpenApi\Attributes as OA;
 
 #[OA\Post(
-    path: '/api/v1/upload/image',
+    path: '/api/v1/upload/images',
     operationId: 'upload',
     tags: ['Upload'],
     summary: 'Upload image',
@@ -50,6 +50,53 @@ use OpenApi\Attributes as OA;
     ]
 )]
 
+#[OA\Get(
+    path: '/api/v1/upload/images',
+    operationId: 'getAllImages',
+    tags: ['Upload'],
+    summary: 'Get all images',
+    description: 'Get all images',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Get all files successfully'
+        )
+    ]
+)]
+
+#[OA\Delete(
+    path: '/api/v1/upload/images/{publicId}',
+    operationId: 'deleteImage',
+    tags: ['Upload'],
+    summary: 'Delete image',
+    description: 'Delete image',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    parameters: [
+        new OA\Parameter(
+            name: 'publicId',
+            in: 'path',
+            required: true,
+            description: 'Public ID of image',
+            schema: new OA\Schema(type: 'string')
+        )
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Delete image successfully'
+        ),
+        new OA\Response(
+            response: 500,
+            description: 'Delete image error'
+        )
+    ]
+)]
+
 
 class CloudinaryController extends Controller
 {
@@ -70,7 +117,7 @@ class CloudinaryController extends Controller
         }
 
         try {
-            $uploadedFileUrl = Cloudinary::upload($request->file('image')->getRealPath())->getSecurePath();
+            $uploadedFileUrl = Cloudinary::upload($request->file('image')->getRealPath());
 
             if (!$uploadedFileUrl) {
                 return response()->json([
@@ -84,7 +131,8 @@ class CloudinaryController extends Controller
                 "status" => true,
                 "message" => "Upload image successfully",
                 'data' => [
-                    'url' => $uploadedFileUrl
+                    'url' => $uploadedFileUrl->getSecurePath(),
+                    'publicId' => $uploadedFileUrl->getPublicId(),
                 ]
             ], 200);
         } catch (\Throwable $th) {
@@ -94,5 +142,34 @@ class CloudinaryController extends Controller
                 'errors' => $th->getMessage()
             ], 500);
         }
+    }
+
+    public function getAllImages()
+    {
+        $files = Cloudinary::search()->expression('resource_type:image')->execute();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Get all files successfully',
+            'data' => $files
+        ], 200);
+    }
+
+    public function deleteImage($publicId)
+    {
+        $result = Cloudinary::destroy($publicId);
+
+        if ($result['result'] === 'ok') {
+            return response()->json([
+                'status' => true,
+                'message' => 'Delete image successfully',
+            ], 200);
+        }
+
+        return response()->json([
+            'status' => false,
+            'message' => 'Delete image error',
+            'errors' => 'Delete image error'
+        ], 500);
     }
 }
