@@ -331,10 +331,8 @@ class ShelveController extends Controller
         ], 200);
     }
 
-    public function show(Request $request)
+    public function show($id)
     {
-        $id = $request->route('id');
-
         $validator = Validator::make(['id' => $id], [
             'id' => 'required|integer|min:1'
         ],[
@@ -367,10 +365,8 @@ class ShelveController extends Controller
         ], 200);
     }
 
-    public function update(Request $request)
+    public function update(Request $request, $id)
     {
-        $id = $request->route('id');
-
         $validator = Validator::make(array_merge(['id' => $id], $request->all()), [
             'id' => 'required|integer|min:1',
             'bookcase_id' => 'nullable',
@@ -428,10 +424,8 @@ class ShelveController extends Controller
         }
     }
 
-    public function destroy(Request $request)
+    public function destroy($id)
     {
-        $id = $request->route('id');
-
         $validator = Validator::make(['id' => $id], [
             'id' => 'required|integer|min:1'
         ],[

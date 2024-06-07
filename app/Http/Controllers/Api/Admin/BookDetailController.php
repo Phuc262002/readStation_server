@@ -458,22 +458,17 @@ class BookDetailController extends Controller
         }
     }
 
-    public function show(Request $request, BookDetail $bookDetail)
+    public function show(Request $request, $id)
     {
         $this->checkBookDetail();
-        $id = $request->route('id');
-
         $validator = Validator::make(['id' => $id], [
-            'id' => 'required|integer|min:1'
-        ]);
-
-        $customMessages = [
+            'id' => 'required|integer|min:1|exists:book_details,id'
+        ],[
             'id.required' => 'Trường id là bắt buộc.',
             'id.integer' => 'Id phải là một số nguyên.',
-            'id.min' => 'Id phải lớn hơn hoặc bằng 1.'
-        ];
-
-        $validator->setCustomMessages($customMessages);
+            'id.min' => 'Id phải lớn hơn hoặc bằng 1.',
+            'id.exists' => 'Id không tồn tại.'
+        ]);
 
         if ($validator->fails()) {
             return response()->json([
@@ -498,12 +493,10 @@ class BookDetailController extends Controller
         ], 200);
     }
 
-    public function update(Request $request, BookDetail $bookDetail)
+    public function update(Request $request, $id)
     {
-        $id = $request->route('id');
-
         $validator = Validator::make(array_merge(['id' => $id], $request->all()), [
-            'id' => 'required|integer|min:1',
+            'id' => 'required|integer|min:1|exists:book_details,id',
             'book_id' => "required|integer",
             'sku_origin' => 'required|string',
             'poster' => "required|string",
@@ -524,6 +517,7 @@ class BookDetailController extends Controller
             'id.required' => 'Trường id là bắt buộc.',
             'id.integer' => 'Id phải là một số nguyên.',
             'id.min' => 'Id phải lớn hơn hoặc bằng 1.',
+            'id.exists' => 'id không tồn tai.',
             'book_id.required' => 'Trường book_id là bắt buộc.',
             'sku_origin.required' => 'Trường sku_origin là bắt buộc.',
             'poster.required' => 'Trường poster là bắt buộc.',
@@ -575,21 +569,16 @@ class BookDetailController extends Controller
         }
     }
 
-    public function destroy(Request $request, BookDetail $bookDetail)
+    public function destroy($id)
     {
-        $id = $request->route('id');
-
         $validator = Validator::make(['id' => $id], [
-            'id' => 'required|integer|min:1'
-        ]);
-
-        $customMessages = [
+            'id' => 'required|integer|min:1|exists:book_details,id'
+        ],[
             'id.required' => 'Trường id là bắt buộc.',
             'id.integer' => 'Id phải là một số nguyên.',
-            'id.min' => 'Id phải lớn hơn hoặc bằng 1.'
-        ];
-
-        $validator->setCustomMessages($customMessages);
+            'id.min' => 'Id phải lớn hơn hoặc bằng 1.',
+            'id.exists' => 'Id không tồn tại.'
+        ]);
 
         if ($validator->fails()) {
             return response()->json([

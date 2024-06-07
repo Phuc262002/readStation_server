@@ -315,16 +315,15 @@ class PublishingCompanyController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Request $request, PublishingCompany $publishingCompany)
+    public function show($id)
     {
-        $id = $request->route('id');
-
         $validator = Validator::make(['id' => $id], [
-            'id' => 'required|integer|min:1'
+            'id' => 'required|integer|min:1|exists:publishing_companies,id'
         ],[
             'id.required' => 'Trường id là bắt buộc.',
             'id.integer' => 'Id phải là một số nguyên.',
-            'id.min' => 'Id phải lớn hơn hoặc bằng 1.'
+            'id.min' => 'Id phải lớn hơn hoặc bằng 1.',
+            'id.exists' => 'Id không tồn tại.',
         ]);
         
         if ($validator->fails()) {
@@ -354,10 +353,8 @@ class PublishingCompanyController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, PublishingCompany $publishingCompany)
+    public function update(Request $request, $id)
     {
-        $id = $request->route('id');
-
         $validator = Validator::make(array_merge(['id' => $id], $request->all()), [
             'id' => 'required|integer|min:1',
             'name' => 'string',
@@ -419,10 +416,8 @@ class PublishingCompanyController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Request $request, PublishingCompany $publishingCompany)
+    public function destroy($id)
     {
-        $id = $request->route('id');
-
         $validator = Validator::make(['id' => $id], [
             'id' => 'required|integer|min:1|exists:publishing_companies,id'
         ],[

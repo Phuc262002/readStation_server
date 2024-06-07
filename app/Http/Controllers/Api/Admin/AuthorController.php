@@ -324,10 +324,8 @@ class AuthorController extends Controller
         ], 200);
     }
 
-    public function show(Request $request, Author $author)
+    public function show($id)
     {
-        $id = $request->route('id');
-
         $validator = Validator::make(['id' => $id], [
             'id' => 'required|integer|min:1'
         ], [
@@ -360,12 +358,10 @@ class AuthorController extends Controller
         ], 200);
     }
 
-    public function update(Request $request, Author $author)
+    public function update(Request $request, $id)
     {
-        $id = $request->route('id');
-
         $validator = Validator::make(array_merge(['id' => $id], $request->all()), [
-            'id' => 'required|integer|min:1',
+            'id' => 'required|integer|exists:authors,id|min:1',
             'author' => 'required|string',
             'avatar' => 'nullable|string',
             'description' => 'nullable|string',
@@ -380,7 +376,8 @@ class AuthorController extends Controller
             'avatar.string' => 'Avatar phải là một chuỗi.',
             'description.string' => 'Mô tả phải là một chuỗi.',
             'is_featured.boolean' => 'Is featured phải là một boolean.',
-            'dob.date' => 'Ngày sinh phải là một ngày.'
+            'dob.date' => 'Ngày sinh phải là một ngày.',
+            'id.exists' => 'Tác giả không tồn tại.'
         ]);
 
         if ($validator->fails()) {
@@ -437,10 +434,8 @@ class AuthorController extends Controller
         }
     }
 
-    public function destroy(Request $request, Author $author)
+    public function destroy($id)
     {
-        $id = $request->route('id');
-
         $validator = Validator::make(['id' => $id], [
             'id' => 'required|integer|min:1'
         ]);

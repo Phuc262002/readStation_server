@@ -223,7 +223,7 @@ class BookcaseController extends Controller
             'pageSize' => 'integer|min:1',
             'search' => 'string',
             'status' => 'string|in:active,inactive,deleted',
-        ],[
+        ], [
             'page.integer' => 'Trang phải là số nguyên.',
             'page.min' => 'Trang phải lớn hơn hoặc bằng 1.',
             'pageSize.integer' => 'Kích thước trang phải là số nguyên.',
@@ -280,7 +280,7 @@ class BookcaseController extends Controller
         $validator = Validator::make($request->all(), [
             'bookcase_code' => 'nullable|string',
             'description' => 'required|string',
-        ],[
+        ], [
             'description.required' => 'Mô tả không được để trống.',
             'description.string' => 'Mô tả phải là chuỗi.',
         ]);
@@ -304,13 +304,11 @@ class BookcaseController extends Controller
         ], 200);
     }
 
-    public function show(Request $request)
+    public function show($id)
     {
-        $id = $request->route('id');
-
         $validator = Validator::make(['id' => $id], [
             'id' => 'required|integer|min:1'
-        ],[
+        ], [
             'id.required' => 'Trường id là bắt buộc.',
             'id.integer' => 'Id phải là một số nguyên.',
             'id.min' => 'Id phải lớn hơn hoặc bằng 1.'
@@ -324,7 +322,7 @@ class BookcaseController extends Controller
             ], 400);
         }
 
-        $bookcase = Bookcase::with(['shelves','shelves.books', 'books'])->find($id);
+        $bookcase = Bookcase::with(['shelves', 'shelves.books', 'books'])->find($id);
 
         if (!$bookcase) {
             return response()->json([
@@ -340,18 +338,17 @@ class BookcaseController extends Controller
         ], 200);
     }
 
-    public function update(Request $request)
+    public function update(Request $request, $id)
     {
-        $id = $request->route('id');
-
         $validator = Validator::make(array_merge(['id' => $id], $request->all()), [
-            'id' => 'required|integer|min:1',
+            'id' => 'required|integer|min:1|exists:bookcases,id',
             'bookcase_code' => 'nullable|string',
             'description' => 'required|string',
             'status' => 'nullable|string|in:active,inactive,deleted',
-        ],[
+        ], [
             'id.required' => 'Trường id là bắt buộc.',
             'id.integer' => 'Id phải là một số nguyên.',
+            'id.exists' => 'Mã kệ sách không tồn tại.',
             'id.min' => 'Id phải lớn hơn hoặc bằng 1.',
             'bookcase_code.string' => 'Mã kệ sách phải là chuỗi.',
             'description.string' => 'Mô tả phải là chuỗi.',
@@ -405,11 +402,12 @@ class BookcaseController extends Controller
         $id = $request->route('id');
 
         $validator = Validator::make(['id' => $id], [
-            'id' => 'required|integer|min:1'
-        ],[
+            'id' => 'required|integer|min:1|exists:bookcases,id'
+        ], [
             'id.required' => 'Trường id là bắt buộc.',
             'id.integer' => 'Id phải là một số nguyên.',
-            'id.min' => 'Id phải lớn hơn hoặc bằng 1.'
+            'id.min' => 'Id phải lớn hơn hoặc bằng 1.',
+            'id.exists' => 'Mã kệ sách không tồn tại.'
         ]);
 
         if ($validator->fails()) {

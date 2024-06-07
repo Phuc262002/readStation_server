@@ -313,6 +313,11 @@ use OpenApi\Attributes as OA;
 
 class BookController extends Controller
 {
+    public function __construct()
+    {
+        $this->checkBookDetail();
+    }
+
     public function checkStoreValidator($request)
     {
         $validator = Validator::make($request->all(), [
@@ -344,7 +349,7 @@ class BookController extends Controller
     public function checkUpdateValidator($request, $id)
     {
         $validator = Validator::make(array_merge(['id' => $id], $request->all()), [
-            'id' => 'required|integer|min:1',
+            'id' => 'required|integer|min:1|exists:books,id',
             'author_id' => "string",
             'title' => "string",
             'original_title' => "string",
@@ -358,6 +363,7 @@ class BookController extends Controller
             'id.required' => 'Trường id là bắt buộc.',
             'id.integer' => 'Id phải là một số nguyên.',
             'id.min' => 'Id phải lớn hơn hoặc bằng 1.',
+            'id.exists' => 'Sách không tồn tại.',
             'author_id.string' => 'Author_id phải là một chuỗi.',
             'title.string' => 'Title phải là một chuỗi.',
             'original_title.string' => 'Original_title phải là một chuỗi.',
@@ -384,8 +390,6 @@ class BookController extends Controller
 
     public function getAllBook(Request $request)
     {
-        $this->checkBookDetail();
-
         $validator = Validator::make($request->all(), [
             'page' => 'integer|min:1',
             'pageSize' => 'integer|min:1',
@@ -446,19 +450,17 @@ class BookController extends Controller
         ], 200);
     }
 
-    public function show(Request $request)
+    public function show($id)
     {
-        $this->checkBookDetail();
-        $id = $request->route('id');
-
         $validator = Validator::make(['id' => $id], [
-            'id' => 'required|integer|min:1'
+            'id' => 'required|integer|min:1|exists:books,id'
         ]);
 
         $customMessages = [
             'id.required' => 'Trường id là bắt buộc.',
             'id.integer' => 'Id phải là một số nguyên.',
-            'id.min' => 'Id phải lớn hơn hoặc bằng 1.'
+            'id.min' => 'Id phải lớn hơn hoặc bằng 1.',
+            'id.exists' => 'Id không tồn tại.'
         ];
 
         $validator->setCustomMessages($customMessages);
@@ -488,8 +490,6 @@ class BookController extends Controller
 
     public function store(Request $request)
     {
-        $this->checkBookDetail();
-
         $validator = $this->checkStoreValidator($request);
 
         if ($validator->fails()) {
@@ -529,12 +529,9 @@ class BookController extends Controller
         }
     }
 
-    public function update(Request $request, Book $book)
+    public function update(Request $request, $id)
     {
-        $id = $request->route('id');
         $validator = $this->checkUpdateValidator($request, $id);
-
-
         if ($validator->fails()) {
             return response()->json([
                 "staus" => false,
@@ -574,10 +571,8 @@ class BookController extends Controller
         }
     }
 
-    public function destroy(Request $request, Book $book)
+    public function destroy($id)
     {
-        $id = $request->route('id');
-
         $validator = Validator::make(['id' => $id], [
             'id' => 'required|integer|min:1'
         ]);

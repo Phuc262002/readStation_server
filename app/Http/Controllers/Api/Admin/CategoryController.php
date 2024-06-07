@@ -338,10 +338,8 @@ class CategoryController extends Controller
         ], 200);
     }
 
-    public function show(Request $request, Category $category)
+    public function show($id)
     {
-        $id = $request->route('id');
-
         $validator = Validator::make(['id' => $id], [
             'id' => 'required|integer|min:1'
         ],[
@@ -374,12 +372,10 @@ class CategoryController extends Controller
         ], 200);
     }
 
-    public function update(Request $request, Category $category)
+    public function update(Request $request, $id)
     {
-        $id = $request->route('id');
-
         $validator = Validator::make(array_merge(['id' => $id], $request->all()), [
-            'id' => 'required|integer|min:1',
+            'id' => 'required|integer|min:1|exists:categories,id',
             'name' => 'string',
             'type' => 'string|in:book,post',
             'is_featured' => 'boolean',
@@ -389,6 +385,7 @@ class CategoryController extends Controller
         ],[
             'id.integer' => 'Id phải là một số nguyên.',
             'id.min' => 'Id phải lớn hơn hoặc bằng 1.',
+            'id.exists' => 'Id không tồn tại.',
             'name.string' => 'Name phải là một chuỗi.',
             'type.string' => 'Type phải là một chuỗi.',
             'type.in' => 'Type phải là book hoặc post.',
@@ -451,16 +448,15 @@ class CategoryController extends Controller
         }
     }
 
-    public function destroy(Request $request, Category $category)
+    public function destroy($id)
     {
-        $id = $request->route('id');
-
         $validator = Validator::make(['id' => $id], [
-            'id' => 'required|integer|min:1'
+            'id' => 'required|integer|min:1|exists:categories,id'
         ],[
             'id.required' => 'Trường id là bắt buộc.',
             'id.integer' => 'Id phải là một số nguyên.',
-            'id.min' => 'Id phải lớn hơn hoặc bằng 1.'
+            'id.min' => 'Id phải lớn hơn hoặc bằng 1.',
+            'id.exists' => 'Id không tồn tại.'
         ]);
 
         if ($validator->fails()) {

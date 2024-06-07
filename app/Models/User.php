@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Notifications\ResetPasswordNotification;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -12,7 +11,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {
-    use HasFactory, Notifiable, HasUuids, Notifiable;
+    use HasFactory, Notifiable, HasUuids;
 
     /**
      * The attributes that are mass assignable.
@@ -116,6 +115,20 @@ class User extends Authenticatable implements JWTSubject
         return [];
     }
 
+    public function scopeSearch($query, $search)
+    {
+        return $query->where('fullname', 'like', '%' . $search . '%')->orWhere('email', 'like', '%' . $search . '%');
+    } 
+
+    public function scopeFilter($query, $status)
+    {
+        if ($status) {
+            $query->where('status', $status);
+        } else {
+            $query->where('status', '!=', 'delete');
+        }
+    }
+
     public function role()
     {
         return $this->belongsTo(Role::class);
@@ -138,5 +151,15 @@ class User extends Authenticatable implements JWTSubject
     public function sendPasswordResetNotification($token): void
     {
         $this->notify(new ResetPasswordNotification($token));
+    }
+
+    public function wallet()
+    {
+        return $this->hasOne(Wallet::class);
+    }
+
+    public function createWallet()
+    {
+        $this->wallet()->create();
     }
 }

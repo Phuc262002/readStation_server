@@ -2344,6 +2344,429 @@
                 ]
             }
         },
+        "/api/v1/users": {
+            "get": {
+                "tags": [
+                    "Admin / User"
+                ],
+                "summary": "Get all users",
+                "description": "Get all users",
+                "operationId": "getUsers",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Số trang hiện tại",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "pageSize",
+                        "in": "query",
+                        "description": "Số lượng mục trên mỗi trang",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Từ khóa tìm kiếm",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Trạng thái của tác giả",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "active",
+                                "inactive",
+                                "deleted"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get all authors successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Admin / User"
+                ],
+                "summary": "Create a new user",
+                "description": "Create a new user",
+                "operationId": "createUser",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "fullname",
+                                    "email",
+                                    "phone"
+                                ],
+                                "properties": {
+                                    "role_id": {
+                                        "description": "Role id",
+                                        "type": "integer",
+                                        "default": 1
+                                    },
+                                    "avatar": {
+                                        "description": "Avatar",
+                                        "type": "string"
+                                    },
+                                    "fullname": {
+                                        "description": "Fullname",
+                                        "type": "string"
+                                    },
+                                    "job": {
+                                        "description": "Job",
+                                        "type": "string"
+                                    },
+                                    "story": {
+                                        "description": "Story",
+                                        "type": "string"
+                                    },
+                                    "gender": {
+                                        "type": "string",
+                                        "enum": [
+                                            "male",
+                                            "female",
+                                            "other"
+                                        ]
+                                    },
+                                    "dob": {
+                                        "description": "Date of birth",
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "email": {
+                                        "description": "Email",
+                                        "type": "string"
+                                    },
+                                    "citizen_identity_card": {
+                                        "properties": {
+                                            "citizen_name": {
+                                                "description": "Tên công dân",
+                                                "type": "string"
+                                            },
+                                            "citizen_code": {
+                                                "description": "Mã CCCD",
+                                                "type": "string"
+                                            },
+                                            "date_of_issue": {
+                                                "description": "Ngày cấp",
+                                                "type": "string",
+                                                "format": "date"
+                                            },
+                                            "place_of_issue": {
+                                                "description": "Nơi cấp",
+                                                "type": "string"
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    "student_id_card": {
+                                        "properties": {
+                                            "student_name": {
+                                                "description": "Tên sinh viên",
+                                                "type": "string"
+                                            },
+                                            "student_code": {
+                                                "description": "Mã số sinh viên",
+                                                "type": "string"
+                                            },
+                                            "student_card_expired": {
+                                                "description": "Ngày hết hạn",
+                                                "type": "string",
+                                                "format": "date"
+                                            },
+                                            "place_of_study": {
+                                                "description": "Tên trường",
+                                                "type": "string"
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    "street": {
+                                        "description": "Street",
+                                        "type": "string"
+                                    },
+                                    "province": {
+                                        "description": "Province",
+                                        "type": "string"
+                                    },
+                                    "district": {
+                                        "description": "District",
+                                        "type": "string"
+                                    },
+                                    "ward": {
+                                        "description": "Ward",
+                                        "type": "string"
+                                    },
+                                    "address_detail": {
+                                        "description": "Address detail",
+                                        "type": "string"
+                                    },
+                                    "phone": {
+                                        "description": "Phone",
+                                        "type": "string"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "active",
+                                            "inactive",
+                                            "banned",
+                                            "deleted"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Create user successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Create user failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/users/get-one/{id}": {
+            "get": {
+                "tags": [
+                    "Admin / User"
+                ],
+                "summary": "Get a user",
+                "description": "Get a user",
+                "operationId": "getUser",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id của user",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get user successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/users/update/{id}": {
+            "put": {
+                "tags": [
+                    "Admin / User"
+                ],
+                "summary": "Update a user",
+                "description": "Update a user",
+                "operationId": "updateUser",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id của user",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "fullname",
+                                    "email",
+                                    "phone"
+                                ],
+                                "properties": {
+                                    "role_id": {
+                                        "description": "Role id",
+                                        "type": "integer",
+                                        "default": 1
+                                    },
+                                    "avatar": {
+                                        "description": "Avatar",
+                                        "type": "string"
+                                    },
+                                    "fullname": {
+                                        "description": "Fullname",
+                                        "type": "string"
+                                    },
+                                    "job": {
+                                        "description": "Job",
+                                        "type": "string"
+                                    },
+                                    "story": {
+                                        "description": "Story",
+                                        "type": "string"
+                                    },
+                                    "gender": {
+                                        "type": "string",
+                                        "enum": [
+                                            "male",
+                                            "female",
+                                            "other"
+                                        ]
+                                    },
+                                    "dob": {
+                                        "description": "Date of birth",
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "citizen_identity_card": {
+                                        "properties": {
+                                            "citizen_name": {
+                                                "description": "Tên công dân",
+                                                "type": "string"
+                                            },
+                                            "citizen_code": {
+                                                "description": "Mã CCCD",
+                                                "type": "string"
+                                            },
+                                            "date_of_issue": {
+                                                "description": "Ngày cấp",
+                                                "type": "string",
+                                                "format": "date"
+                                            },
+                                            "place_of_issue": {
+                                                "description": "Nơi cấp",
+                                                "type": "string"
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    "student_id_card": {
+                                        "properties": {
+                                            "student_name": {
+                                                "description": "Tên sinh viên",
+                                                "type": "string"
+                                            },
+                                            "student_code": {
+                                                "description": "Mã số sinh viên",
+                                                "type": "string"
+                                            },
+                                            "student_card_expired": {
+                                                "description": "Ngày hết hạn",
+                                                "type": "string",
+                                                "format": "date"
+                                            },
+                                            "place_of_study": {
+                                                "description": "Tên trường",
+                                                "type": "string"
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    "street": {
+                                        "description": "Street",
+                                        "type": "string"
+                                    },
+                                    "province": {
+                                        "description": "Province",
+                                        "type": "string"
+                                    },
+                                    "district": {
+                                        "description": "District",
+                                        "type": "string"
+                                    },
+                                    "ward": {
+                                        "description": "Ward",
+                                        "type": "string"
+                                    },
+                                    "address_detail": {
+                                        "description": "Address detail",
+                                        "type": "string"
+                                    },
+                                    "phone": {
+                                        "description": "Phone",
+                                        "type": "string"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "active",
+                                            "inactive",
+                                            "banned",
+                                            "deleted"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Update user successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Update user failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/auth/login": {
             "post": {
                 "tags": [

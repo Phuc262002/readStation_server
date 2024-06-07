@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\Admin\CategoryController as AdminCategoryController
 use App\Http\Controllers\Api\Admin\PostController as AdminPostController;
 use App\Http\Controllers\Api\Admin\PublishingCompanyController as AdminPublishingCompanyController;
 use App\Http\Controllers\Api\Admin\ShelveController;
+use App\Http\Controllers\Api\Admin\UserController;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Auth\PasswordController;
 use App\Http\Controllers\Api\Auth\VerifyEmailController;
@@ -52,6 +53,17 @@ Route::group([
             Route::post('/logout', [AuthController::class, 'logout']);
             Route::post('/change-password', [PasswordController::class, 'changePassWord']);
         });
+    });
+
+    Route::group([
+        "prefix" => "users",
+        "middleware" => ["auth:api"]
+    ], function () {
+        Route::get('/', [UserController::class, 'index']);
+        Route::get('/get-one/{id}', [UserController::class, 'show']);
+        Route::post('/create', [UserController::class, 'store']);
+        Route::put('/update/{id}', [UserController::class, 'update']);
+        Route::delete('/delete/{id}', [UserController::class, 'delete']);
     });
 
     Route::group([
