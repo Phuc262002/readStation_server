@@ -2344,7 +2344,7 @@
                 ]
             }
         },
-        "/api/v1/users/create": {
+        "/api/v1/users": {
             "get": {
                 "tags": [
                     "Admin / User"
@@ -2412,7 +2412,7 @@
                 ]
             }
         },
-        "/api/v1/users": {
+        "/api/v1/users/create": {
             "post": {
                 "tags": [
                     "Admin / User"
