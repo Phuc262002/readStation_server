@@ -270,7 +270,7 @@ class ShelveController extends Controller
         $status = $request->input('status');
 
         // Tạo query ban đầu
-        $query = Shelve::query()->with(['category', 'bookcase']);
+        $query = Shelve::query()->with(['category', 'bookcase', 'books']);
 
         // Lấy tổng số mục trong DB trước khi áp dụng bộ lọc tìm kiếm
 

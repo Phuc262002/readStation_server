@@ -2344,7 +2344,7 @@
                 ]
             }
         },
-        "/api/v1/users": {
+        "/api/v1/users/create": {
             "get": {
                 "tags": [
                     "Admin / User"
@@ -2410,7 +2410,9 @@
                         "bearerAuth": []
                     }
                 ]
-            },
+            }
+        },
+        "/api/v1/users": {
             "post": {
                 "tags": [
                     "Admin / User"
