@@ -99,8 +99,9 @@ use OpenApi\Attributes as OA;
     requestBody: new OA\RequestBody(
         required: true,
         content: new OA\JsonContent(
-            required: ['invoice_name', 'total', 'invoice_description', 'supplier_id', 'invoice_date', 'status', 'invoice_enter_detail'],
+            required: ['invoice_code', 'invoice_name', 'total', 'invoice_description', 'supplier_id', 'invoice_date', 'status', 'invoice_enter_detail'],
             properties: [
+                new OA\Property(property: 'invoice_code', type: 'string', description: 'Mã hóa đơn', nullable: true, default: null),
                 new OA\Property(property: 'invoice_name', type: 'string', description: 'Tên hóa đơn'),
                 new OA\Property(property: 'total', type: 'string', description: 'Tổng tiền'),
                 new OA\Property(property: 'invoice_description', type: 'string', description: 'Mô tả hóa đơn'),
