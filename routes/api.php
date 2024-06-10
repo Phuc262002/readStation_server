@@ -5,9 +5,11 @@ use App\Http\Controllers\Api\Admin\BookcaseController;
 use App\Http\Controllers\Api\Admin\BookController as AdminBookController;
 use App\Http\Controllers\Api\Admin\BookDetailController;
 use App\Http\Controllers\Api\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\Api\Admin\InvoiceEnterController;
 use App\Http\Controllers\Api\Admin\PostController as AdminPostController;
 use App\Http\Controllers\Api\Admin\PublishingCompanyController as AdminPublishingCompanyController;
 use App\Http\Controllers\Api\Admin\ShelveController;
+use App\Http\Controllers\Api\Admin\SupplierController;
 use App\Http\Controllers\Api\Admin\UserController;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Auth\PasswordController;
@@ -84,7 +86,6 @@ Route::group([
             Route::get('/get-all', [OrderController::class, 'index']);
             Route::post('/create', [OrderController::class, 'store']);
             Route::put('/update/{order}', [OrderController::class, 'update']);
-            Route::delete('/delete/{order}', [OrderController::class, 'destroy']);
         });
     });
 
@@ -217,6 +218,27 @@ Route::group([
             Route::put('/update/{id}', [AdminAuthorController::class, 'update']);
             Route::delete('/delete/{id}', [AdminAuthorController::class, 'destroy']);
         });
+    });
+
+    Route::group([
+        "prefix" => "suppliers",
+        "middleware" => ["auth:api"]
+    ], function () {
+        Route::get('/', [SupplierController::class, 'index']);
+        Route::get('/get-one/{id}', [SupplierController::class, 'show']);
+        Route::post('/create', [SupplierController::class, 'store']);
+        Route::put('/update/{id}', [SupplierController::class, 'update']);
+        Route::delete('/delete/{id}', [SupplierController::class, 'destroy']);
+    });
+
+    Route::group([
+        "prefix" => "invoice-enters",
+        "middleware" => ["auth:api"]
+    ], function () {
+        Route::get('/', [InvoiceEnterController::class, 'index']);
+        Route::get('/get-one/{id}', [InvoiceEnterController::class, 'show']);
+        Route::post('/create', [InvoiceEnterController::class, 'store']);
+        Route::put('/update/{id}', [InvoiceEnterController::class, 'update']);
     });
 
     Route::group([

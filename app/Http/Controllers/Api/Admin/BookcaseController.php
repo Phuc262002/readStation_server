@@ -59,39 +59,6 @@ use OpenApi\Attributes as OA;
     ],
 )]
 
-#[OA\Post(
-    path: '/api/v1/bookcases/create',
-    tags: ['Admin / Bookcase'],
-    operationId: 'createBookcase',
-    summary: 'Create new bookcase',
-    description: 'Create new bookcase',
-    security: [
-        ['bearerAuth' => []]
-    ],
-    requestBody: new OA\RequestBody(
-        required: true,
-        description: 'Create new bookcase',
-        content: new OA\JsonContent(
-            required: ['bookcase_code', 'description', 'name'],
-            properties: [
-                new OA\Property(property: 'bookcase_code', type: 'string', default: null, nullable: true),
-                new OA\Property(property: 'name', type: 'string'),
-                new OA\Property(property: 'description', type: 'string'),
-            ]
-        )
-    ),
-    responses: [
-        new OA\Response(
-            response: 200,
-            description: 'Create bookcase successfully',
-        ),
-        new OA\Response(
-            response: 400,
-            description: 'Validation error',
-        ),
-    ],
-)]
-
 #[OA\Get(
     path: '/api/v1/bookcases/get-one/{id}',
     tags: ['Admin / Bookcase'],
@@ -122,6 +89,39 @@ use OpenApi\Attributes as OA;
         new OA\Response(
             response: 404,
             description: 'Bookcase not found',
+        ),
+    ],
+)]
+
+#[OA\Post(
+    path: '/api/v1/bookcases/create',
+    tags: ['Admin / Bookcase'],
+    operationId: 'createBookcase',
+    summary: 'Create new bookcase',
+    description: 'Create new bookcase',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    requestBody: new OA\RequestBody(
+        required: true,
+        description: 'Create new bookcase',
+        content: new OA\JsonContent(
+            required: ['bookcase_code', 'description', 'name'],
+            properties: [
+                new OA\Property(property: 'bookcase_code', type: 'string', default: null, nullable: true),
+                new OA\Property(property: 'name', type: 'string'),
+                new OA\Property(property: 'description', type: 'string'),
+            ]
+        )
+    ),
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Create bookcase successfully',
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error',
         ),
     ],
 )]
@@ -401,10 +401,8 @@ class BookcaseController extends Controller
         }
     }
 
-    public function destroy(Request $request)
+    public function destroy($id)
     {
-        $id = $request->route('id');
-
         $validator = Validator::make(['id' => $id], [
             'id' => 'required|integer|min:1|exists:bookcases,id'
         ], [

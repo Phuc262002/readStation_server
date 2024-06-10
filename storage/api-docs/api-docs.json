@@ -1193,6 +1193,43 @@
                 ]
             }
         },
+        "/api/v1/bookcases/get-one/{id}": {
+            "get": {
+                "tags": [
+                    "Admin / Bookcase"
+                ],
+                "summary": "Get bookcase by id",
+                "description": "Get bookcase by id",
+                "operationId": "getBookcase",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id của bookcase",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get bookcase successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "404": {
+                        "description": "Bookcase not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/bookcases/create": {
             "post": {
                 "tags": [
@@ -1236,43 +1273,6 @@
                     },
                     "400": {
                         "description": "Validation error"
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/api/v1/bookcases/get-one/{id}": {
-            "get": {
-                "tags": [
-                    "Admin / Bookcase"
-                ],
-                "summary": "Get bookcase by id",
-                "description": "Get bookcase by id",
-                "operationId": "getBookcase",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "Id của bookcase",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Get bookcase successfully"
-                    },
-                    "400": {
-                        "description": "Validation error"
-                    },
-                    "404": {
-                        "description": "Bookcase not found"
                     }
                 },
                 "security": [
@@ -1687,6 +1687,275 @@
                     },
                     "500": {
                         "description": "Delete category failed!"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/invoice-enters": {
+            "get": {
+                "tags": [
+                    "Admin / Invoice Enter"
+                ],
+                "summary": "Get all invoice enters",
+                "description": "Lấy danh sách hóa đơn nhập",
+                "operationId": "6762d2cc55e9d01624ba018f03f56ad5",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Số trang hiện tại",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "pageSize",
+                        "in": "query",
+                        "description": "Số lượng mục trên mỗi trang",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Từ khóa tìm kiếm",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Trạng thái",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "active",
+                                "inactive",
+                                "deleted"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get all suppliers successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/invoice-enters/{id}": {
+            "get": {
+                "tags": [
+                    "Admin / Invoice Enter"
+                ],
+                "summary": "Get invoice enter by ID",
+                "description": "Lấy thông tin hóa đơn nhập theo ID",
+                "operationId": "6786ad540fb37654fa9e2de3b35cb856",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID hóa đơn nhập",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get invoice enter successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/invoice-enters/create": {
+            "post": {
+                "tags": [
+                    "Admin / Invoice Enter"
+                ],
+                "summary": "Create new invoice enter",
+                "description": "Tạo mới một nhà cung cấp",
+                "operationId": "29d6f8e1181eddc4e1232331a5cd3fdd",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "invoice_name",
+                                    "total",
+                                    "invoice_description",
+                                    "supplier_id",
+                                    "invoice_date",
+                                    "status",
+                                    "invoice_enter_detail"
+                                ],
+                                "properties": {
+                                    "invoice_name": {
+                                        "description": "Tên hóa đơn",
+                                        "type": "string"
+                                    },
+                                    "total": {
+                                        "description": "Tổng tiền",
+                                        "type": "string"
+                                    },
+                                    "invoice_description": {
+                                        "description": "Mô tả hóa đơn",
+                                        "type": "string"
+                                    },
+                                    "supplier_id": {
+                                        "description": "ID nhà cung cấp",
+                                        "type": "integer"
+                                    },
+                                    "invoice_date": {
+                                        "description": "Ngày hóa đơn",
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "status": {
+                                        "description": "Trạng thái",
+                                        "type": "string",
+                                        "enum": [
+                                            "draft",
+                                            "active"
+                                        ]
+                                    },
+                                    "invoice_enter_detail": {
+                                        "description": "Chi tiết hóa đơn",
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "book_detail_id",
+                                                "book_price",
+                                                "book_quantity"
+                                            ],
+                                            "properties": {
+                                                "book_detail_id": {
+                                                    "description": "ID chi tiết sách",
+                                                    "type": "integer"
+                                                },
+                                                "book_price": {
+                                                    "description": "Giá sách",
+                                                    "type": "string"
+                                                },
+                                                "book_quantity": {
+                                                    "description": "Số lượng sách",
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Create invoice enter successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/invoice-enters/update/{id}": {
+            "put": {
+                "tags": [
+                    "Admin / Invoice Enter"
+                ],
+                "summary": "Update invoice enter by ID",
+                "description": "Cập nhật thông tin hóa đơn nhập theo ID",
+                "operationId": "a4e2565a166f0afed990b5502c908b3b",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID hóa đơn nhập",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "invoice_name",
+                                    "invoice_description",
+                                    "status"
+                                ],
+                                "properties": {
+                                    "invoice_name": {
+                                        "description": "Tên hóa đơn",
+                                        "type": "string"
+                                    },
+                                    "invoice_description": {
+                                        "description": "Mô tả hóa đơn",
+                                        "type": "string"
+                                    },
+                                    "status": {
+                                        "description": "Trạng thái",
+                                        "type": "string",
+                                        "enum": [
+                                            "draft",
+                                            "active",
+                                            "canceled"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Update invoice enter successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
                     }
                 },
                 "security": [
@@ -2360,6 +2629,253 @@
                 ]
             }
         },
+        "/api/v1/suppliers": {
+            "get": {
+                "tags": [
+                    "Admin / Supplier"
+                ],
+                "summary": "Danh sách nhà cung cấp",
+                "description": "Lấy danh sách nhà cung cấp",
+                "operationId": "getAllSuppliers",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Số trang hiện tại",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "pageSize",
+                        "in": "query",
+                        "description": "Số lượng mục trên mỗi trang",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Từ khóa tìm kiếm",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Trạng thái",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "active",
+                                "inactive",
+                                "deleted"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get all authors successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/suppliers/get-one/{id}": {
+            "get": {
+                "tags": [
+                    "Admin / Supplier"
+                ],
+                "summary": "Chi tiết nhà cung cấp",
+                "description": "Lấy thông tin chi tiết của một nhà cung cấp",
+                "operationId": "getSupplier",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID của nhà cung cấp",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get supplier successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/suppliers/create": {
+            "post": {
+                "tags": [
+                    "Admin / Supplier"
+                ],
+                "summary": "Tạo nhà cung cấp",
+                "description": "Tạo mới một nhà cung cấp",
+                "operationId": "createSupplier",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "address",
+                                    "phone",
+                                    "email"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "address": {
+                                        "type": "string"
+                                    },
+                                    "phone": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Create supplier successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/suppliers/update/{id}": {
+            "put": {
+                "tags": [
+                    "Admin / Supplier"
+                ],
+                "summary": "Cập nhật nhà cung cấp",
+                "description": "Cập nhật thông tin của một nhà cung cấp",
+                "operationId": "updateSupplier",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID của nhà cung cấp",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "address": {
+                                        "type": "string"
+                                    },
+                                    "phone": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Update supplier successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/suppliers/delete/{id}": {
+            "delete": {
+                "tags": [
+                    "Admin / Supplier"
+                ],
+                "summary": "Xóa nhà cung cấp",
+                "description": "Xóa một nhà cung cấp",
+                "operationId": "deleteSupplier",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID của nhà cung cấp",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Delete supplier successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/users": {
             "get": {
                 "tags": [
@@ -2416,6 +2932,40 @@
                 "responses": {
                     "200": {
                         "description": "Get all authors successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/users/get-one/{id}": {
+            "get": {
+                "tags": [
+                    "Admin / User"
+                ],
+                "summary": "Get a user",
+                "description": "Get a user",
+                "operationId": "getUser",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id của user",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get user successfully"
                     },
                     "400": {
                         "description": "Validation error"
@@ -2577,40 +3127,6 @@
                     },
                     "500": {
                         "description": "Create user failed"
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/api/v1/users/get-one/{id}": {
-            "get": {
-                "tags": [
-                    "Admin / User"
-                ],
-                "summary": "Get a user",
-                "description": "Get a user",
-                "operationId": "getUser",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "Id của user",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Get user successfully"
-                    },
-                    "400": {
-                        "description": "Validation error"
                     }
                 },
                 "security": [

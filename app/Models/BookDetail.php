@@ -60,6 +60,11 @@ class BookDetail extends Model
         return $this->belongsTo(PublishingCompany::class, 'publishing_company_id');
     }
 
+    public function InvoiceEnterDetail()
+    {
+        return $this->hasMany(InvoiceEnterDetail::class, 'book_detail_id');
+    }
+
     public function scopeSearch($query, $search)
     {
         if ($search) {

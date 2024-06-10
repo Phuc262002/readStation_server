@@ -3,17 +3,17 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Author;
+use App\Models\Supplier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use OpenApi\Attributes as OA;
 
 #[OA\Get(
-    path: '/api/v1/authors/admin/get-all',
-    tags: ['Admin / Author'],
-    operationId: 'getAllAuthors',
-    summary: 'Get all authors (admin)',
-    description: 'Get all authors',
+    path: '/api/v1/suppliers',
+    tags: ['Admin / Supplier'],
+    operationId: 'getAllSuppliers',
+    summary: 'Danh sách nhà cung cấp',
+    description: 'Lấy danh sách nhà cung cấp',
     security: [
         ['bearerAuth' => []]
     ],
@@ -43,7 +43,7 @@ use OpenApi\Attributes as OA;
             name: 'status',
             in: 'query',
             required: false,
-            description: 'Trạng thái của tác giả',
+            description: 'Trạng thái',
             schema: new OA\Schema(type: 'string', enum: ['active', 'inactive', 'deleted'])
         ),
     ],
@@ -60,11 +60,11 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Get(
-    path: '/api/v1/authors/get-one/{id}',
-    tags: ['Admin / Author'],
-    operationId: 'getAuthor',
-    summary: 'Get author by id',
-    description: 'Get author by id',
+    path: '/api/v1/suppliers/get-one/{id}',
+    tags: ['Admin / Supplier'],
+    operationId: 'getSupplier',
+    summary: 'Chi tiết nhà cung cấp',
+    description: 'Lấy thông tin chi tiết của một nhà cung cấp',
     security: [
         ['bearerAuth' => []]
     ],
@@ -73,52 +73,48 @@ use OpenApi\Attributes as OA;
             name: 'id',
             in: 'path',
             required: true,
-            description: 'Id của tác giả',
+            description: 'ID của nhà cung cấp',
             schema: new OA\Schema(type: 'integer')
         ),
     ],
     responses: [
         new OA\Response(
             response: 200,
-            description: 'Get author successfully',
+            description: 'Get supplier successfully',
         ),
         new OA\Response(
             response: 400,
             description: 'Validation error',
         ),
-        new OA\Response(
-            response: 404,
-            description: 'Author not found',
-        ),
     ],
 )]
 
+
 #[OA\Post(
-    path: '/api/v1/authors/create',
-    tags: ['Admin / Author'],
-    operationId: 'createAuthor',
-    summary: 'Create author',
-    description: 'Create author',
+    path: '/api/v1/suppliers/create',
+    tags: ['Admin / Supplier'],
+    operationId: 'createSupplier',
+    summary: 'Tạo nhà cung cấp',
+    description: 'Tạo mới một nhà cung cấp',
     security: [
         ['bearerAuth' => []]
     ],
     requestBody: new OA\RequestBody(
         required: true,
         content: new OA\JsonContent(
-            required: ['Admin / Author'],
+            required: ['name', 'address', 'phone', 'email'],
             properties: [
-                new OA\Property(property: 'author', type: 'string'),
-                new OA\Property(property: 'avatar', type: 'string'),
-                new OA\Property(property: 'is_featured', type: 'boolean'),
-                new OA\Property(property: 'description', type: 'string'),
-                new OA\Property(property: 'dob', type: 'date'),
+                new OA\Property(property: 'name', type: 'string'),
+                new OA\Property(property: 'address', type: 'string'),
+                new OA\Property(property: 'phone', type: 'string'),
+                new OA\Property(property: 'email', type: 'string'),
             ]
         )
     ),
     responses: [
         new OA\Response(
             response: 200,
-            description: 'Create author successfully',
+            description: 'Create supplier successfully',
         ),
         new OA\Response(
             response: 400,
@@ -128,11 +124,11 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Put(
-    path: '/api/v1/authors/update/{id}',
-    tags: ['Admin / Author'],
-    operationId: 'updateAuthor',
-    summary: 'Update author',
-    description: 'Update author',
+    path: '/api/v1/suppliers/update/{id}',
+    tags: ['Admin / Supplier'],
+    operationId: 'updateSupplier',
+    summary: 'Cập nhật nhà cung cấp',
+    description: 'Cập nhật thông tin của một nhà cung cấp',
     security: [
         ['bearerAuth' => []]
     ],
@@ -141,45 +137,39 @@ use OpenApi\Attributes as OA;
             name: 'id',
             in: 'path',
             required: true,
-            description: 'Id của tác giả',
+            description: 'ID của nhà cung cấp',
             schema: new OA\Schema(type: 'integer')
         ),
     ],
     requestBody: new OA\RequestBody(
         required: true,
         content: new OA\JsonContent(
-            required: ['Admin / Author'],
             properties: [
-                new OA\Property(property: 'author', type: 'string'),
-                new OA\Property(property: 'avatar', type: 'string'),
-                new OA\Property(property: 'is_featured', type: 'boolean'),
-                new OA\Property(property: 'description', type: 'string'),
-                new OA\Property(property: 'dob', type: 'date'),
+                new OA\Property(property: 'name', type: 'string'),
+                new OA\Property(property: 'address', type: 'string'),
+                new OA\Property(property: 'phone', type: 'string'),
+                new OA\Property(property: 'email', type: 'string'),
             ]
         )
     ),
     responses: [
         new OA\Response(
             response: 200,
-            description: 'Update author successfully',
+            description: 'Update supplier successfully',
         ),
         new OA\Response(
             response: 400,
             description: 'Validation error',
         ),
-        new OA\Response(
-            response: 404,
-            description: 'Author not found',
-        ),
     ],
 )]
 
 #[OA\Delete(
-    path: '/api/v1/authors/delete/{id}',
-    tags: ['Admin / Author'],
-    operationId: 'deleteAuthor',
-    summary: 'Delete author',
-    description: 'Delete author',
+    path: '/api/v1/suppliers/delete/{id}',
+    tags: ['Admin / Supplier'],
+    operationId: 'deleteSupplier',
+    summary: 'Xóa nhà cung cấp',
+    description: 'Xóa một nhà cung cấp',
     security: [
         ['bearerAuth' => []]
     ],
@@ -188,43 +178,36 @@ use OpenApi\Attributes as OA;
             name: 'id',
             in: 'path',
             required: true,
-            description: 'Id của tác giả',
+            description: 'ID của nhà cung cấp',
             schema: new OA\Schema(type: 'integer')
         ),
     ],
     responses: [
         new OA\Response(
             response: 200,
-            description: 'Delete author successfully',
+            description: 'Delete supplier successfully',
         ),
         new OA\Response(
             response: 400,
             description: 'Validation error',
         ),
-        new OA\Response(
-            response: 404,
-            description: 'Author not found',
-        ),
     ],
 )]
 
-class AuthorController extends Controller
+class SupplierController extends Controller
 {
-    public function getAllAuthor(Request $request)
+    public function index(Request $request)
     {
-        // Validate request parameters
         $validator = Validator::make($request->all(), [
             'page' => 'integer|min:1',
             'pageSize' => 'integer|min:1',
             'search' => 'string',
             'status' => 'string|in:active,inactive,deleted',
-            'author' => 'string'
         ], [
             'page.integer' => 'Trang phải là số nguyên.',
             'page.min' => 'Trang phải lớn hơn hoặc bằng 1.',
             'pageSize.integer' => 'Kích thước trang phải là số nguyên.',
             'pageSize.min' => 'Kích thước trang phải lớn hơn hoặc bằng 1.',
-            'author.string' => 'Tác giả phải là một chuỗi.',
             'status.in' => 'Status phải là active, inactive hoặc deleted'
         ]);
 
@@ -240,33 +223,32 @@ class AuthorController extends Controller
         $page = $request->input('page', 1);
         $pageSize = $request->input('pageSize', 10);
         $search = $request->input('search');
-        $type = $request->input('author');
         $status = $request->input('status');
 
-        // Tạo query ban đầu
-        $query = Author::query();
+        // Tạo câu query
+        $query = Supplier::query();
 
         // Lấy tổng số mục trong DB trước khi áp dụng bộ lọc tìm kiếm
 
         // Áp dụng bộ lọc theo type
         $totalItems = $query->count();
-        $query = $query->filter($status, true);
+        $query = $query->filter($status);
 
         // Áp dụng bộ lọc tìm kiếm nếu có tham số tìm kiếm
         $query = $query->search($search);
 
         // Thực hiện phân trang
-        $authors = $query->orderBy('created_at', 'desc')->paginate($pageSize, ['*'], 'page', $page);
+        $suppliers = $query->orderBy('created_at', 'desc')->paginate($pageSize, ['*'], 'page', $page);
 
         return response()->json([
             "status" => true,
-            "message" => "Get all authors successfully!",
+            "message" => "Get all suppliers successfully!",
             "data" => [
-                "authors" => $authors->items(),
-                "page" => $authors->currentPage(),
-                "pageSize" => $authors->perPage(),
-                "totalPages" => $authors->lastPage(),
-                "totalResults" => $authors->total(),
+                "suppliers" => $suppliers->items(),
+                "page" => $suppliers->currentPage(),
+                "pageSize" => $suppliers->perPage(),
+                "totalPages" => $suppliers->lastPage(),
+                "totalResults" => $suppliers->total(),
                 "total" => $totalItems
             ],
         ]);
@@ -275,18 +257,19 @@ class AuthorController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'author' => 'required|string',
-            'avatar' => 'nullable|string',
-            'is_featured' => 'nullable|boolean',
-            'description' => 'nullable|string',
-            'dob' => 'nullable|date',
+            'name' => 'required|string',
+            'address' => 'required|string',
+            'phone' => 'required|string',
+            'email' => 'required|email',
         ],[
-            'author.required' => 'Tên tác giả không được để trống.',
-            'author.string' => 'Tên tác giả phải là một chuỗi.',
-            'avatar.string' => 'Avatar phải là một chuỗi.',
-            'is_featured.boolean' => 'Is featured phải là một boolean.',
-            'description.string' => 'Mô tả phải là một chuỗi.',
-            'dob.date' => 'Ngày sinh phải là một ngày.'
+            'name.required' => 'Tên nhà cung cấp không được để trống',
+            'name.string' => 'Tên nhà cung cấp phải là chuỗi',
+            'address.required' => 'Địa chỉ nhà cung cấp không được để trống',
+            'address.string' => 'Địa chỉ nhà cung cấp phải là chuỗi',
+            'phone.required' => 'Số điện thoại nhà cung cấp không được để trống',
+            'phone.string' => 'Số điện thoại nhà cung cấp phải là chuỗi',
+            'email.required' => 'Email nhà cung cấp không được để trống',
+            'email.email' => 'Email nhà cung cấp không đúng định dạng',
         ]);
 
         if ($validator->fails()) {
@@ -297,37 +280,31 @@ class AuthorController extends Controller
             ], 400);
         }
 
-        if ($request->input('is_featured') == true) {
-            if ($request->boolean('is_featured')) {
-                Author::query()->update(['is_featured' => false]);
-            }
+        try {
+            $supplier = Supplier::create($request->all());
+            return response()->json([
+                "status" => true,
+                "message" => "Create supplier success",
+                "data" => $supplier
+            ], 201);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => false,
+                "message" => "Create supplier fail",
+                "errors" => $th->getMessage()
+            ], 500);
         }
-
-        if (Author::where('is_featured', true)->count() == 0) {
-            $author = Author::create(array_merge(
-                $validator->validated(),
-                ['is_featured' => true]
-            ));
-        } else {
-            $author = Author::create($validator->validated());
-        }
-
-
-        return response()->json([
-            "status" => true,
-            "message" => "Create author successfully!",
-            "data" => $author
-        ], 200);
     }
 
     public function show($id)
     {
         $validator = Validator::make(['id' => $id], [
-            'id' => 'required|integer|min:1'
+            'id' => 'required|integer|min:1|exists:suppliers,id'
         ], [
             'id.required' => 'Trường id là bắt buộc.',
             'id.integer' => 'Id phải là một số nguyên.',
-            'id.min' => 'Id phải lớn hơn hoặc bằng 1.'
+            'id.min' => 'Id phải lớn hơn hoặc bằng 1.',
+            'id.exists' => 'Id không tồn tại.'
         ]);
 
         if ($validator->fails()) {
@@ -338,42 +315,32 @@ class AuthorController extends Controller
             ], 400);
         }
 
-        $category = Author::find($id);
-
-        if (!$category) {
-            return response()->json([
-                "status" => false,
-                "message" => "Author not found!"
-            ], 404);
-        }
+        $supplier = Supplier::find($id);
 
         return response()->json([
             "status" => true,
-            "message" => "Get author successfully!",
-            "data" => $category
-        ], 200);
+            "message" => "Get supplier successfully!",
+            "data" => $supplier
+        ]);
     }
 
     public function update(Request $request, $id)
     {
         $validator = Validator::make(array_merge(['id' => $id], $request->all()), [
-            'id' => 'required|integer|exists:authors,id|min:1',
-            'author' => 'required|string',
-            'avatar' => 'nullable|string',
-            'description' => 'nullable|string',
-            'is_featured' => 'nullable|boolean',
-            'dob' => 'nullable|date',
+            'id' => 'required|integer|exists:suppliers,id|min:1',
+            'name' => 'string',
+            'address' => 'string',
+            'phone' => 'string',
+            'email' => 'email',
         ], [
             'id.required' => 'Trường id là bắt buộc.',
             'id.integer' => 'Id phải là một số nguyên.',
             'id.min' => 'Id phải lớn hơn hoặc bằng 1.',
-            'author.required' => 'Tên tác giả không được để trống.',
-            'author.string' => 'Tên tác giả phải là một chuỗi.',
-            'avatar.string' => 'Avatar phải là một chuỗi.',
-            'description.string' => 'Mô tả phải là một chuỗi.',
-            'is_featured.boolean' => 'Is featured phải là một boolean.',
-            'dob.date' => 'Ngày sinh phải là một ngày.',
-            'id.exists' => 'Tác giả không tồn tại.'
+            'id.exists' => 'Id không tồn tại.',
+            'name.string' => 'Tên nhà cung cấp phải là chuỗi',
+            'address.string' => 'Địa chỉ nhà cung cấp phải là chuỗi',
+            'phone.string' => 'Số điện thoại nhà cung cấp phải là chuỗi',
+            'email.email' => 'Email nhà cung cấp không đúng định dạng',
         ]);
 
         if ($validator->fails()) {
@@ -384,48 +351,20 @@ class AuthorController extends Controller
             ], 400);
         }
 
-        $author = Author::find($id);
-
-        if (!$author) {
-            return response()->json([
-                "status" => false,
-                "message" => "Author not found!"
-            ], 404);
-        }
+        $supplier = Supplier::find($id);
 
         try {
-            if ($request->input('is_featured') == true) {
-                Author::query()->where('id', '!=', $id)->update(['is_featured' => false]);
-                $author->update(array_merge(
-                    $validator->validated(),
-                    [
-                        'is_featured' => true,
-                        'status' => 'active'
-                    ]
-                ));
-            } else {
-                if (Author::where('is_featured', true)->count() == 0) {
-                    $author->update(array_merge(
-                        $validator->validated(),
-                        [
-                            'is_featured' => true,
-                            'status' => 'active'
-                        ]
-                    ));
-                } else {
-                    $author->update($validator->validated());
-                }
-            }
-
+            $supplier->update($request->all());
             return response()->json([
                 "status" => true,
-                "message" => "Update author successfully!",
-                "data" => $author
-            ], 200);
+                "message" => "Update supplier success",
+                "data" => $supplier
+            ]);
         } catch (\Throwable $th) {
             return response()->json([
                 "status" => false,
-                "message" => "Update author failed!"
+                "message" => "Update supplier fail",
+                "errors" => $th->getMessage()
             ], 500);
         }
     }
@@ -433,12 +372,12 @@ class AuthorController extends Controller
     public function destroy($id)
     {
         $validator = Validator::make(['id' => $id], [
-            'id' => 'required|integer|min:1|exists:authors,id'
+            'id' => 'required|integer|min:1|exists:suppliers,id'
         ],[
             'id.required' => 'Trường id là bắt buộc.',
             'id.integer' => 'Id phải là một số nguyên.',
             'id.min' => 'Id phải lớn hơn hoặc bằng 1.',
-            'id.exists' => 'Tác giả không tồn tại.'
+            'id.exists' => 'Id không tồn tại.'
         ]);
 
         if ($validator->fails()) {
@@ -449,39 +388,39 @@ class AuthorController extends Controller
             ], 400);
         }
 
-        $author = Author::find($id);
+        $supplier = Supplier::find($id);
 
-        if (!$author) {
+        if (!$supplier) {
             return response()->json([
                 "status" => false,
-                "message" => "Author not found!"
+                "message" => "Supplier not found!"
             ], 404);
-        } elseif ($author->status == 'deleted') {
+        } elseif ($supplier->status == 'deleted') {
             return response()->json([
                 "status" => false,
-                "message" => "Author not found!"
+                "message" => "Supplier not found!"
             ], 400);
         }
 
         try {
-            $author->delete();
+            $supplier->delete();
 
-            if ($author->status == 'deleted') {
+            if ($supplier->status == 'deleted') {
                 return response()->json([
                     "status" => true,
-                    "message" => "Tác giả đã thêm vào thùng rác! Bạn có thể khôi phục lại sau này!",
+                    "message" => "Nhà cung cấp đã thêm vào thùng rác! Bạn có thể khôi phục lại sau này!",
                 ], 200);
             }
         } catch (\Throwable $th) {
             return response()->json([
                 "status" => false,
-                "message" => "Delete author failed!"
+                "message" => "Delete supplier failed!"
             ], 500);
         }
 
         return response()->json([
             "status" => true,
-            "message" => "Danh mục đã được xóa vĩnh viễn! Bạn không thể khôi phục lại sau này!",
+            "message" => "Nhà cung cấp đã được xóa vĩnh viễn! Bạn không thể khôi phục lại sau này!",
         ], 200);
     }
 }

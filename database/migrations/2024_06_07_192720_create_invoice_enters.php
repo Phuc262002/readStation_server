@@ -19,6 +19,7 @@ return new class extends Migration
             $table->decimal('total', 20, 8);
             $table->string('invoice_description')->nullable();
             $table->unsignedBigInteger('supplier_id');
+            $table->date('invoice_date')->nullable();
             $table->enum('status', ['draft','active', 'canceled'])->default('draft');
             $table->timestamps();
 

@@ -36,7 +36,7 @@ class Shelve extends Model
 
     public function scopeSearch($query, $search)
     {
-        return $query->where('bookshelf_code', 'like', '%' . $search . '%');
+        return $query->where('bookshelf_code', 'like', '%' . $search . '%')->orWhere('name', 'like', '%' . $search . '%');
     }
 
     public function scopeFilter($query, $status, $bookcase_id, $category_id)

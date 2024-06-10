@@ -29,7 +29,7 @@ class Bookcase extends Model
 
     public function scopeSearch($query, $search)
     {
-        return $query->where('bookcase_code', 'like', '%' . $search . '%');
+        return $query->where('bookcase_code', 'like', '%' . $search . '%')->orWhere('name', 'like', '%' . $search . '%');
     }
 
     public function scopeFilter($query, $status)

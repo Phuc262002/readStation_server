@@ -713,7 +713,7 @@ class BookController extends Controller
             }
 
             $bookDetails = $validatedData['book_detail'];
-            foreach ($bookDetails as &$detail) {
+            foreach ($bookDetails as $detail) {
                 $detail['book_id'] = $book->id;
             }
 

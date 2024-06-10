@@ -61,6 +61,36 @@ use OpenApi\Attributes as OA;
     ],
 )]
 
+#[OA\Get(
+    path: '/api/v1/users/get-one/{id}',
+    tags: ['Admin / User'],
+    operationId: 'getUser',
+    summary: 'Get a user',
+    description: 'Get a user',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    parameters: [
+        new OA\Parameter(
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Id của user',
+            schema: new OA\Schema(type: 'string')
+        ),
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Get user successfully',
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error',
+        ),
+    ],
+)]
+
 #[OA\Post(
     path: '/api/v1/users/create',
     tags: ['Admin / User'],
@@ -125,36 +155,6 @@ use OpenApi\Attributes as OA;
         new OA\Response(
             response: 500,
             description: 'Create user failed',
-        ),
-    ],
-)]
-
-#[OA\Get(
-    path: '/api/v1/users/get-one/{id}',
-    tags: ['Admin / User'],
-    operationId: 'getUser',
-    summary: 'Get a user',
-    description: 'Get a user',
-    security: [
-        ['bearerAuth' => []]
-    ],
-    parameters: [
-        new OA\Parameter(
-            name: 'id',
-            in: 'path',
-            required: true,
-            description: 'Id của user',
-            schema: new OA\Schema(type: 'string')
-        ),
-    ],
-    responses: [
-        new OA\Response(
-            response: 200,
-            description: 'Get user successfully',
-        ),
-        new OA\Response(
-            response: 400,
-            description: 'Validation error',
         ),
     ],
 )]
