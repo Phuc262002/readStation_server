@@ -120,11 +120,12 @@ use OpenApi\Attributes as OA;
         required: true,
         description: 'Create new shelve',
         content: new OA\JsonContent(
-            required: ['bookcase_id', 'category_id', 'description'],
+            required: ['bookcase_id', 'category_id', 'description', 'name'],
             properties: [
                 new OA\Property(property: 'bookcase_id', type: 'integer'),
                 new OA\Property(property: 'bookshelf_code', type: 'string', nullable: true, default: null),
                 new OA\Property(property: 'category_id', type: 'integer'),
+                new OA\Property(property: 'name', type: 'string'),
                 new OA\Property(property: 'description', type: 'string'),
             ]
         )
@@ -163,12 +164,13 @@ use OpenApi\Attributes as OA;
         required: true,
         description: 'Update shelve',
         content: new OA\JsonContent(
-            required: ['bookcase_id', 'bookshelf_code', 'category_id', 'description', 'status'],
+            required: ['bookcase_id', 'bookshelf_code', 'category_id', 'description', 'status', 'name'],
             properties: [
                 new OA\Property(property: 'bookcase_id', type: 'integer'),
                 new OA\Property(property: 'bookshelf_code', type: 'string'),
                 new OA\Property(property: 'category_id', type: 'integer'),
                 new OA\Property(property: 'status', type: 'string'),
+                new OA\Property(property: 'name', type: 'string'),
                 new OA\Property(property: 'description', type: 'string'),
             ]
         )
@@ -304,12 +306,13 @@ class ShelveController extends Controller
             'bookcase_id' => 'required',
             'bookshelf_code' => 'nullable|string',
             'category_id' => 'required',
-            'description' => 'required|string',
+            'name' => 'required|string',
+            'description' => 'nullable|string',
         ],[
             'bookcase_id.required' => 'Bookcase_id không được để trống.',
             'bookshelf_code.string' => 'Bookshelf_code phải là chuỗi.',
             'category_id.required' => 'Category_id không được để trống.',
-            'description.required' => 'Description không được để trống.',
+            'name.required' => 'Tên kệ không được để trống.',
         ]);
 
         if ($validator->fails()) {
@@ -349,7 +352,7 @@ class ShelveController extends Controller
             ], 400);
         }
 
-        $shelve = Shelve::with(['category', 'bookcase', 'books'])->find($id);
+        $shelve = Shelve::with(['category', 'bookcase', 'bookDetails', 'bookDetails.book', 'bookDetails.publishingCompany', 'bookDetails.book.author', 'bookDetails.book.category'])->find($id);
 
         if (!$shelve) {
             return response()->json([
@@ -373,6 +376,7 @@ class ShelveController extends Controller
             'bookshelf_code' => 'string',
             'category_id' => 'nullable',
             'status' => 'string|in:active,inactive,deleted',
+            'name' => 'required|string',
             'description' => 'string',
         ],[
             'id.required' => 'Trường id là bắt buộc.',
@@ -380,6 +384,7 @@ class ShelveController extends Controller
             'id.min' => 'Id phải lớn hơn hoặc bằng 1.',
             'bookshelf_code.string' => 'Bookshelf_code phải là chuỗi.',
             'status.in' => 'Status phải là active, inactive hoặc deleted',
+            'name.required' => 'Tên kệ không được để trống.',
         ]);
 
         if ($validator->fails()) {

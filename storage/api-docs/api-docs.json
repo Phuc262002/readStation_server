@@ -1209,13 +1209,17 @@
                             "schema": {
                                 "required": [
                                     "bookcase_code",
-                                    "description"
+                                    "description",
+                                    "name"
                                 ],
                                 "properties": {
                                     "bookcase_code": {
                                         "type": "string",
                                         "default": null,
                                         "nullable": true
+                                    },
+                                    "name": {
+                                        "type": "string"
                                     },
                                     "description": {
                                         "type": "string"
@@ -1304,13 +1308,17 @@
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "description"
+                                    "description",
+                                    "name"
                                 ],
                                 "properties": {
                                     "bookcase_code": {
                                         "type": "string",
                                         "default": null,
                                         "nullable": true
+                                    },
+                                    "name": {
+                                        "type": "string"
                                     },
                                     "description": {
                                         "type": "string"
@@ -2191,7 +2199,8 @@
                                 "required": [
                                     "bookcase_id",
                                     "category_id",
-                                    "description"
+                                    "description",
+                                    "name"
                                 ],
                                 "properties": {
                                     "bookcase_id": {
@@ -2204,6 +2213,9 @@
                                     },
                                     "category_id": {
                                         "type": "integer"
+                                    },
+                                    "name": {
+                                        "type": "string"
                                     },
                                     "description": {
                                         "type": "string"
@@ -2259,7 +2271,8 @@
                                     "bookshelf_code",
                                     "category_id",
                                     "description",
-                                    "status"
+                                    "status",
+                                    "name"
                                 ],
                                 "properties": {
                                     "bookcase_id": {
@@ -2272,6 +2285,9 @@
                                         "type": "integer"
                                     },
                                     "status": {
+                                        "type": "string"
+                                    },
+                                    "name": {
                                         "type": "string"
                                     },
                                     "description": {

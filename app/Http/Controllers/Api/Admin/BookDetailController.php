@@ -319,7 +319,7 @@ class BookDetailController extends Controller
         $author_id = $request->input('author_id');
         $status = $request->input('status');
 
-        $query = BookDetail::with('book', 'book.category', 'book.author', 'book.shelve', 'book.shelve.bookcase');
+        $query = BookDetail::with('book', 'book.category', 'book.author', 'book.shelve', 'book.shelve.bookcase', 'publishingCompany');
 
         $totalItems = $query->count();
         // Apply filters
@@ -478,7 +478,7 @@ class BookDetailController extends Controller
             ], 400);
         }
 
-        $bookdetail = BookDetail::with('book', 'book.category', 'book.author', 'book.shelve', 'book.shelve.bookcase')->find($id);
+        $bookdetail = BookDetail::with('book', 'book.category', 'book.author', 'book.shelve', 'book.shelve.bookcase', 'publishingCompany')->find($id);
         if (!$bookdetail) {
             return response()->json([
                 "status" => false,

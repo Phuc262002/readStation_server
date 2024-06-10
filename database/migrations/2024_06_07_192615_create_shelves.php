@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('bookcase_id');
             $table->string('bookshelf_code');
             $table->unsignedBigInteger('category_id');
+            $table->string('name');
             $table->text('description')->nullable();
             $table->enum('status', ['active', 'inactive', 'deleted'])->default('active');
             $table->timestamps();

@@ -425,7 +425,7 @@ class BookController extends Controller
 
         // Tạo query ban đầu
         $query = Book::query()
-            ->with(['category', 'author', 'shelve', 'shelve.bookcase', 'shelve.category', 'bookDetail']);
+            ->with(['category', 'author', 'shelve', 'shelve.bookcase', 'shelve.category', 'bookDetail', 'bookDetail.publishingCompany']);
 
         $totalItems = $query->count();
         $query = $query->filter($category_id, $status, $author_id, true);
@@ -473,7 +473,7 @@ class BookController extends Controller
             ], 400);
         }
 
-        $bookdetail = Book::with('bookDetail', 'category', 'author', 'shelve', 'shelve.bookcase', 'shelve.category')->find($id);
+        $bookdetail = Book::with('bookDetail', 'bookDetail.publishingCompany', 'category', 'author', 'shelve', 'shelve.bookcase', 'shelve.category')->find($id);
         if (!$bookdetail) {
             return response()->json([
                 "status" => false,

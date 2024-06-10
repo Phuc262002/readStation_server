@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('bookcases', function (Blueprint $table) {
             $table->id();
             $table->string('bookcase_code');
+            $table->string('name');
             $table->text('description')->nullable();
             $table->enum('status', ['active', 'inactive', 'deleted'])->default('active');
             $table->timestamps();

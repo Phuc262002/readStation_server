@@ -11,6 +11,7 @@ class Bookcase extends Model
 
     protected $fillable = [
         'bookcase_code',
+        'name',
         'description',
         'status',
     ];

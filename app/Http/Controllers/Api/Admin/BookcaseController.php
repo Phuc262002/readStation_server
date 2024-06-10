@@ -72,9 +72,10 @@ use OpenApi\Attributes as OA;
         required: true,
         description: 'Create new bookcase',
         content: new OA\JsonContent(
-            required: ['bookcase_code', 'description'],
+            required: ['bookcase_code', 'description', 'name'],
             properties: [
                 new OA\Property(property: 'bookcase_code', type: 'string', default: null, nullable: true),
+                new OA\Property(property: 'name', type: 'string'),
                 new OA\Property(property: 'description', type: 'string'),
             ]
         )
@@ -147,9 +148,10 @@ use OpenApi\Attributes as OA;
         required: true,
         description: 'Update bookcase',
         content: new OA\JsonContent(
-            required: ['description'],
+            required: ['description', 'name'],
             properties: [
                 new OA\Property(property: 'bookcase_code', type: 'string', default: null, nullable: true),
+                new OA\Property(property: 'name', type: 'string'),
                 new OA\Property(property: 'description', type: 'string'),
                 new OA\Property(property: 'status', type: 'string', default: null, nullable: true),
             ]
@@ -279,10 +281,11 @@ class BookcaseController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'bookcase_code' => 'nullable|string',
-            'description' => 'required|string',
+            'name' => 'required|string',
+            'description' => 'nullable|string',
         ], [
-            'description.required' => 'Mô tả không được để trống.',
-            'description.string' => 'Mô tả phải là chuỗi.',
+            'name.required' => 'Tên không được để trống.',
+            'name.string' => 'Tên phải là chuỗi.',
         ]);
 
         if ($validator->fails()) {
@@ -343,7 +346,8 @@ class BookcaseController extends Controller
         $validator = Validator::make(array_merge(['id' => $id], $request->all()), [
             'id' => 'required|integer|min:1|exists:bookcases,id',
             'bookcase_code' => 'nullable|string',
-            'description' => 'required|string',
+            'name' => 'required|string',
+            'description' => 'nullable|string',
             'status' => 'nullable|string|in:active,inactive,deleted',
         ], [
             'id.required' => 'Trường id là bắt buộc.',

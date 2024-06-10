@@ -13,6 +13,7 @@ class Shelve extends Model
         'bookcase_id',
         'bookshelf_code',
         'category_id',
+        'name',
         'description',
         'status',
     ];
@@ -72,10 +73,14 @@ class Shelve extends Model
         return $this->hasMany(Book::class);
     }
 
+    public function bookDetails()
+    {
+        return $this->hasManyThrough(BookDetail::class, Book::class);
+    }
+
     public function delete()
     {
         $this->status = 'deleted';
         $this->save();
     }
-   
 }
