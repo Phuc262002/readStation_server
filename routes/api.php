@@ -20,6 +20,9 @@ use App\Http\Controllers\Api\Client\AccountController;
 use App\Http\Controllers\Api\Client\CommentController;
 use App\Http\Controllers\Api\Client\OrderController;
 use App\Http\Controllers\Api\Client\PostController;
+use App\Http\Controllers\Api\PayOS\CheckoutController;
+use App\Http\Controllers\Api\PayOS\OrderController as PayOSOrderController;
+use App\Http\Controllers\Api\PayOS\PaymentController;
 use App\Http\Controllers\Api\Public\AuthorController;
 use App\Http\Controllers\Api\Public\BookController;
 use App\Http\Controllers\Api\Public\CategoryController;
@@ -261,5 +264,18 @@ Route::group([
         Route::get('/images', [CloudinaryController::class, 'getAllImages']);
         Route::post('/images', [CloudinaryController::class, 'upload']);
         Route::delete('/images/delete/{publicId}', [CloudinaryController::class, 'deleteImage']);
+    });
+
+
+    Route::post('/create-payment-link', [CheckoutController::class, 'createPaymentLink']);
+
+    Route::prefix('/order-test')->group(function () {
+        Route::post('/create', [PayOSOrderController::class, 'createOrder']);
+        Route::get('/{id}', [PayOSOrderController::class, 'getPaymentLinkInfoOfOrder']);
+        Route::put('/{id}', [PayOSOrderController::class, 'cancelPaymentLinkOfOrder']);
+    });
+
+    Route::prefix('/payment')->group(function () {
+        Route::post('/payos', [PaymentController::class, 'handlePayOSWebhook']);
     });
 });

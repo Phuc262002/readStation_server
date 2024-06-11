@@ -18,9 +18,9 @@ return new class extends Migration
             $table->string('poster');
             $table->json('images')->nullable();
             $table->string('book_version')->nullable();
-            $table->string('price')->nullable();
-            $table->decimal('hire_percent', 8, 2)->nullable();
-            $table->unsignedInteger('stock')->nullable();
+            $table->decimal('price', 20, 8)->default(0);
+            $table->decimal('hire_percent', 8, 2)->default(0);
+            $table->unsignedInteger('stock')->default(0);
             $table->date('publish_date')->nullable();
             $table->unsignedBigInteger('publishing_company_id')->nullable();
             $table->string('issuing_company')->nullable();
