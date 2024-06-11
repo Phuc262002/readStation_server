@@ -566,7 +566,8 @@ class BookController extends Controller
         } catch (\Throwable $th) {
             return response()->json([
                 "status" => false,
-                "message" => "Update book failed!"
+                "message" => "Update book failed!",
+                "errors" => $th->getMessage()
             ], 500);
         }
     }
