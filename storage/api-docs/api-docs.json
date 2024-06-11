@@ -1812,6 +1812,7 @@
                         "application/json": {
                             "schema": {
                                 "required": [
+                                    "invoice_code",
                                     "invoice_name",
                                     "total",
                                     "invoice_description",
@@ -1821,6 +1822,12 @@
                                     "invoice_enter_detail"
                                 ],
                                 "properties": {
+                                    "invoice_code": {
+                                        "description": "Mã hóa đơn",
+                                        "type": "string",
+                                        "default": null,
+                                        "nullable": true
+                                    },
                                     "invoice_name": {
                                         "description": "Tên hóa đơn",
                                         "type": "string"
@@ -4091,6 +4098,122 @@
                 "responses": {
                     "200": {
                         "description": "Get all order successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/account/order/create": {
+            "post": {
+                "tags": [
+                    "Account"
+                ],
+                "summary": "Create order",
+                "description": "Create order",
+                "operationId": "createOrder",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "payment_method",
+                                    "payment_shipping",
+                                    "phone",
+                                    "address",
+                                    "deposit_fee",
+                                    "total_fee",
+                                    "order_details"
+                                ],
+                                "properties": {
+                                    "payment_method": {
+                                        "description": "Phương thức thanh toán",
+                                        "type": "string",
+                                        "enum": [
+                                            "wallet",
+                                            "cash"
+                                        ]
+                                    },
+                                    "payment_shipping": {
+                                        "description": "Phương thức vận chuyển",
+                                        "type": "string",
+                                        "enum": [
+                                            "library",
+                                            "shipper"
+                                        ]
+                                    },
+                                    "phone": {
+                                        "description": "Số điện thoại",
+                                        "type": "string"
+                                    },
+                                    "address": {
+                                        "description": "Địa chỉ",
+                                        "type": "string"
+                                    },
+                                    "user_note": {
+                                        "description": "Ghi chú",
+                                        "type": "string"
+                                    },
+                                    "deposit_fee": {
+                                        "description": "Tiền đặt cọc",
+                                        "type": "number"
+                                    },
+                                    "expired_date": {
+                                        "description": "Ngày hết hạn",
+                                        "type": "string"
+                                    },
+                                    "total_fee": {
+                                        "description": "Tổng tiền",
+                                        "type": "number"
+                                    },
+                                    "order_details": {
+                                        "description": "Chi tiết đơn hàng",
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "book_details_id",
+                                                "service_fee",
+                                                "deposit"
+                                            ],
+                                            "properties": {
+                                                "book_details_id": {
+                                                    "description": "Id chi tiết sách",
+                                                    "type": "integer"
+                                                },
+                                                "service_fee": {
+                                                    "description": "Phí dịch vụ",
+                                                    "type": "integer"
+                                                },
+                                                "deposit": {
+                                                    "description": "Tiền đặt cọc",
+                                                    "type": "number"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Create order successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Create order failed"
                     }
                 },
                 "security": [

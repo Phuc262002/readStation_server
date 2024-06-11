@@ -84,6 +84,7 @@ Route::group([
             "prefix" => "order"
         ], function () {
             Route::get('/get-all', [OrderController::class, 'index']);
+            Route::get('/get-one/{id}', [OrderController::class, 'show']);
             Route::post('/create', [OrderController::class, 'store']);
             Route::put('/update/{order}', [OrderController::class, 'update']);
         });

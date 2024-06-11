@@ -35,7 +35,7 @@ class Order extends Model
         parent::boot();
 
         static::creating(function ($model) {
-            $model->order_code = strtoupper('OD'.time().substr(md5(uniqid()), 0, 3));
+            $model->order_code = strtoupper('DH'.time().substr(md5(uniqid()), 0, 3));
         });
     }
 
