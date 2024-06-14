@@ -423,7 +423,8 @@ class ShelveController extends Controller
         } catch (\Throwable $th) {
             return response()->json([
                 "status" => false,
-                "message" => "Update shelve failed!"
+                "message" => "Update shelve failed!",
+                "error" => $th->getMessage(),
             ], 500);
         }
     }
