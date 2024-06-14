@@ -376,7 +376,7 @@ class ShelveController extends Controller
             'bookshelf_code' => 'string',
             'category_id' => 'nullable',
             'status' => 'string|in:active,inactive,deleted',
-            'name' => 'required|string',
+            'name' => 'string',
             'description' => 'string',
         ],[
             'id.required' => 'Trường id là bắt buộc.',
@@ -384,7 +384,6 @@ class ShelveController extends Controller
             'id.min' => 'Id phải lớn hơn hoặc bằng 1.',
             'bookshelf_code.string' => 'Bookshelf_code phải là chuỗi.',
             'status.in' => 'Status phải là active, inactive hoặc deleted',
-            'name.required' => 'Tên kệ không được để trống.',
         ]);
 
         if ($validator->fails()) {
