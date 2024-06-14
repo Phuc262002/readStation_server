@@ -427,15 +427,17 @@ class BookcaseController extends Controller
                 "status" => false,
                 "message" => "Bookcase not found!"
             ], 404);
-        } else if ($bookcase->status == 'deleted') {
-            return response()->json([
-                "status" => false,
-                "message" => "Bookcase is not exist!"
-            ], 400);
         }
 
         try {
             $bookcase->delete();
+
+            if ($bookcase->status == 'deleted') {
+                return response()->json([
+                    "status" => true,
+                    "message" => "Tủ đã thêm vào thùng rác! Bạn có thể khôi phục lại sau này!",
+                ], 200);
+            }
         } catch (\Throwable $th) {
             return response()->json([
                 "status" => false,
@@ -445,7 +447,7 @@ class BookcaseController extends Controller
 
         return response()->json([
             "status" => true,
-            "message" => "Delete bookcase successfully!",
+            "message" => "Tủ đã được xóa vĩnh viễn! Bạn không thể khôi phục lại sau này!",
         ], 200);
     }
 }
