@@ -283,17 +283,6 @@ class WalletController extends Controller
             ]);
         }
 
-        $body = $request->input();
-
-        $body["amount"] = intval($body["amount"]);
-        $body["description"] = $body["description"];
-        $body["orderCode"] = $transaction_code;
-        $body["returnUrl"] = env('APP_URL') . "/success.html";
-        $body["cancelUrl"] = env('APP_URL') . "/cancel.html";
-
-
-        $payOS = new PayOS($this->payOSClientId, $this->payOSApiKey, $this->payOSChecksumKey);
-
         try {
             $response = $payOS->createPaymentLink($body);
 

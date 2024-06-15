@@ -3367,6 +3367,64 @@
                 ]
             }
         },
+        "/api/v1/account/wallet/admin/create/{user_id}": {
+            "post": {
+                "tags": [
+                    "Admin / Wallet"
+                ],
+                "summary": "Create transaction",
+                "description": "Create transaction",
+                "operationId": "createTransaction",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "amount",
+                                    "description",
+                                    "transaction_type"
+                                ],
+                                "properties": {
+                                    "amount": {
+                                        "description": "Số tiền",
+                                        "type": "number",
+                                        "example": 10000
+                                    },
+                                    "description": {
+                                        "description": "Mô tả",
+                                        "type": "string",
+                                        "example": "Nạp tiền vào ví"
+                                    },
+                                    "transaction_type": {
+                                        "description": "Loại giao dịch",
+                                        "type": "string",
+                                        "example": "deposit"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Create transaction successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Create transaction failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/auth/login": {
             "post": {
                 "tags": [

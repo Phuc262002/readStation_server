@@ -344,7 +344,7 @@ class CommentController extends Controller
             if (auth()->user()->role->name == 'admin' || auth()->user()->role->name == 'manager') {
                 $comment->update([
                     'status' => $request->status,
-                    'content' => $request->content,
+                    'content' => $request->content ? $request->content : $comment->content,
                 ]);
 
                 return response()->json([
@@ -356,7 +356,7 @@ class CommentController extends Controller
                 if ($comment->user_id == auth()->user()->id) {
                     $comment->update([
                         'status' => $request->status,
-                        'content' => $request->content,
+                        'content' => $request->content ? $request->content : $comment->content,
                     ]);
 
                     return response()->json([

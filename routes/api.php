@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\Admin\PublishingCompanyController as AdminPublishin
 use App\Http\Controllers\Api\Admin\ShelveController;
 use App\Http\Controllers\Api\Admin\SupplierController;
 use App\Http\Controllers\Api\Admin\UserController;
+use App\Http\Controllers\Api\Admin\WalletController as AdminWalletController;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Auth\PasswordController;
 use App\Http\Controllers\Api\Auth\VerifyEmailController;
@@ -98,6 +99,13 @@ Route::group([
             Route::post('/create', [OrderController::class, 'store']);
             Route::put('/update/{order}', [OrderController::class, 'update']);
         });
+    });
+
+    Route::group([
+        "prefix" => "wallet",
+        "middleware" => ["auth:api"]
+    ], function () {
+        Route::post('admin/create/{user_id}', [AdminWalletController::class, 'store']);
     });
 
     Route::group([
