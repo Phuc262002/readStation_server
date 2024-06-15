@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('image');
             $table->string('slug')->unique();
             $table->integer('view')->default(0);
-            $table->enum('status', ['wating_approve','draft', 'published','hidden', 'deleted'])->default('published');
+            $table->enum('status', ['wating_approve', 'approve_canceled', 'draft', 'published','hidden', 'deleted'])->default('published');
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

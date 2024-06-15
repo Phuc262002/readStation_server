@@ -4590,6 +4590,203 @@
                 ]
             }
         },
+        "/api/v1/account/wallet/transaction-history": {
+            "get": {
+                "tags": [
+                    "Wallet"
+                ],
+                "summary": "Transaction history",
+                "description": "Transaction history",
+                "operationId": "transactionHistory",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Số trang hiện tại",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "pageSize",
+                        "in": "query",
+                        "description": "Số lượng mục trên mỗi trang",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sắp xếp theo tháng hoặc tất cả",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "inMonth",
+                            "enum": [
+                                "inMonth",
+                                "all"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Transaction history fetched successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/account/wallet/create-transaction": {
+            "post": {
+                "tags": [
+                    "Wallet"
+                ],
+                "summary": "Create transaction",
+                "description": "Create transaction",
+                "operationId": "storeDeposit",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "amount",
+                                    "description",
+                                    "transaction_type"
+                                ],
+                                "properties": {
+                                    "amount": {
+                                        "description": "Số tiền",
+                                        "type": "number",
+                                        "example": 10000
+                                    },
+                                    "description": {
+                                        "description": "Mô tả",
+                                        "type": "string",
+                                        "example": "Nạp tiền vào ví"
+                                    },
+                                    "transaction_type": {
+                                        "description": "Loại giao dịch",
+                                        "type": "string",
+                                        "example": "deposit"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Create transaction successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Create transaction failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/account/wallet/get-payment-link/{id}": {
+            "get": {
+                "tags": [
+                    "Wallet"
+                ],
+                "summary": "Transaction history",
+                "description": "Transaction history",
+                "operationId": "getPaymentLink",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Mã giao dịch",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Transaction history fetched successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/account/wallet/update-transaction-status/{id}": {
+            "put": {
+                "tags": [
+                    "Wallet"
+                ],
+                "summary": "Update transaction status",
+                "description": "Update transaction status",
+                "operationId": "updateTransactionStatus",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "status"
+                                ],
+                                "properties": {
+                                    "status": {
+                                        "description": "Trạng thái",
+                                        "type": "string",
+                                        "example": "completed"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Create transaction successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Create transaction failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/authors": {
             "get": {
                 "tags": [

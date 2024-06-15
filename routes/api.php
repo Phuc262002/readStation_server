@@ -86,6 +86,9 @@ Route::group([
         Route::get('/get-posts', [PostController::class, 'getPostAccount']);
 
         Route::post('wallet/create-transaction', [WalletController::class, 'storeDeposit']);
+        Route::get('wallet/get-payment-link/{id}', [WalletController::class, 'getPaymentLink']);
+        Route::get('wallet/transaction-history', [WalletController::class, 'transactionHistory']);
+        Route::put('wallet/update-transaction-status/{id}', [WalletController::class, 'updateTransactionStatus']);
 
         Route::group([
             "prefix" => "order"

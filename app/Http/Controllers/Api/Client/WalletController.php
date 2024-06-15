@@ -7,12 +7,161 @@ use App\Models\Wallet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use PayOS\PayOS;
+use OpenApi\Attributes as OA;
+
+#[OA\Get(
+    path: '/api/v1/account/wallet/transaction-history',
+    operationId: 'transactionHistory',
+    tags: ['Wallet'],
+    summary: 'Transaction history',
+    description: 'Transaction history',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    parameters: [
+        new OA\Parameter(
+            name: 'page',
+            in: 'query',
+            required: false,
+            description: 'Số trang hiện tại',
+            schema: new OA\Schema(type: 'integer', default: 1)
+        ),
+        new OA\Parameter(
+            name: 'pageSize',
+            in: 'query',
+            required: false,
+            description: 'Số lượng mục trên mỗi trang',
+            schema: new OA\Schema(type: 'integer', default: 10)
+        ),
+        new OA\Parameter(
+            name: 'sort',
+            in: 'query',
+            required: false,
+            description: 'Sắp xếp theo tháng hoặc tất cả',
+            schema: new OA\Schema(type: 'string', enum: ['inMonth', 'all'], default: 'inMonth')
+        ),
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Transaction history fetched successfully'
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error'
+        )
+    ]
+)]
+
+#[OA\Post(
+    path: '/api/v1/account/wallet/create-transaction',
+    tags: ['Wallet'],
+    operationId: 'storeDeposit',
+    summary: 'Create transaction',
+    description: 'Create transaction',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            required: ['amount', 'description', 'transaction_type'],
+            properties: [
+                new OA\Property(property: 'amount', type: 'number', description: 'Số tiền', example: 10000),
+                new OA\Property(property: 'description', type: 'string', description: 'Mô tả', example: 'Nạp tiền vào ví'),
+                new OA\Property(property: 'transaction_type', type: 'string', description: 'Loại giao dịch', example: 'deposit'),
+            ]
+        )
+    ),
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Create transaction successfully',
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error',
+        ),
+        new OA\Response(
+            response: 500,
+            description: 'Create transaction failed',
+        ),
+    ],
+)]
+
+#[OA\Get(
+    path: '/api/v1/account/wallet/get-payment-link/{id}',
+    operationId: 'getPaymentLink',
+    tags: ['Wallet'],
+    summary: 'Transaction history',
+    description: 'Transaction history',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    parameters: [
+        new OA\Parameter(
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Mã giao dịch',
+            schema: new OA\Schema(type: 'integer')
+        ),
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Transaction history fetched successfully'
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error'
+        )
+    ]
+)]
+
+#[OA\Put(
+    path: '/api/v1/account/wallet/update-transaction-status/{id}',
+    tags: ['Wallet'],
+    operationId: 'updateTransactionStatus',
+    summary: 'Update transaction status',
+    description: 'Update transaction status',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            required: ['status'],
+            properties: [
+                new OA\Property(property: 'status', type: 'string', description: 'Trạng thái', example: 'completed'),
+            ]
+        )
+    ),
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Create transaction successfully',
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error',
+        ),
+        new OA\Response(
+            response: 500,
+            description: 'Create transaction failed',
+        ),
+    ],
+)]
+
+
 
 class WalletController extends Controller
 {
     private string $payOSClientId;
     private string $payOSApiKey;
     private string $payOSChecksumKey;
+
+
 
     public function __construct()
     {
@@ -21,12 +170,64 @@ class WalletController extends Controller
         $this->payOSChecksumKey = env("PAYOS_CHECKSUM_KEY");
     }
 
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function transactionHistory(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'page' => 'integer|min:1',
+            'pageSize' => 'integer|min:1',
+            'sort' => 'string|in:inMonth,all',
+        ], [
+            'page.integer' => 'Page phải là số nguyên.',
+            'pageSize.integer' => 'PageSize phải là số nguyên.',
+            'page.min' => 'Page phải lớn hơn hoặc bằng 1.',
+            'pageSize.min' => 'PageSize phải lớn hơn hoặc bằng 1.',
+            'sort.string' => 'Sort phải là chuỗi.',
+            'sort.in' => 'Sort phải là inMonth hoặc all.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                "staus" => false,
+                "message" => "Validation error",
+                "errors" => $validator->errors()
+            ], 400);
+        }
+
+        $wallet = Wallet::where('user_id', auth()->user()->id)->first();
+
+        if (!$wallet) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Tài khoản không tồn tại',
+            ]);
+        }
+
+        $page = $request->input('page', 1);
+        $pageSize = $request->input('pageSize', 10);
+        $sort = $request->input('sort', 'inMonth');
+
+        if ($sort == 'inMonth') {
+            $transactions = $wallet->transactions()
+                ->whereMonth('created_at', now()->month)
+                ->orderBy('created_at', 'desc')
+                ->paginate($pageSize, ['*'], 'page', $page);
+        } else {
+            $transactions = $wallet->transactions()
+                ->orderBy('created_at', 'desc')
+                ->paginate($pageSize, ['*'], 'page', $page);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Success',
+            'data' => [
+                'transactions' => $transactions->items(),
+                "page" => $transactions->currentPage(),
+                "pageSize" => $transactions->perPage(),
+                "totalPages" => $transactions->lastPage(),
+                "totalResults" => $transactions->total(),
+            ],
+        ]);
     }
 
     public function storeDeposit(Request $request)
@@ -48,7 +249,7 @@ class WalletController extends Controller
 
         if ($validator->fails()) {
             return response()->json([
-                'error' => 1,
+                'status' => false,
                 'message' => $validator->errors(),
             ]);
         }
@@ -57,12 +258,10 @@ class WalletController extends Controller
 
         if (!$wallet) {
             return response()->json([
-                'error' => false,
+                'status' => false,
                 'message' => 'Tài khoản không tồn tại',
             ]);
         }
-
-        // dd($wallet);
 
         $transaction_code = intval(substr(strval(microtime(true) * 100000), -6));
 
@@ -97,56 +296,112 @@ class WalletController extends Controller
 
         try {
             $response = $payOS->createPaymentLink($body);
+
             return response()->json([
-                "error" => 0,
+                "status" => true,
                 "message" => "Success",
-                "data" => $response["checkoutUrl"]
+                "data" => $response
             ]);
         } catch (\Throwable $th) {
             return response()->json([
-                "error" => $th->getCode(),
+                "status" => false,
                 "message" => $th->getMessage(),
                 "data" => null
             ]);
         }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function getPaymentLink($id)
     {
+        $validator = Validator::make(['id' => $id], [
+            'id' => 'required|numeric',
+        ], [
+            'id.required' => 'Vui lòng nhập mã giao dịch',
+            'id.numeric' => 'Mã giao dịch phải là số',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'error' => 1,
+                'message' => $validator->errors(),
+            ]);
+        }
+
+        $payOS = new PayOS($this->payOSClientId, $this->payOSApiKey, $this->payOSChecksumKey);
+
+        try {
+            $response = $payOS->getPaymentLinkInformation($id);
+
+            return response()->json([
+                "status" => true,
+                "message" => "Success",
+                "data" => $response
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => false,
+                "message" => $th->getMessage(),
+                "data" => null
+            ]);
+        }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Wallet $wallet)
+    public function updateTransactionStatus(Request $request, $id)
     {
-        //
-    }
+        $validator = Validator::make($request->all(), [
+            'status' => 'required|string|in:completed,failed,canceled',
+        ], [
+            'status.required' => 'Vui lòng chọn trạng thái',
+            'status.string' => 'Trạng thái phải là chuỗi',
+            'status.in' => 'Trạng thái phải là completed, failed hoặc canceled',
+        ]);
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Wallet $wallet)
-    {
-        //
-    }
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => $validator->errors(),
+            ]);
+        }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Wallet $wallet)
-    {
-        //
-    }
+        $transaction = Wallet::where('user_id', auth()->user()->id)->first()->transactions()->where('transaction_code', $id)->first();
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Wallet $wallet)
-    {
-        //
+        if (!$transaction) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Giao dịch không tồn tại',
+            ]);
+        }
+
+        if ($transaction->status != 'pending') {
+            return response()->json([
+                'status' => false,
+                'message' => 'Giao dịch đã được xử lý',
+            ]);
+        }
+
+        try {
+            $transaction->update([
+                'status' => $request->status
+            ]);
+
+            $wallet = Wallet::where('user_id', auth()->user()->id)->first();
+
+            if ($request->status == 'completed') {
+                $wallet->update([
+                    'balance' => $wallet->balance + $transaction->amount
+                ]);
+            }
+
+            return response()->json([
+                "status" => true,
+                "message" => "Success",
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => false,
+                "message" => $th->getMessage(),
+                "data" => null
+            ]);
+        }
     }
 }
