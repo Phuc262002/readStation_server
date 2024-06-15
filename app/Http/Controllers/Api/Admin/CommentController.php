@@ -13,6 +13,9 @@ use OpenApi\Attributes as OA;
     tags: ['Admin / Comment'],
     summary: 'Get comments',
     description: 'Get comments',
+    security: [
+        ['bearerAuth' => []]
+    ],
     parameters: [
         new OA\Parameter(
             name: 'page',
