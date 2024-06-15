@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('shelves', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('bookcase_id');
+            $table->unsignedBigInteger('bookcase_id')->nullable();
             $table->string('bookshelf_code');
             $table->unsignedBigInteger('category_id');
             $table->string('name');
