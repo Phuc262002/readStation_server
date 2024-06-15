@@ -440,11 +440,6 @@ class PostController extends Controller
                 "status" => false,
                 "message" => "Post not found",
             ], 404);
-        } else if ($post->status == 'deleted') {
-            return response()->json([
-                "status" => false,
-                "message" => "Post not found",
-            ], 404);
         } else if ($post->user_id != auth()->user()->id && auth()->user()->role->name != 'admin' && auth()->user()->role->name != 'manager'){
             return response()->json([
                 "status" => false,

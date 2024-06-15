@@ -22,6 +22,7 @@ return new class extends Migration
             $table->decimal('amount', 20, 8);
             $table->timestamps();
 
+            $table->unique('id');
             $table->foreign('wallet_id')->references('id')->on('wallets')->onDelete('cascade');
         });
     }

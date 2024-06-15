@@ -85,7 +85,7 @@ Route::group([
 
         Route::get('/get-posts', [PostController::class, 'getPostAccount']);
 
-        Route::post('/wallet/deposit', [WalletController::class, 'storeDeposit']);
+        Route::post('wallet/create-transaction', [WalletController::class, 'storeDeposit']);
 
         Route::group([
             "prefix" => "order"
