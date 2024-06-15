@@ -16,12 +16,9 @@ class WalletController extends Controller
         //
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function storeDeposit(Request $request)
     {
-        //
+        
     }
 
     /**
@@ -29,7 +26,7 @@ class WalletController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        
     }
 
     /**

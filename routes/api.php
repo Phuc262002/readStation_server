@@ -21,6 +21,7 @@ use App\Http\Controllers\Api\Client\AccountController;
 use App\Http\Controllers\Api\Client\CommentController;
 use App\Http\Controllers\Api\Client\OrderController;
 use App\Http\Controllers\Api\Client\PostController;
+use App\Http\Controllers\Api\Client\WalletController;
 use App\Http\Controllers\Api\PayOS\CheckoutController;
 use App\Http\Controllers\Api\PayOS\OrderController as PayOSOrderController;
 use App\Http\Controllers\Api\PayOS\PaymentController;
@@ -83,6 +84,8 @@ Route::group([
         Route::get('/get-one/{order}', [OrderController::class, 'show']);
 
         Route::get('/get-posts', [PostController::class, 'getPostAccount']);
+
+        Route::post('/wallet/deposit', [WalletController::class, 'storeDeposit']);
 
         Route::group([
             "prefix" => "order"
