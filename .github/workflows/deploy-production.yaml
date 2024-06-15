@@ -38,4 +38,4 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           password: ${{ secrets.SERVER_PASSWORD }}
           port: ${{ secrets.SERVER_PORT }}
-          script: cd test && sudo docker compose pull && sudo docker compose up -d && sudo docker image prune -f
+          script: sudo docker compose pull && sudo docker compose up -d && sudo docker image prune -f
