@@ -1696,6 +1696,60 @@
                 ]
             }
         },
+        "/api/v1/comments/admin/get-all": {
+            "get": {
+                "tags": [
+                    "Admin / Comment"
+                ],
+                "summary": "Get comments",
+                "description": "Get comments",
+                "operationId": "getCommentAdmin",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Số trang hiện tại",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "pageSize",
+                        "in": "query",
+                        "description": "Số lượng mục trên mỗi trang",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Trạng thái của bình luận",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "published",
+                                "banned",
+                                "hidden"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User profile fetched successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
         "/api/v1/invoice-enters": {
             "get": {
                 "tags": [

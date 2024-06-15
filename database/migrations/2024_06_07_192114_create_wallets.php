@@ -15,7 +15,7 @@ return new class extends Migration
             $table->uuid('id')->primary(); 
             $table->foreignUuid('user_id');
             $table->decimal('balance', 20, 8);
-            $table->enum('status', ['active', 'inactive', 'locked', 'suspended', 'pending', 'closed', 'frozen'])->default('active');
+            $table->enum('status', ['active', 'locked', 'suspended', 'frozen'])->default('active');
             $table->timestamps();
 
             $table->unique('id');

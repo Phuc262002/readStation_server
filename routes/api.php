@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\Admin\BookcaseController;
 use App\Http\Controllers\Api\Admin\BookController as AdminBookController;
 use App\Http\Controllers\Api\Admin\BookDetailController;
 use App\Http\Controllers\Api\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\Api\Admin\CommentController as AdminCommentController;
 use App\Http\Controllers\Api\Admin\InvoiceEnterController;
 use App\Http\Controllers\Api\Admin\PostController as AdminPostController;
 use App\Http\Controllers\Api\Admin\PublishingCompanyController as AdminPublishingCompanyController;
@@ -193,6 +194,9 @@ Route::group([
         Route::get('/', [CommentController::class, 'index']);
 
         Route::group(["middleware" => ["auth:api"]], function () {
+
+            Route::get('/admin/get-all', [AdminCommentController::class, 'index']);
+
             Route::post('/create', [CommentController::class, 'store']);
             Route::put('/update/{id}', [CommentController::class, 'update']);
             Route::delete('/delete/{id}', [CommentController::class, 'destroy']);
