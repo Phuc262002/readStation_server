@@ -128,6 +128,15 @@ use OpenApi\Attributes as OA;
     security: [
         ['bearerAuth' => []]
     ],
+    parameters: [
+        new OA\Parameter(
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Mã giao dịch',
+            schema: new OA\Schema(type: 'integer')
+        ),
+    ],
     requestBody: new OA\RequestBody(
         required: true,
         content: new OA\JsonContent(

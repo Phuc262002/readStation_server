@@ -346,7 +346,7 @@ class BookcaseController extends Controller
         $validator = Validator::make(array_merge(['id' => $id], $request->all()), [
             'id' => 'required|integer|min:1|exists:bookcases,id',
             'bookcase_code' => 'nullable|string',
-            'name' => 'required|string',
+            'name' => 'nullable|string',
             'description' => 'nullable|string',
             'status' => 'nullable|string|in:active,inactive,deleted',
         ], [

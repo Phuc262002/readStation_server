@@ -376,7 +376,7 @@ class ShelveController extends Controller
             'bookshelf_code' => 'string',
             'category_id' => 'nullable',
             'status' => 'string|in:active,inactive,deleted',
-            'name' => 'string',
+            'name' => 'nullable|string',
             'description' => 'string',
         ],[
             'id.required' => 'Trường id là bắt buộc.',

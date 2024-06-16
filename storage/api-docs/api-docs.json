@@ -4807,6 +4807,17 @@
                 "summary": "Update transaction status",
                 "description": "Update transaction status",
                 "operationId": "updateTransactionStatus",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Mã giao dịch",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
                 "requestBody": {
                     "required": true,
                     "content": {
