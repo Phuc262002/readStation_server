@@ -245,15 +245,15 @@ class InvoiceEnterController extends Controller
         $validator = Validator::make($request->all(), [
             'invoice_code' => "nullable|string",
             'invoice_name' => "required",
-            'total' => "required|string",
+            'total' => "required",
             'invoice_description' => "required|string",
             'supplier_id' => "required",
             'invoice_date' => "required|date",
             'status' => "required|string|in:draft,active",
             'invoice_enter_detail' => "required|array",
-            'invoice_enter_detail.*.book_detail_id' => "required|integer",
-            'invoice_enter_detail.*.book_price' => "required|string",
-            'invoice_enter_detail.*.book_quantity' => "required|integer",
+            'invoice_enter_detail.*.book_detail_id' => "required",
+            'invoice_enter_detail.*.book_price' => "required",
+            'invoice_enter_detail.*.book_quantity' => "required",
 
         ], [
             'invoice_name.required' => 'Tên hóa đơn không được để trống.',
@@ -269,10 +269,8 @@ class InvoiceEnterController extends Controller
             'invoice_enter_detail.required' => 'Chi tiết hóa đơn không được để trống.',
             'invoice_enter_detail.array' => 'Chi tiết hóa đơn phải là mảng.',
             'invoice_enter_detail.*.book_detail_id.required' => 'ID chi tiết sách không được để trống.',
-            'invoice_enter_detail.*.book_detail_id.integer' => 'ID chi tiết sách phải là số nguyên.',
             'invoice_enter_detail.*.book_price.required' => 'Giá sách không được để trống.',
             'invoice_enter_detail.*.book_quantity.required' => 'Số lượng sách không được để trống.',
-            'invoice_enter_detail.*.book_quantity.integer' => 'Số lượng sách phải là số nguyên.',
         ]);
 
         if ($validator->fails()) {

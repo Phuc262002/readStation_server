@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Client;
 
 use App\Http\Controllers\Controller;
 use App\Models\Wallet;
+use App\Models\WalletTransaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use PayOS\PayOS;
@@ -472,6 +473,11 @@ class WalletController extends Controller
         $payOS = new PayOS($this->payOSClientId, $this->payOSApiKey, $this->payOSChecksumKey);
         try {
             $response = $payOS->cancelPaymentLink($id);
+
+            WalletTransaction::where('transaction_code', $id)->update([
+                'status' => 'canceled'
+            ]);
+            
             return response()->json([
                 'status' => true,
                 "message" => "Success",
