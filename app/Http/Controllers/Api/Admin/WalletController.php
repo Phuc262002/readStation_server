@@ -8,8 +8,59 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use OpenApi\Attributes as OA;
 
+#[OA\Get(
+    path: '/api/v1/account/wallet/admin/get-all',
+    operationId: 'getAllWallets',
+    tags: ['Admin / Wallet'],
+    summary: 'Get all wallets',
+    description: 'Get all wallets',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    parameters: [
+        new OA\Parameter(
+            name: 'page',
+            in: 'query',
+            required: false,
+            description: 'Số trang hiện tại',
+            schema: new OA\Schema(type: 'integer', default: 1)
+        ),
+        new OA\Parameter(
+            name: 'pageSize',
+            in: 'query',
+            required: false,
+            description: 'Số lượng mục trên mỗi trang',
+            schema: new OA\Schema(type: 'integer', default: 10)
+        ),
+        new OA\Parameter(
+            name: 'search',
+            in: 'query',
+            required: false,
+            description: 'Tìm kiếm theo tên, email hoặc số điện thoại',
+            schema: new OA\Schema(type: 'string')
+        ),
+        new OA\Parameter(
+            name: 'status',
+            in: 'query',
+            required: false,
+            description: 'Lọc theo trạng thái',
+            schema: new OA\Schema(type: 'string', enum: ['active', 'locked', 'suspended', 'frozen'])
+        ),
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Get all wallets successfully',
+        ),
+        new OA\Response(
+            response: 500,
+            description: 'Get all wallets failed',
+        ),
+    ]
+)]
+
 #[OA\Post(
-    path: '/api/v1/account/wallet/admin/create/{user_id}',
+    path: '/api/v1/account/wallet/admin/create',
     tags: ['Admin / Wallet'],
     operationId: 'createTransaction',
     summary: 'Create transaction',
@@ -20,8 +71,9 @@ use OpenApi\Attributes as OA;
     requestBody: new OA\RequestBody(
         required: true,
         content: new OA\JsonContent(
-            required: ['amount', 'description', 'transaction_type'],
+            required: ['user_id', 'amount', 'description', 'transaction_type'],
             properties: [
+                new OA\Property(property: 'user_id', type: 'string', description: 'ID người dùng', example: '1'),
                 new OA\Property(property: 'amount', type: 'number', description: 'Số tiền', example: 10000),
                 new OA\Property(property: 'description', type: 'string', description: 'Mô tả', example: 'Nạp tiền vào ví'),
                 new OA\Property(property: 'transaction_type', type: 'string', description: 'Loại giao dịch', example: 'deposit'),
@@ -44,17 +96,99 @@ use OpenApi\Attributes as OA;
     ],
 )]
 
+#[OA\Get(
+    path: '/api/v1/account/wallet/admin/get-user-wallet-transactions-history/{id}',
+    operationId: 'getUserWalletTransactionsHistory',
+    tags: ['Admin / Wallet'],
+    summary: 'Get user wallet transactions history',
+    description: 'Get user wallet transactions history',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    parameters: [
+        new OA\Parameter(
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'ID người dùng',
+            schema: new OA\Schema(type: 'string')
+        ),
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Get user wallet transactions history successfully',
+        ),
+        new OA\Response(
+            response: 500,
+            description: 'Get user wallet transactions history failed',
+        ),
+    ]
+)]
+
+
+
 class WalletController extends Controller
 {
+    public function index(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'page' => 'integer|min:1',
+            'pageSize' => 'integer|min:1',
+            'search' => 'string',
+            'status' => 'string|in:active,locked,suspended,frozen',
+        ], [
+            'page.integer' => 'Trang phải là số nguyên.',
+            'page.min' => 'Trang phải lớn hơn hoặc bằng 1.',
+            'pageSize.integer' => 'Kích thước trang phải là số nguyên.',
+            'pageSize.min' => 'Kích thước trang phải lớn hơn hoặc bằng 1.',
+            'search.string' => 'Tìm kiếm phải là chuỗi.',
+            'status.string' => 'Trạng thái phải là chuỗi.',
+            'status.in' => 'Trạng thái phải là active, locked, suspended hoặc frozen.',
+        ]);
 
-    public function store(Request $request, $user_id)
+        $page = $request->input('page', 1);
+        $pageSize = $request->input('pageSize', 10);
+        $search = $request->input('search');
+        $status = $request->input('status');
+
+        $query = Wallet::query()->with('user');
+
+        $totalItems = $query->count();
+
+        if ($search) {
+            $wallets = $query->whereHas('user', function ($query) use ($search) {
+                $query->where('name', 'like', '%' . $search . '%')
+                ->orWhere('email', 'like', '%' . $search . '%')
+                ->orWhere('phone', 'like', '%' . $search . '%');
+            });
+        }
+
+        if($status) {
+            $query->where('status', $status);
+        }
+
+        $wallets = $query->orderBy('created_at', 'desc')->paginate($pageSize, ['*'], 'page', $page);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Get all wallets successfully',
+            'data' => [
+                "wallets" => $wallets->items(),
+                "page" => $wallets->currentPage(),
+                "pageSize" => $wallets->perPage(),
+                "totalPages" => $wallets->lastPage(),
+                "totalResults" => $wallets->total(),
+                "total" => $totalItems
+            ]
+        ]);
+    }
+
+    public function store(Request $request)
     {
 
 
-        $validator = Validator::make(array_merge(
-            ['user_id' => $user_id],
-            $request->all()
-        ), [
+        $validator = Validator::make($request->all(), [
             'user_id' => 'required|exists:users,id',
             'amount' => 'required|numeric|min:10000',
             'description' => 'required|string',
@@ -77,7 +211,7 @@ class WalletController extends Controller
             ]);
         }
 
-        $wallet = Wallet::where('user_id', $user_id)->first();
+        $wallet = Wallet::where('user_id', $request->user_id)->first();
 
         if (!$wallet) {
             return response()->json([
@@ -131,5 +265,37 @@ class WalletController extends Controller
                 "data" => null
             ]);
         }
+    }
+
+    public function show($id)
+    {
+        $validator = Validator::make(['id' => $id], [
+            'id' => 'required|exists:wallets,id',
+        ], [
+            'id.required' => 'Vui lòng nhập ID',
+            'id.exists' => 'ID không tồn tại',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => $validator->errors(),
+            ]);
+        }
+
+        $wallet = Wallet::with('user', 'transactions')->find($id);
+
+        if (!$wallet) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Wallet not found',
+            ]);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Get wallet successfully',
+            'data' => $wallet
+        ]);
     }
 }

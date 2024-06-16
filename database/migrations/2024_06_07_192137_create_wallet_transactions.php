@@ -19,7 +19,7 @@ return new class extends Migration
             $table->enum('transaction_type', ['deposit', 'withdraw']);
             $table->enum('transaction_method', ['online', 'offline']);
             $table->enum('status', ['pending', 'completed', 'failed', 'canceled'])->default('pending');
-            $table->decimal('amount', 20, 8);
+            $table->unsignedBigInteger('amount');
             $table->timestamps();
 
             $table->unique('id');

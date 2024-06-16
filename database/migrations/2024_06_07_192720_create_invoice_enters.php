@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignUuid('user_id');
             $table->string('invoice_code');
             $table->string('invoice_name');
-            $table->decimal('total', 20, 8);
+            $table->unsignedBigInteger('total');
             $table->string('invoice_description')->nullable();
             $table->unsignedBigInteger('supplier_id');
             $table->date('invoice_date')->nullable();

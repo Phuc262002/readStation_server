@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('invoice_enter_id');
             $table->unsignedBigInteger('book_detail_id');
-            $table->decimal('book_price', 20, 8);
+            $table->unsignedBigInteger('book_price');
             $table->unsignedInteger('book_quantity');
             $table->timestamps();
 

@@ -54,7 +54,7 @@ return new class extends Migration
         // Schema::create('wallets', function (Blueprint $table) {
         //     $table->uuid('id')->primary(); 
         //     $table->foreignUuid('user_id');
-        //     $table->decimal('balance', 20, 8);
+        //     $table->unsignedBigInteger('balance');
         //     $table->enum('status', ['active', 'inactive', 'locked', 'suspended', 'pending', 'closed', 'frozen'])->default('active');
         //     $table->timestamps();
 
@@ -70,7 +70,7 @@ return new class extends Migration
         //     $table->enum('transaction_type', ['deposit', 'withdraw']);
         //     $table->enum('transaction_method', ['online', 'offline']);
         //     $table->enum('status', ['pending', 'completed', 'failed', 'canceled'])->default('pending');
-        //     $table->decimal('amount', 20, 8);
+        //     $table->unsignedBigInteger('amount');
         //     $table->timestamps();
 
         //     $table->foreign('wallet_id')->references('id')->on('wallets')->onDelete('cascade');
@@ -221,7 +221,7 @@ return new class extends Migration
         //     $table->json('images')->nullable();
         //     $table->string('book_version')->nullable();
         //     $table->string('price')->nullable();
-        //     $table->decimal('hire_percent', 8, 2)->nullable();
+        //     $table->unsignedBigInteger('hire_percent', 8, 2)->nullable();
         //     $table->unsignedInteger('stock')->nullable();
         //     $table->date('publish_date')->nullable();
         //     $table->unsignedBigInteger('publishing_company_id')->nullable();
@@ -254,9 +254,9 @@ return new class extends Migration
         //     $table->string('address')->nullable();
         //     $table->string('user_note')->nullable();
         //     $table->string('manager_note')->nullable();
-        //     $table->decimal('deposit_fee', 20, 8)->default(0);
-        //     $table->decimal('fine_fee', 20, 8)->default(0);
-        //     $table->decimal('total_fee', 20, 8)->default(0);
+        //     $table->unsignedBigInteger('deposit_fee')->default(0);
+        //     $table->unsignedBigInteger('fine_fee')->default(0);
+        //     $table->unsignedBigInteger('total_fee')->default(0);
         //     $table->enum('status', ['pending', 'approved', 'wating_take_book', 'hiring', 'increasing', 'wating_return', 'completed', 'canceled', 'out_of_date'])->default('pending');
         //     $table->timestamps();
 
@@ -267,7 +267,7 @@ return new class extends Migration
         // Schema::create('order_details', function (Blueprint $table) {
         //     $table->id();
         //     $table->unsignedBigInteger('order_id');
-        //     $table->decimal('service_fee', 20, 8)->default(0);
+        //     $table->unsignedBigInteger('service_fee')->default(0);
         //     $table->unsignedBigInteger('book_details_id');
         //     $table->date('return_date')->nullable();
         //     $table->integer('max_extensions')->default(3);
@@ -279,7 +279,7 @@ return new class extends Migration
         //     $table->text('comment')->nullable();
         //     $table->enum('status_cmt', ['hiring', 'rating_yet', 'active', 'hide', 'canceled'])->default('hiring');
         //     $table->enum('status_od', ['pending', 'hiring', 'completed', 'canceled', 'out_of_date'])->default('pending');
-        //     $table->decimal('deposit', 20, 8)->default(0);
+        //     $table->unsignedBigInteger('deposit')->default(0);
         //     $table->timestamps();
 
         //     $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
@@ -301,7 +301,7 @@ return new class extends Migration
         //     $table->foreignUuid('user_id');
         //     $table->string('invoice_code');
         //     $table->string('invoice_name');
-        //     $table->decimal('total', 20, 8);
+        //     $table->unsignedBigInteger('total');
         //     $table->string('invoice_description')->nullable();
         //     $table->unsignedBigInteger('supplier_id');
         //     $table->enum('status', ['draft','active', 'canceled'])->default('draft');
@@ -315,7 +315,7 @@ return new class extends Migration
         //     $table->id();
         //     $table->unsignedBigInteger('invoice_enter_id');
         //     $table->unsignedBigInteger('book_detail_id');
-        //     $table->decimal('book_price', 20, 8);
+        //     $table->unsignedBigInteger('book_price');
         //     $table->unsignedInteger('book_quantity');
         //     $table->timestamps();
 

@@ -242,13 +242,13 @@ class WalletController extends Controller
     public function storeDeposit(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'amount' => 'required|numeric|min:10000',
+            'amount' => 'required|numeric|min:20000',
             'description' => 'required|string',
             'transaction_type' => 'required|string|in:deposit,withdraw',
         ], [
             'amount.required' => 'Vui lòng nhập số tiền',
             'amount.numeric' => 'Số tiền phải là số',
-            'amount.min' => 'Số tiền tối thiểu là 10,000 VND',
+            'amount.min' => 'Số tiền tối thiểu là 20,000 VND',
             'description.required' => 'Vui lòng nhập mô tả',
             'description.string' => 'Mô tả phải là chuỗi',
             'transaction_type.required' => 'Vui lòng chọn loại giao dịch',

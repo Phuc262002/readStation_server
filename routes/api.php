@@ -105,7 +105,9 @@ Route::group([
         "prefix" => "wallet",
         "middleware" => ["auth:api"]
     ], function () {
-        Route::post('admin/create/{user_id}', [AdminWalletController::class, 'store']);
+        Route::get('admin/get-all', [AdminWalletController::class, 'index']);
+        Route::post('admin/create', [AdminWalletController::class, 'store']);
+        Route::get('admin/get-user-wallet-transactions-history/{id}', [AdminWalletController::class, 'show']);
     });
 
     Route::group([

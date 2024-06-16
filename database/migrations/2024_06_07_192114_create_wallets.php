@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('wallets', function (Blueprint $table) {
             $table->uuid('id')->primary(); 
             $table->foreignUuid('user_id');
-            $table->decimal('balance', 20, 8);
+            $table->unsignedBigInteger('balance');
             $table->enum('status', ['active', 'locked', 'suspended', 'frozen'])->default('active');
             $table->timestamps();
 
