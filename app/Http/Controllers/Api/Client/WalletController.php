@@ -162,6 +162,36 @@ use OpenApi\Attributes as OA;
     ],
 )]
 
+#[OA\Post(
+    path: '/api/v1/account/wallet/cancel-transaction/{id}',
+    tags: ['Wallet'],
+    operationId: 'cancelPaymentLinkOfTransction',
+    summary: 'Cancel payment link of transaction',
+    description: 'Cancel payment link of transaction',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    parameters: [
+        new OA\Parameter(
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Mã giao dịch',
+            schema: new OA\Schema(type: 'integer')
+        ),
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Cancel payment link of transaction successfully'
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error'
+        )
+    ],
+)]
+
 
 
 class WalletController extends Controller
@@ -272,7 +302,7 @@ class WalletController extends Controller
             ]);
         }
 
-        $transaction_code = intval(substr(strval(microtime(true) * 100000), -6));
+        $transaction_code = intval(substr(strtotime(now()) . rand(1000, 9999), -9));
 
         $transaction = $wallet->transactions()->create([
             'wallet_id' => $wallet->id,
@@ -297,6 +327,7 @@ class WalletController extends Controller
         $body["amount"] = intval($body["amount"]);
         $body["orderCode"] = $transaction_code;
         $body["description"] = $request->description;
+        $body["expiredAt"] = now()->addMinutes(30)->getTimestamp();
         $body["returnUrl"] = env('APP_URL') . "/success.html";
         $body["cancelUrl"] = env('APP_URL') . "/cancel.html";
 
@@ -310,6 +341,7 @@ class WalletController extends Controller
                 "data" => $response
             ]);
         } catch (\Throwable $th) {
+            $transaction->delete();
             return response()->json([
                 "status" => false,
                 "message" => $th->getMessage(),
@@ -408,6 +440,47 @@ class WalletController extends Controller
                 "status" => false,
                 "message" => $th->getMessage(),
                 "data" => null
+            ]);
+        }
+    }
+
+    public function cancelPaymentLinkOfTransction(Request $request, string $id)
+    {
+        $validator = Validator::make(['id' => $id], [
+            'id' => 'required|string',
+        ], [
+            'id.required' => 'Vui lòng nhập mã giao dịch',
+            'id.string' => 'Mã giao dịch phải là chuỗi',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => $validator->errors(),
+            ]);
+        }
+
+        $transaction = Wallet::where('user_id', auth()->user()->id)->first()->transactions()->where('transaction_code', $id)->first();
+
+        if (!$transaction) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Giao dịch không tồn tại',
+            ]);
+        }
+
+        $payOS = new PayOS($this->payOSClientId, $this->payOSApiKey, $this->payOSChecksumKey);
+        try {
+            $response = $payOS->cancelPaymentLink($id);
+            return response()->json([
+                'status' => true,
+                "message" => "Success",
+                "data" => $response
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => false,
+                "message" => $th->getMessage(),
             ]);
         }
     }

@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Validator;
 use OpenApi\Attributes as OA;
 
 #[OA\Get(
-    path: '/api/v1/account/wallet/admin/get-all',
+    path: '/api/v1/wallet/admin/get-all',
     operationId: 'getAllWallets',
     tags: ['Admin / Wallet'],
     summary: 'Get all wallets',

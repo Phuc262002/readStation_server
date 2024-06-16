@@ -90,6 +90,7 @@ Route::group([
         Route::get('wallet/get-payment-link/{id}', [WalletController::class, 'getPaymentLink']);
         Route::get('wallet/transaction-history', [WalletController::class, 'transactionHistory']);
         Route::put('wallet/update-transaction-status/{id}', [WalletController::class, 'updateTransactionStatus']);
+        Route::post('wallet/cancel-transaction/{id}', [WalletController::class, 'cancelPaymentLinkOfTransction']);
 
         Route::group([
             "prefix" => "order"

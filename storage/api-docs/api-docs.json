@@ -3367,7 +3367,7 @@
                 ]
             }
         },
-        "/api/v1/account/wallet/admin/get-all": {
+        "/api/v1/wallet/admin/get-all": {
             "get": {
                 "tags": [
                     "Admin / Wallet"
@@ -4956,6 +4956,40 @@
                     },
                     "500": {
                         "description": "Create transaction failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/account/wallet/cancel-transaction/{id}": {
+            "post": {
+                "tags": [
+                    "Wallet"
+                ],
+                "summary": "Cancel payment link of transaction",
+                "description": "Cancel payment link of transaction",
+                "operationId": "cancelPaymentLinkOfTransction",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Mã giao dịch",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Cancel payment link of transaction successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
                     }
                 },
                 "security": [
