@@ -60,7 +60,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Post(
-    path: '/api/v1/account/wallet/admin/create',
+    path: '/api/v1/wallet/admin/create',
     tags: ['Admin / Wallet'],
     operationId: 'createTransaction',
     summary: 'Create transaction',
@@ -97,7 +97,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Get(
-    path: '/api/v1/account/wallet/admin/get-user-wallet-transactions-history/{id}',
+    path: '/api/v1/wallet/admin/get-user-wallet-transactions-history/{id}',
     operationId: 'getUserWalletTransactionsHistory',
     tags: ['Admin / Wallet'],
     summary: 'Get user wallet transactions history',
@@ -152,7 +152,7 @@ class WalletController extends Controller
         $search = $request->input('search');
         $status = $request->input('status');
 
-        $query = Wallet::query()->with('user');
+        $query = Wallet::query()->with('user', 'user.role');
 
         $totalItems = $query->count();
 
@@ -283,7 +283,7 @@ class WalletController extends Controller
             ]);
         }
 
-        $wallet = Wallet::with('user', 'transactions')->find($id);
+        $wallet = Wallet::with('user', 'user.role', 'transactions')->find($id);
 
         if (!$wallet) {
             return response()->json([

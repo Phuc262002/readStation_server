@@ -3436,7 +3436,7 @@
                 ]
             }
         },
-        "/api/v1/account/wallet/admin/create": {
+        "/api/v1/wallet/admin/create": {
             "post": {
                 "tags": [
                     "Admin / Wallet"
@@ -3500,7 +3500,7 @@
                 ]
             }
         },
-        "/api/v1/account/wallet/admin/get-user-wallet-transactions-history/{id}": {
+        "/api/v1/wallet/admin/get-user-wallet-transactions-history/{id}": {
             "get": {
                 "tags": [
                     "Admin / Wallet"
