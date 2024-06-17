@@ -81,16 +81,19 @@ Route::group([
         Route::get('/get-profile', [AccountController::class, 'userProfile']);
         Route::put('/update-profile', [AccountController::class, 'updateProfile']);
 
-        Route::get('/', [OrderController::class, 'index']);
-        Route::get('/get-one/{order}', [OrderController::class, 'show']);
-
         Route::get('/get-posts', [PostController::class, 'getPostAccount']);
 
-        Route::post('wallet/create-transaction', [WalletController::class, 'storeDeposit']);
-        Route::get('wallet/get-payment-link/{id}', [WalletController::class, 'getPaymentLink']);
-        Route::get('wallet/transaction-history', [WalletController::class, 'transactionHistory']);
-        Route::put('wallet/update-transaction-status/{id}', [WalletController::class, 'updateTransactionStatus']);
-        Route::post('wallet/cancel-transaction/{id}', [WalletController::class, 'cancelPaymentLinkOfTransction']);
+
+
+        Route::group([
+            "prefix" => "wallet"
+        ], function () {
+            Route::post('/create-transaction', [WalletController::class, 'storeDeposit']);
+            Route::get('/get-payment-link/{id}', [WalletController::class, 'getPaymentLink']);
+            Route::get('/transaction-history', [WalletController::class, 'transactionHistory']);
+            Route::put('/update-transaction-status/{id}', [WalletController::class, 'updateTransactionStatus']);
+            Route::post('/cancel-transaction/{id}', [WalletController::class, 'cancelPaymentLinkOfTransction']);
+        });
 
         Route::group([
             "prefix" => "order"
@@ -270,6 +273,7 @@ Route::group([
         "prefix" => "telegram"
     ], function () {
         Route::post('/github-actions', [GithubActionController::class, 'githubActions']);
+        Route::post('/github-actions-success', [GithubActionController::class, 'githubActionsSuccess']);
     });
 
     Route::group([
@@ -288,15 +292,15 @@ Route::group([
     });
 
 
-    Route::post('/create-payment-link', [CheckoutController::class, 'createPaymentLink']);
+    // Route::post('/create-payment-link', [CheckoutController::class, 'createPaymentLink']);
 
-    Route::prefix('/order-test')->group(function () {
-        Route::post('/create', [PayOSOrderController::class, 'createOrder']);
-        Route::get('/{id}', [PayOSOrderController::class, 'getPaymentLinkInfoOfOrder']);
-        Route::put('/{id}', [PayOSOrderController::class, 'cancelPaymentLinkOfOrder']);
-    });
+    // Route::prefix('/order-test')->group(function () {
+    //     Route::post('/create', [PayOSOrderController::class, 'createOrder']);
+    //     Route::get('/{id}', [PayOSOrderController::class, 'getPaymentLinkInfoOfOrder']);
+    //     Route::put('/{id}', [PayOSOrderController::class, 'cancelPaymentLinkOfOrder']);
+    // });
 
-    Route::prefix('/payment')->group(function () {
-        Route::post('/payos', [PaymentController::class, 'handlePayOSWebhook']);
-    });
+    // Route::prefix('/payment')->group(function () {
+    //     Route::post('/payos', [PaymentController::class, 'handlePayOSWebhook']);
+    // });
 });

@@ -114,6 +114,36 @@ use OpenApi\Attributes as OA;
     ]
 )]
 
+#[OA\Get(
+    path: '/api/v1/account/order/get-one/{id}',
+    operationId: 'getOrder',
+    tags: ['Account'],
+    summary: 'Get order',
+    description: 'Get order',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    parameters: [
+        new OA\Parameter(
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Id của order',
+            schema: new OA\Schema(type: 'integer')
+        ),
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Get order successfully'
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error',
+        ),
+    ]
+)]
+
 class OrderController extends Controller
 {
     /**

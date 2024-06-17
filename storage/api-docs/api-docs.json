@@ -4449,6 +4449,40 @@
                 ]
             }
         },
+        "/api/v1/account/order/get-one/{id}": {
+            "get": {
+                "tags": [
+                    "Account"
+                ],
+                "summary": "Get order",
+                "description": "Get order",
+                "operationId": "getOrder",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id của order",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get order successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/account/get-posts": {
             "get": {
                 "tags": [

@@ -14,7 +14,7 @@ class TelegramGithubActionNotification extends Notification
     /**
      * Create a new notification instance.
      */
-    public function __construct(public array $message)
+    public function __construct(public array $message, public $chatId, public $view, public $url = null)
     {
         //
     }
@@ -34,14 +34,26 @@ class TelegramGithubActionNotification extends Notification
      */
     public function toTelegram($notifiable)
     {
-        return TelegramMessage::create()
-            ->options([
-                'message_thread_id' => '39',
-                'parse_mode' => 'HTML',
-            ])
-            ->view('telegram.github_push', [
-                'message' => $this->message,
-            ]);
+        if ($this->url) {
+            return TelegramMessage::create()
+                ->options([
+                    'message_thread_id' => $this->chatId,
+                    'parse_mode' => 'HTML',
+                ])
+                ->view($this->view, [
+                    'message' => $this->message,
+                ])
+                ->button('View action', $this->url);
+        } else {
+            return TelegramMessage::create()
+                ->options([
+                    'message_thread_id' => $this->chatId,
+                    'parse_mode' => 'HTML',
+                ])
+                ->view($this->view, [
+                    'message' => $this->message,
+                ]);
+        }
     }
 
     /**

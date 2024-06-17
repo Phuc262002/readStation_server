@@ -31,7 +31,19 @@ class GithubActionController extends Controller
                     'commit_count' => count($request->input('commits')),
                     'commit_changes' => $request->input('commits')
                 ]
-            ]));
+            ], '39', 'telegram.github_push'));
+
+        return response()->json([
+            'message' => 'Notification sent to Telegram'
+        ]);
+    }
+
+    public function githubActionsSuccess(Request $request)
+    {
+        Notification::route('telegram', '-1002142408121')
+            ->notify(new TelegramGithubActionNotification([
+
+            ], '543', 'telegram.github_push_success', "https://laravel-notification-channels.com/telegram/#usage"));
 
         return response()->json([
             'message' => 'Notification sent to Telegram'
