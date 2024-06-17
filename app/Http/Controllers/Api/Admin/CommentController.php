@@ -81,7 +81,7 @@ class CommentController extends Controller
         $pageSize = $request->input('pageSize', 10);
         $request->input('published'); // Thêm dấu chấm phẩy ở đây
 
-        $query = Comment::query()->with('user', 'post', 'post.user');
+        $query = Comment::query()->with('user', 'post', 'post.user', 'get_parent_comment');
 
         if ($request->has('status')) {
             $query->where('status', $request->input('status'));
