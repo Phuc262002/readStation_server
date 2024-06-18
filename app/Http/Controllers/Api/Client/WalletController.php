@@ -91,7 +91,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Get(
-    path: '/api/v1/account/wallet/get-payment-link/{id}',
+    path: '/api/v1/account/wallet/get-payment-link/{transaction_code}',
     operationId: 'getPaymentLink',
     tags: ['Wallet'],
     summary: 'Get payment link',
@@ -101,7 +101,7 @@ use OpenApi\Attributes as OA;
     ],
     parameters: [
         new OA\Parameter(
-            name: 'id',
+            name: 'transaction_code',
             in: 'path',
             required: true,
             description: 'Mã giao dịch',
@@ -121,7 +121,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Put(
-    path: '/api/v1/account/wallet/update-transaction-status/{id}',
+    path: '/api/v1/account/wallet/update-transaction-status/{transaction_code}',
     tags: ['Wallet'],
     operationId: 'updateTransactionStatus',
     summary: 'Update transaction status',
@@ -131,7 +131,7 @@ use OpenApi\Attributes as OA;
     ],
     parameters: [
         new OA\Parameter(
-            name: 'id',
+            name: 'transaction_code',
             in: 'path',
             required: true,
             description: 'Mã giao dịch',
@@ -164,7 +164,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Post(
-    path: '/api/v1/account/wallet/cancel-transaction/{id}',
+    path: '/api/v1/account/wallet/cancel-transaction/{transaction_code}',
     tags: ['Wallet'],
     operationId: 'cancelPaymentLinkOfTransction',
     summary: 'Cancel payment link of transaction',
@@ -174,7 +174,7 @@ use OpenApi\Attributes as OA;
     ],
     parameters: [
         new OA\Parameter(
-            name: 'id',
+            name: 'transaction_code',
             in: 'path',
             required: true,
             description: 'Mã giao dịch',
@@ -367,13 +367,14 @@ class WalletController extends Controller
         }
     }
 
-    public function getPaymentLink($id)
+    public function getPaymentLink($transaction_code)
     {
-        $validator = Validator::make(['id' => $id], [
-            'id' => 'required|numeric',
+        $validator = Validator::make(['transaction_code' => $transaction_code], [
+            'transaction_code' => 'required|string|exists:wallet_transactions,transaction_code',
         ], [
-            'id.required' => 'Vui lòng nhập mã giao dịch',
-            'id.numeric' => 'Mã giao dịch phải là số',
+            'transaction_code.required' => 'Vui lòng nhập mã giao dịch',
+            'transaction_code.numeric' => 'Mã giao dịch phải là số',
+            'transaction_code.exists' => 'Giao dịch không tồn tại',
         ]);
 
         if ($validator->fails()) {
@@ -383,10 +384,26 @@ class WalletController extends Controller
             ]);
         }
 
+        $transaction = Wallet::where('user_id', auth()->user()->id)->first()->transactions()->where('transaction_code', $transaction_code)->first();
+
+        if (!$transaction) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Giao dịch không tồn tại',
+            ]);
+        }
+
+        if ($transaction->status != 'pending') {
+            return response()->json([
+                'status' => false,
+                'message' => 'Giao dịch đã được xử lý',
+            ]);
+        }
+
         $payOS = new PayOS($this->payOSClientId, $this->payOSApiKey, $this->payOSChecksumKey);
 
         try {
-            $response = $payOS->getPaymentLinkInformation($id);
+            $response = $payOS->getPaymentLinkInformation($transaction_code);
 
             return response()->json([
                 "status" => true,
@@ -402,11 +419,17 @@ class WalletController extends Controller
         }
     }
 
-    public function updateTransactionStatus(Request $request, $id)
+    public function updateTransactionStatus(Request $request, $transaction_code)
     {
-        $validator = Validator::make($request->all(), [
+        $validator = Validator::make(array_merge($request->all(), [
+            'transaction_code' => $transaction_code
+        ]), [
+            'transaction_code' => 'required|string|exists:wallet_transactions,transaction_code',
             'status' => 'required|string|in:completed,failed,canceled',
         ], [
+            'transaction_code.required' => 'Vui lòng nhập mã giao dịch',
+            'transaction_code.numeric' => 'Mã giao dịch phải là số',
+            'transaction_code.exists' => 'Giao dịch không tồn tại',
             'status.required' => 'Vui lòng chọn trạng thái',
             'status.string' => 'Trạng thái phải là chuỗi',
             'status.in' => 'Trạng thái phải là completed, failed hoặc canceled',
@@ -435,7 +458,7 @@ class WalletController extends Controller
             ]);
         }
 
-        $transaction = Wallet::where('user_id', auth()->user()->id)->first()->transactions()->where('transaction_code', $id)->first();
+        $transaction = Wallet::where('user_id', auth()->user()->id)->first()->transactions()->where('transaction_code', $transaction_code)->first();
 
         if (!$transaction) {
             return response()->json([
@@ -478,13 +501,16 @@ class WalletController extends Controller
         }
     }
 
-    public function cancelPaymentLinkOfTransction(Request $request, string $id)
+    public function cancelPaymentLinkOfTransction(Request $request, string $transaction_code)
     {
-        $validator = Validator::make(['id' => $id], [
-            'id' => 'required|string',
+        $validator = Validator::make(array_merge($request->all(), [
+            'transaction_code' => $transaction_code
+        ]), [
+            'transaction_code' => 'required|string|exists:wallet_transactions,transaction_code',
         ], [
-            'id.required' => 'Vui lòng nhập mã giao dịch',
-            'id.string' => 'Mã giao dịch phải là chuỗi',
+            'transaction_code.required' => 'Vui lòng nhập mã giao dịch',
+            'transaction_code.numeric' => 'Mã giao dịch phải là số',
+            'transaction_code.exists' => 'Giao dịch không tồn tại',
         ]);
 
         if ($validator->fails()) {
@@ -510,7 +536,7 @@ class WalletController extends Controller
             ]);
         }
 
-        $transaction = Wallet::where('user_id', auth()->user()->id)->first()->transactions()->where('transaction_code', $id)->first();
+        $transaction = Wallet::where('user_id', auth()->user()->id)->first()->transactions()->where('transaction_code', $transaction_code)->first();
 
         if (!$transaction) {
             return response()->json([
@@ -521,9 +547,9 @@ class WalletController extends Controller
 
         $payOS = new PayOS($this->payOSClientId, $this->payOSApiKey, $this->payOSChecksumKey);
         try {
-            $response = $payOS->cancelPaymentLink($id);
+            $response = $payOS->cancelPaymentLink($transaction_code);
 
-            WalletTransaction::where('transaction_code', $id)->update([
+            WalletTransaction::where('transaction_code', $transaction_code)->update([
                 'status' => 'canceled',
                 'completed_at' => now()
             ]);

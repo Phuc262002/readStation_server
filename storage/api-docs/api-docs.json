@@ -3436,7 +3436,7 @@
                 ]
             }
         },
-        "/api/v1/wallet/admin/create": {
+        "/api/v1/wallet/admin/create-deposit": {
             "post": {
                 "tags": [
                     "Admin / Wallet"
@@ -3612,7 +3612,7 @@
                         "description": "Mã giao dịch",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "type": "integer"
                         }
                     }
                 ],
@@ -3646,7 +3646,7 @@
                         "description": "Mã giao dịch",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "type": "integer"
                         }
                     }
                 ],
@@ -5039,7 +5039,7 @@
                 ]
             }
         },
-        "/api/v1/account/wallet/get-payment-link/{id}": {
+        "/api/v1/account/wallet/get-payment-link/{transaction_code}": {
             "get": {
                 "tags": [
                     "Wallet"
@@ -5049,7 +5049,7 @@
                 "operationId": "getPaymentLink",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "transaction_code",
                         "in": "path",
                         "description": "Mã giao dịch",
                         "required": true,
@@ -5073,7 +5073,7 @@
                 ]
             }
         },
-        "/api/v1/account/wallet/update-transaction-status/{id}": {
+        "/api/v1/account/wallet/update-transaction-status/{transaction_code}": {
             "put": {
                 "tags": [
                     "Wallet"
@@ -5083,7 +5083,7 @@
                 "operationId": "updateTransactionStatus",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "transaction_code",
                         "in": "path",
                         "description": "Mã giao dịch",
                         "required": true,
@@ -5130,7 +5130,7 @@
                 ]
             }
         },
-        "/api/v1/account/wallet/cancel-transaction/{id}": {
+        "/api/v1/account/wallet/cancel-transaction/{transaction_code}": {
             "post": {
                 "tags": [
                     "Wallet"
@@ -5140,7 +5140,7 @@
                 "operationId": "cancelPaymentLinkOfTransction",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "transaction_code",
                         "in": "path",
                         "description": "Mã giao dịch",
                         "required": true,

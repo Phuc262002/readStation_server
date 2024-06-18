@@ -89,10 +89,10 @@ Route::group([
             "prefix" => "wallet"
         ], function () {
             Route::post('/create-transaction', [WalletController::class, 'storeDeposit']);
-            Route::get('/get-payment-link/{id}', [WalletController::class, 'getPaymentLink']);
+            Route::get('/get-payment-link/{transaction_code}', [WalletController::class, 'getPaymentLink']);
             Route::get('/transaction-history', [WalletController::class, 'transactionHistory']);
-            Route::put('/update-transaction-status/{id}', [WalletController::class, 'updateTransactionStatus']);
-            Route::post('/cancel-transaction/{id}', [WalletController::class, 'cancelPaymentLinkOfTransction']);
+            Route::put('/update-transaction-status/{transaction_code}', [WalletController::class, 'updateTransactionStatus']);
+            Route::post('/cancel-transaction/{transaction_code}', [WalletController::class, 'cancelPaymentLinkOfTransction']);
         });
 
         Route::group([
@@ -110,7 +110,7 @@ Route::group([
         "middleware" => ["auth:api"]
     ], function () {
         Route::get('admin/get-all', [AdminWalletController::class, 'index']);
-        Route::post('admin/create', [AdminWalletController::class, 'store']);
+        Route::post('admin/create-deposit', [AdminWalletController::class, 'storeDeposit']);
         Route::get('admin/get-user-wallet-transactions-history/{id}', [AdminWalletController::class, 'show']);
         Route::put('admin/update-status/{id}', [AdminWalletController::class, 'update']);
 

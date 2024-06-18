@@ -62,7 +62,7 @@ use PayOS\PayOS;
 )]
 
 #[OA\Post(
-    path: '/api/v1/wallet/admin/create',
+    path: '/api/v1/wallet/admin/create-deposit',
     tags: ['Admin / Wallet'],
     operationId: 'createTransaction',
     summary: 'Create transaction',
@@ -266,6 +266,13 @@ class WalletController extends Controller
             'status.in' => 'Trạng thái phải là active, locked, suspended hoặc frozen.',
         ]);
 
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => $validator->errors(),
+            ]);
+        }
+
         $page = $request->input('page', 1);
         $pageSize = $request->input('pageSize', 10);
         $search = $request->input('search');
@@ -303,7 +310,7 @@ class WalletController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function storeDeposit(Request $request)
     {
 
 
@@ -311,16 +318,12 @@ class WalletController extends Controller
             'user_id' => 'required|exists:users,id',
             'amount' => 'required|numeric|min:10000',
             'description' => 'required|string',
-            'transaction_type' => 'required|string|in:deposit,withdraw',
         ], [
             'amount.required' => 'Vui lòng nhập số tiền',
             'amount.numeric' => 'Số tiền phải là số',
             'amount.min' => 'Số tiền tối thiểu là 10,000 VND',
             'description.required' => 'Vui lòng nhập mô tả',
             'description.string' => 'Mô tả phải là chuỗi',
-            'transaction_type.required' => 'Vui lòng chọn loại giao dịch',
-            'transaction_type.string' => 'Loại giao dịch phải là chuỗi',
-            'transaction_type.in' => 'Loại giao dịch không hợp lệ',
         ]);
 
         if ($validator->fails()) {
@@ -347,7 +350,7 @@ class WalletController extends Controller
             'description' => $request->description,
             'reference_id' => $transaction_code,
             'transaction_code' => $transaction_code,
-            'transaction_type' => $request->transaction_type,
+            'transaction_type' => 'deposit',
             'transaction_method' => 'offline',
             'status' => 'completed'
         ]);
@@ -360,17 +363,9 @@ class WalletController extends Controller
         }
 
         try {
-            if ($transaction->transaction_type == 'deposit') {
-                $wallet->update([
-                    'balance' => $wallet->balance + $transaction->amount
-                ]);
-            }
-
-            if ($transaction->transaction_type == 'withdraw') {
-                $wallet->update([
-                    'balance' => $wallet->balance - $transaction->amount
-                ]);
-            }
+            $wallet->update([
+                'balance' => $wallet->balance + $transaction->amount
+            ]);
 
             return response()->json([
                 "status" => true,
@@ -601,11 +596,12 @@ class WalletController extends Controller
     public function getPaymentLink(Request $request, string $transaction_code)
     {
         $validator = Validator::make(['transaction_code' => $transaction_code], [
-            'transaction_code' => 'required|string',
+            'transaction_code' => 'required|string|exists:wallet_transactions,transaction_code',
             'user_id' => 'required|exists:users,id',
         ], [
             'transaction_code.required' => 'Vui lòng nhập mã giao dịch',
             'transaction_code.string' => 'Mã giao dịch phải là chuỗi',
+            'transaction_code.exists' => 'Mã giao dịch không tồn tại',
             'user_id.required' => 'Vui lòng nhập ID người dùng',
             'user_id.exists' => 'ID người dùng không tồn tại',
         ]);
@@ -614,6 +610,22 @@ class WalletController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => $validator->errors(),
+            ]);
+        }
+
+        $transaction = Wallet::where('user_id', $request->user_id)->first()->transactions()->where('transaction_code', $transaction_code)->first();
+
+        if (!$transaction) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Giao dịch không tồn tại',
+            ]);
+        }
+
+        if ($transaction->status != 'pending') {
+            return response()->json([
+                'status' => false,
+                'message' => 'Giao dịch đã được xử lý',
             ]);
         }
 
