@@ -416,7 +416,7 @@ class CategoryController extends Controller
                 "status" => false,
                 "message" => "Image is required when is_featured is true!"
             ], 400);
-        } else if ($request->is_featured == true && Category::where('is_featured', true)->count() >= 6) {
+        } else if ($request->is_featured == true && $category->is_featured != true && Category::where('is_featured', true)->count() >= 6) {
             return response()->json([
                 "status" => false,
                 "message" => "Only 6 categories can be featured!"
