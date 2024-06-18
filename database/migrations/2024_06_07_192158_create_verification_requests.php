@@ -19,8 +19,9 @@ return new class extends Migration
             $table->string('verification_card_image');
             $table->json('verification_card_info');
             $table->date('card_expired');
+            $table->string('reason')->nullable();
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
-            $table->date('verification_date')->nullable();
+            $table->dateTime('verification_date')->nullable();
             $table->timestamps();
 
             $table->foreign('user_request_id')->references('id')->on('users')->onDelete('cascade');

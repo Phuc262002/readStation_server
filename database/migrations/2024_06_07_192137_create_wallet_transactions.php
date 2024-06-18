@@ -19,7 +19,9 @@ return new class extends Migration
             $table->enum('transaction_type', ['deposit', 'withdraw']);
             $table->enum('transaction_method', ['online', 'offline']);
             $table->enum('status', ['pending', 'completed', 'failed', 'canceled'])->default('pending');
+            $table->dateTime('completed_at')->nullable();
             $table->unsignedBigInteger('amount');
+            $table->string('description')->nullable();
             $table->timestamps();
 
             $table->unique('id');

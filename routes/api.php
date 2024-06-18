@@ -112,6 +112,11 @@ Route::group([
         Route::get('admin/get-all', [AdminWalletController::class, 'index']);
         Route::post('admin/create', [AdminWalletController::class, 'store']);
         Route::get('admin/get-user-wallet-transactions-history/{id}', [AdminWalletController::class, 'show']);
+        Route::put('admin/update-status/{id}', [AdminWalletController::class, 'update']);
+
+        Route::put('admin/update-transaction-status/{id}', [AdminWalletController::class, 'updateTransactionStatus']);
+        Route::post('admin/cancel-transaction/{transaction_code}', [AdminWalletController::class, 'cancelPaymentLinkOfTransction']);
+        Route::get('admin/get-payment-link/{transaction_code}', [AdminWalletController::class, 'getPaymentLink']);
     });
 
     Route::group([

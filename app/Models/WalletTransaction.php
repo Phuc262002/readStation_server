@@ -20,6 +20,8 @@ class WalletTransaction extends Model
         'transaction_method',
         'status',
         'amount',
+        'completed_at',
+        'description'
     ];
 
     protected $hidden = [

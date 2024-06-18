@@ -94,8 +94,8 @@ use OpenApi\Attributes as OA;
     path: '/api/v1/account/wallet/get-payment-link/{id}',
     operationId: 'getPaymentLink',
     tags: ['Wallet'],
-    summary: 'Transaction history',
-    description: 'Transaction history',
+    summary: 'Get payment link',
+    description: 'Get payment link',
     security: [
         ['bearerAuth' => []]
     ],
@@ -111,7 +111,7 @@ use OpenApi\Attributes as OA;
     responses: [
         new OA\Response(
             response: 200,
-            description: 'Transaction history fetched successfully'
+            description: 'Get payment link successfully'
         ),
         new OA\Response(
             response: 400,
@@ -303,6 +303,13 @@ class WalletController extends Controller
             ]);
         }
 
+        if ($wallet->status != 'active') {
+            return response()->json([
+                'status' => false,
+                'message' => 'Tài khoản đã bị khóa. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết',
+            ]);
+        }
+
         $transaction_code = intval(substr(strtotime(now()) . rand(1000, 9999), -9));
 
         $transaction = $wallet->transactions()->create([
@@ -323,24 +330,33 @@ class WalletController extends Controller
             ]);
         }
 
-        $body = $request->input();
-
-        $body["amount"] = intval($body["amount"]);
-        $body["orderCode"] = $transaction_code;
-        $body["description"] = $request->description;
-        $body["expiredAt"] = now()->addMinutes(30)->getTimestamp();
-        $body["returnUrl"] = env('APP_URL') . "/success.html";
-        $body["cancelUrl"] = env('APP_URL') . "/cancel.html";
 
         try {
-            $payOS = new PayOS($this->payOSClientId, $this->payOSApiKey, $this->payOSChecksumKey);
-            $response = $payOS->createPaymentLink($body);
+            if ($request->transaction_type == 'deposit') {
+                $body = $request->input();
 
-            return response()->json([
-                "status" => true,
-                "message" => "Success",
-                "data" => $response
-            ]);
+                $body["amount"] = intval($body["amount"]);
+                $body["orderCode"] = $transaction_code;
+                $body["description"] = $request->description;
+                $body["expiredAt"] = now()->addMinutes(30)->getTimestamp();
+                $body["returnUrl"] = env('APP_URL') . "/success.html";
+                $body["cancelUrl"] = env('APP_URL') . "/cancel.html";
+
+                $payOS = new PayOS($this->payOSClientId, $this->payOSApiKey, $this->payOSChecksumKey);
+                $response = $payOS->createPaymentLink($body);
+
+                return response()->json([
+                    "status" => true,
+                    "message" => "Success",
+                    "data" => $response
+                ]);
+            } else {
+                return response()->json([
+                    "status" => true,
+                    "message" => "Success",
+                    "data" => $transaction
+                ]);
+            }
         } catch (\Throwable $th) {
             $transaction->delete();
             return response()->json([
@@ -403,6 +419,22 @@ class WalletController extends Controller
             ]);
         }
 
+        $wallet = Wallet::where('user_id', auth()->user()->id)->first();
+
+        if (!$wallet) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Tài khoản không tồn tại',
+            ]);
+        }
+
+        if ($wallet->status != 'active') {
+            return response()->json([
+                'status' => false,
+                'message' => 'Tài khoản đã bị khóa. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết',
+            ]);
+        }
+
         $transaction = Wallet::where('user_id', auth()->user()->id)->first()->transactions()->where('transaction_code', $id)->first();
 
         if (!$transaction) {
@@ -421,7 +453,8 @@ class WalletController extends Controller
 
         try {
             $transaction->update([
-                'status' => $request->status
+                'status' => $request->status,
+                'completed_at' => now()
             ]);
 
             $wallet = Wallet::where('user_id', auth()->user()->id)->first();
@@ -461,6 +494,22 @@ class WalletController extends Controller
             ]);
         }
 
+        $wallet = Wallet::where('user_id', auth()->user()->id)->first();
+
+        if (!$wallet) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Tài khoản không tồn tại',
+            ]);
+        }
+
+        if ($wallet->status != 'active') {
+            return response()->json([
+                'status' => false,
+                'message' => 'Tài khoản đã bị khóa. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết',
+            ]);
+        }
+
         $transaction = Wallet::where('user_id', auth()->user()->id)->first()->transactions()->where('transaction_code', $id)->first();
 
         if (!$transaction) {
@@ -475,9 +524,10 @@ class WalletController extends Controller
             $response = $payOS->cancelPaymentLink($id);
 
             WalletTransaction::where('transaction_code', $id)->update([
-                'status' => 'canceled'
+                'status' => 'canceled',
+                'completed_at' => now()
             ]);
-            
+
             return response()->json([
                 'status' => true,
                 "message" => "Success",

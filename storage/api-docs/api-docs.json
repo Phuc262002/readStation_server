@@ -3534,6 +3534,137 @@
                 ]
             }
         },
+        "/api/v1/wallet/admin/update-status/{id}": {
+            "put": {
+                "tags": [
+                    "Admin / Wallet"
+                ],
+                "summary": "Update wallet status",
+                "description": "Update wallet status",
+                "operationId": "updateWalletStatus",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID ví",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "status",
+                                    "reason"
+                                ],
+                                "properties": {
+                                    "status": {
+                                        "description": "Trạng thái",
+                                        "type": "string",
+                                        "example": "active"
+                                    },
+                                    "reason": {
+                                        "description": "Lý do",
+                                        "type": "string",
+                                        "example": "Lý do khác"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Update wallet status successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Update wallet status failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/wallet/cancel-transaction/{transaction_code}": {
+            "post": {
+                "tags": [
+                    "Admin / Wallet"
+                ],
+                "summary": "Cancel payment link of transaction",
+                "description": "Cancel payment link of transaction",
+                "operationId": "cancelPaymentLinkOfTransctionAdmin",
+                "parameters": [
+                    {
+                        "name": "transaction_code",
+                        "in": "path",
+                        "description": "Mã giao dịch",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Cancel payment link of transaction successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/wallet/get-payment-link/{transaction_code}": {
+            "get": {
+                "tags": [
+                    "Admin / Wallet"
+                ],
+                "summary": "Get payment link",
+                "description": "Get payment link",
+                "operationId": "getPaymentLinkAdmin",
+                "parameters": [
+                    {
+                        "name": "transaction_code",
+                        "in": "path",
+                        "description": "Mã giao dịch",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get payment link successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/auth/login": {
             "post": {
                 "tags": [
@@ -4913,8 +5044,8 @@
                 "tags": [
                     "Wallet"
                 ],
-                "summary": "Transaction history",
-                "description": "Transaction history",
+                "summary": "Get payment link",
+                "description": "Get payment link",
                 "operationId": "getPaymentLink",
                 "parameters": [
                     {
@@ -4929,7 +5060,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Transaction history fetched successfully"
+                        "description": "Get payment link successfully"
                     },
                     "400": {
                         "description": "Validation error"
