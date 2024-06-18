@@ -172,6 +172,50 @@ use PayOS\PayOS;
     ],
 )]
 
+#[OA\Put(
+    path: '/api/v1/wallet/admin/update-transaction-status/{id}',
+    operationId: 'updateTransactionStatusAdmin',
+    tags: ['Admin / Wallet'],
+    summary: 'Update transaction status',
+    description: 'Update transaction status',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    parameters: [
+        new OA\Parameter(
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'ID giao dịch',
+            schema: new OA\Schema(type: 'string')
+        ),
+    ],
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            required: ['status'],
+            properties: [
+                new OA\Property(property: 'status', type: 'string', description: 'Trạng thái', example: 'completed'),
+            ]
+        )
+    ),
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Update transaction status successfully',
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error',
+        ),
+        new OA\Response(
+            response: 500,
+            description: 'Update transaction status failed',
+        ),
+    ],
+)]
+
+
 #[OA\Post(
     path: '/api/v1/wallet/cancel-transaction/{transaction_code}',
     tags: ['Admin / Wallet'],

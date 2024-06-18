@@ -3597,6 +3597,63 @@
                 ]
             }
         },
+        "/api/v1/wallet/admin/update-transaction-status/{id}": {
+            "put": {
+                "tags": [
+                    "Admin / Wallet"
+                ],
+                "summary": "Update transaction status",
+                "description": "Update transaction status",
+                "operationId": "updateTransactionStatusAdmin",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID giao dịch",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "status"
+                                ],
+                                "properties": {
+                                    "status": {
+                                        "description": "Trạng thái",
+                                        "type": "string",
+                                        "example": "completed"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Update transaction status successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Update transaction status failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/wallet/cancel-transaction/{transaction_code}": {
             "post": {
                 "tags": [
