@@ -11,7 +11,7 @@ use OpenApi\Attributes as OA;
 use PayOS\PayOS;
 
 #[OA\Get(
-    path: '/api/v1/wallet/admin/get-all',
+    path: '/api/v1/admin/wallet/get-all',
     operationId: 'getAllWallets',
     tags: ['Admin / Wallet'],
     summary: 'Get all wallets',
@@ -62,7 +62,7 @@ use PayOS\PayOS;
 )]
 
 #[OA\Post(
-    path: '/api/v1/wallet/admin/create-deposit',
+    path: '/api/v1/admin/wallet/create-deposit',
     tags: ['Admin / Wallet'],
     operationId: 'createTransaction',
     summary: 'Create transaction',
@@ -99,7 +99,7 @@ use PayOS\PayOS;
 )]
 
 #[OA\Get(
-    path: '/api/v1/wallet/admin/get-user-wallet-transactions-history/{id}',
+    path: '/api/v1/admin/wallet/get-user-wallet-transactions-history/{id}',
     operationId: 'getUserWalletTransactionsHistory',
     tags: ['Admin / Wallet'],
     summary: 'Get user wallet transactions history',
@@ -129,7 +129,7 @@ use PayOS\PayOS;
 )]
 
 #[OA\Put(
-    path: '/api/v1/wallet/admin/update-status/{id}',
+    path: '/api/v1/admin/wallet/update-status/{id}',
     operationId: 'updateWalletStatus',
     tags: ['Admin / Wallet'],
     summary: 'Update wallet status',
@@ -173,7 +173,7 @@ use PayOS\PayOS;
 )]
 
 #[OA\Put(
-    path: '/api/v1/wallet/admin/update-transaction-status/{id}',
+    path: '/api/v1/admin/wallet/update-transaction-status/{id}',
     operationId: 'updateTransactionStatusAdmin',
     tags: ['Admin / Wallet'],
     summary: 'Update transaction status',

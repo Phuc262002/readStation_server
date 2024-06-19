@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\Admin\BookDetailController;
 use App\Http\Controllers\Api\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Api\Admin\CommentController as AdminCommentController;
 use App\Http\Controllers\Api\Admin\InvoiceEnterController;
+use App\Http\Controllers\Api\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Api\Admin\PostController as AdminPostController;
 use App\Http\Controllers\Api\Admin\PublishingCompanyController as AdminPublishingCompanyController;
 use App\Http\Controllers\Api\Admin\ShelveController;
@@ -23,9 +24,6 @@ use App\Http\Controllers\Api\Client\CommentController;
 use App\Http\Controllers\Api\Client\OrderController;
 use App\Http\Controllers\Api\Client\PostController;
 use App\Http\Controllers\Api\Client\WalletController;
-use App\Http\Controllers\Api\PayOS\CheckoutController;
-use App\Http\Controllers\Api\PayOS\OrderController as PayOSOrderController;
-use App\Http\Controllers\Api\PayOS\PaymentController;
 use App\Http\Controllers\Api\Public\AuthorController;
 use App\Http\Controllers\Api\Public\BookController;
 use App\Http\Controllers\Api\Public\CategoryController;
@@ -35,11 +33,11 @@ use App\Http\Controllers\Api\Public\PublishingCompanyController;
 use App\Http\Controllers\Api\Upload\CloudinaryController;
 use Illuminate\Support\Facades\Route;
 
-
-
 Route::group([
     "prefix" => "v1"
 ], function () {
+
+    // Authenticated routes
     Route::group([
         "prefix" => "auth"
     ], function () {
@@ -63,17 +61,19 @@ Route::group([
         });
     });
 
+    // Home routes
     Route::group([
-        "prefix" => "users",
-        "middleware" => ["auth:api"]
+        "prefix" => "home"
     ], function () {
-        Route::get('/', [UserController::class, 'index']);
-        Route::get('/get-one/{id}', [UserController::class, 'show']);
-        Route::post('/create', [UserController::class, 'store']);
-        Route::put('/update/{id}', [UserController::class, 'update']);
-        Route::delete('/delete/{id}', [UserController::class, 'delete']);
+        Route::get('/get-feautured-author', [PublicHomeController::class, 'getFeaturedAuthor']);
+        Route::get('/get-feautured-book', [PublicHomeController::class, 'getFeaturedBook']);
+        Route::get('/get-feautured-category', [PublicHomeController::class, 'getFeaturedCategory']);
+        Route::get('/get-recommend-book', [PublicHomeController::class, 'bookRecommend']);
+        Route::get('/get-book-lastest', [PublicHomeController::class, 'bookLatest']);
+        Route::get('/get-statistic', [PublicHomeController::class, 'statisticHome']);
     });
 
+    // Account routes
     Route::group([
         "prefix" => "account",
         "middleware" => ["auth:api"]
@@ -82,6 +82,7 @@ Route::group([
         Route::put('/update-profile', [AccountController::class, 'updateProfile']);
 
         Route::get('/get-posts', [PostController::class, 'getPostAccount']);
+        Route::get('/get-comments', [CommentController::class, 'getCommentAccount']);
 
 
 
@@ -105,30 +106,44 @@ Route::group([
         });
     });
 
+    // Admin routes
     Route::group([
-        "prefix" => "wallet",
-        "middleware" => ["auth:api"]
+        "prefix" => "admin"
     ], function () {
-        Route::get('admin/get-all', [AdminWalletController::class, 'index']);
-        Route::post('admin/create-deposit', [AdminWalletController::class, 'storeDeposit']);
-        Route::get('admin/get-user-wallet-transactions-history/{id}', [AdminWalletController::class, 'show']);
-        Route::put('admin/update-status/{id}', [AdminWalletController::class, 'update']);
+        Route::group([
+            "prefix" => "wallet",
+            "middleware" => ["auth:api"]
+        ], function () {
+            Route::get('get-all', [AdminWalletController::class, 'index']);
+            Route::post('create-deposit', [AdminWalletController::class, 'storeDeposit']);
+            Route::get('get-user-wallet-transactions-history/{id}', [AdminWalletController::class, 'show']);
+            Route::put('update-status/{id}', [AdminWalletController::class, 'update']);
 
-        Route::put('admin/update-transaction-status/{id}', [AdminWalletController::class, 'updateTransactionStatus']);
-        Route::post('admin/cancel-transaction/{transaction_code}', [AdminWalletController::class, 'cancelPaymentLinkOfTransction']);
-        Route::get('admin/get-payment-link/{transaction_code}', [AdminWalletController::class, 'getPaymentLink']);
+            Route::put('update-transaction-status/{id}', [AdminWalletController::class, 'updateTransactionStatus']);
+            Route::post('cancel-transaction/{transaction_code}', [AdminWalletController::class, 'cancelPaymentLinkOfTransction']);
+            Route::get('get-payment-link/{transaction_code}', [AdminWalletController::class, 'getPaymentLink']);
+        });
+
+        Route::group([
+            "prefix" => "users",
+        ], function () {
+            Route::get('/', [UserController::class, 'index']);
+            Route::get('/get-one/{id}', [UserController::class, 'show']);
+            Route::post('/create', [UserController::class, 'store']);
+            Route::put('/update/{id}', [UserController::class, 'update']);
+            Route::delete('/delete/{id}', [UserController::class, 'delete']);
+        });
+
+        Route::group([
+            "prefix" => "orders",
+        ], function () {
+            Route::get('/', [AdminOrderController::class, 'index']);
+            Route::get('/{id}', [AdminOrderController::class, 'show']);
+        });
     });
 
-    Route::group([
-        "prefix" => "home"
-    ], function () {
-        Route::get('/get-feautured-author', [PublicHomeController::class, 'getFeaturedAuthor']);
-        Route::get('/get-feautured-book', [PublicHomeController::class, 'getFeaturedBook']);
-        Route::get('/get-feautured-category', [PublicHomeController::class, 'getFeaturedCategory']);
-        Route::get('/get-recommend-book', [PublicHomeController::class, 'bookRecommend']);
-        Route::get('/get-book-lastest', [PublicHomeController::class, 'bookLatest']);
-        Route::get('/get-statistic', [PublicHomeController::class, 'statisticHome']);
-    });
+
+
 
     Route::group([
         "prefix" => "categories"
@@ -295,17 +310,4 @@ Route::group([
         Route::post('/images', [CloudinaryController::class, 'upload']);
         Route::delete('/images/delete/{publicId}', [CloudinaryController::class, 'deleteImage']);
     });
-
-
-    // Route::post('/create-payment-link', [CheckoutController::class, 'createPaymentLink']);
-
-    // Route::prefix('/order-test')->group(function () {
-    //     Route::post('/create', [PayOSOrderController::class, 'createOrder']);
-    //     Route::get('/{id}', [PayOSOrderController::class, 'getPaymentLinkInfoOfOrder']);
-    //     Route::put('/{id}', [PayOSOrderController::class, 'cancelPaymentLinkOfOrder']);
-    // });
-
-    // Route::prefix('/payment')->group(function () {
-    //     Route::post('/payos', [PaymentController::class, 'handlePayOSWebhook']);
-    // });
 });

@@ -2031,6 +2031,120 @@
                 ]
             }
         },
+        "/api/v1/admin/orders": {
+            "get": {
+                "tags": [
+                    "Admin / Order"
+                ],
+                "summary": "Danh sách đơn hàng",
+                "description": "Danh sách đơn hàng",
+                "operationId": "adminOrderIndex",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Số trang hiện tại",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "pageSize",
+                        "in": "query",
+                        "description": "Số lượng mục trên mỗi trang",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Trạng thái đơn hàng",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "pending",
+                                "approved",
+                                "wating_take_book",
+                                "hiring",
+                                "increasing",
+                                "wating_return",
+                                "completed",
+                                "canceled",
+                                "out_of_date"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Tìm kiếm theo mã đơn hàng, tên người dùng, email, số điện thoại",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Danh sách đơn hàng"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Lỗi không xác định"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/orders/{id}": {
+            "get": {
+                "tags": [
+                    "Admin / Order"
+                ],
+                "summary": "Chi tiết đơn hàng",
+                "description": "Chi tiết đơn hàng",
+                "operationId": "adminOrderShow",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id đơn hàng",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Chi tiết đơn hàng"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Lỗi không xác định"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/posts/admin/get-all": {
             "get": {
                 "tags": [
@@ -2942,7 +3056,7 @@
                 ]
             }
         },
-        "/api/v1/users": {
+        "/api/v1/admin/users": {
             "get": {
                 "tags": [
                     "Admin / User"
@@ -3010,7 +3124,7 @@
                 ]
             }
         },
-        "/api/v1/users/get-one/{id}": {
+        "/api/v1/admin/users/get-one/{id}": {
             "get": {
                 "tags": [
                     "Admin / User"
@@ -3044,7 +3158,7 @@
                 ]
             }
         },
-        "/api/v1/users/create": {
+        "/api/v1/admin/users/create": {
             "post": {
                 "tags": [
                     "Admin / User"
@@ -3202,7 +3316,7 @@
                 ]
             }
         },
-        "/api/v1/users/update/{id}": {
+        "/api/v1/admin/users/update/{id}": {
             "put": {
                 "tags": [
                     "Admin / User"
@@ -3367,7 +3481,7 @@
                 ]
             }
         },
-        "/api/v1/wallet/admin/get-all": {
+        "/api/v1/admin/wallet/get-all": {
             "get": {
                 "tags": [
                     "Admin / Wallet"
@@ -3436,7 +3550,7 @@
                 ]
             }
         },
-        "/api/v1/wallet/admin/create-deposit": {
+        "/api/v1/admin/wallet/create-deposit": {
             "post": {
                 "tags": [
                     "Admin / Wallet"
@@ -3500,7 +3614,7 @@
                 ]
             }
         },
-        "/api/v1/wallet/admin/get-user-wallet-transactions-history/{id}": {
+        "/api/v1/admin/wallet/get-user-wallet-transactions-history/{id}": {
             "get": {
                 "tags": [
                     "Admin / Wallet"
@@ -3534,7 +3648,7 @@
                 ]
             }
         },
-        "/api/v1/wallet/admin/update-status/{id}": {
+        "/api/v1/admin/wallet/update-status/{id}": {
             "put": {
                 "tags": [
                     "Admin / Wallet"
@@ -3597,7 +3711,7 @@
                 ]
             }
         },
-        "/api/v1/wallet/admin/update-transaction-status/{id}": {
+        "/api/v1/admin/wallet/update-transaction-status/{id}": {
             "put": {
                 "tags": [
                     "Admin / Wallet"
@@ -4454,6 +4568,61 @@
                 ]
             }
         },
+        "/api/v1/account/get-comments": {
+            "get": {
+                "tags": [
+                    "Account"
+                ],
+                "summary": "Get comments of account",
+                "description": "Get comments of account",
+                "operationId": "getCommentAccount",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Số trang hiện tại",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "pageSize",
+                        "in": "query",
+                        "description": "Số lượng mục trên mỗi trang",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sắp xếp theo thời gian tạo",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get comments successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/account/order/get-all": {
             "get": {
                 "tags": [
@@ -4885,7 +5054,8 @@
                                     "content",
                                     "summary",
                                     "image",
-                                    "status"
+                                    "status",
+                                    "reason_cancel"
                                 ],
                                 "properties": {
                                     "category_id": {
@@ -4902,6 +5072,11 @@
                                     },
                                     "image": {
                                         "type": "string"
+                                    },
+                                    "reason_cancel": {
+                                        "type": "string",
+                                        "default": null,
+                                        "nullable": true
                                     },
                                     "status": {
                                         "type": "string",

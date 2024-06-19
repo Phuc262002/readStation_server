@@ -17,6 +17,7 @@ class Post extends Model
         'content',
         'summary',
         'image',
+        'reason_cancel',
         'slug',
         'view',
         'status',

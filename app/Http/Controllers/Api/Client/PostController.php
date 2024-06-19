@@ -160,13 +160,14 @@ use OpenApi\Attributes as OA;
     requestBody: new OA\RequestBody(
         required: true,
         content: new OA\JsonContent(
-            required: ['category_id', 'title', 'content', 'summary', 'image', 'status'],
+            required: ['category_id', 'title', 'content', 'summary', 'image', 'status', 'reason_cancel'],
             properties: [
                 new OA\Property(property: 'category_id', type: 'string'),
                 new OA\Property(property: 'title', type: 'string'),
                 new OA\Property(property: 'content', type: 'string'),
                 new OA\Property(property: 'summary', type: 'string'),
                 new OA\Property(property: 'image', type: 'string'),
+                new OA\Property(property: 'reason_cancel', type: 'string', nullable: true, default: null),
                 new OA\Property(property: 'status', type: 'string', enum: ['wating_approve','draft', 'published','hidden']),
             ]
         )
@@ -412,6 +413,7 @@ class PostController extends Controller
             "content" => "string",
             "summary" => "string",
             "image" => "string",
+            "reason_cancel" => "string|nullable",
             "status" => "string|in:wating_approve,draft,published,approve_canceled",
         ], [
             'id.required' => 'ID không được để trống.',
@@ -445,6 +447,14 @@ class PostController extends Controller
                 "status" => false,
                 "message" => "You don't have permission to update this post",
             ], 403);
+        }
+
+        if ($request->status == 'approve_canceled' && !$request->reason_cancel) {
+            return response()->json([
+                "status" => false,
+                "message" => "Lý do hủy bài viết không được để trống",
+            ], 400);
+            
         }
 
         try {

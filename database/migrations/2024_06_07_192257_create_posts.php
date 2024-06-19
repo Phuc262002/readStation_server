@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('image');
             $table->string('slug')->unique();
             $table->integer('view')->default(0);
+            $table->string('reason_cancel')->nullable();
             $table->enum('status', ['wating_approve', 'approve_canceled', 'draft', 'published','hidden', 'deleted'])->default('published');
             $table->timestamps();
 

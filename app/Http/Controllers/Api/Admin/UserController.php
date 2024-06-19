@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Validator;
 use OpenApi\Attributes as OA;
 
 #[OA\Get(
-    path: '/api/v1/users',
+    path: '/api/v1/admin/users',
     tags: ['Admin / User'],
     operationId: 'getUsers',
     summary: 'Get all users',
@@ -62,7 +62,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Get(
-    path: '/api/v1/users/get-one/{id}',
+    path: '/api/v1/admin/users/get-one/{id}',
     tags: ['Admin / User'],
     operationId: 'getUser',
     summary: 'Get a user',
@@ -92,7 +92,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Post(
-    path: '/api/v1/users/create',
+    path: '/api/v1/admin/users/create',
     tags: ['Admin / User'],
     operationId: 'createUser',
     summary: 'Create a new user',
@@ -160,7 +160,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Put(
-    path: '/api/v1/users/update/{id}',
+    path: '/api/v1/admin/users/update/{id}',
     tags: ['Admin / User'],
     operationId: 'updateUser',
     summary: 'Update a user',
