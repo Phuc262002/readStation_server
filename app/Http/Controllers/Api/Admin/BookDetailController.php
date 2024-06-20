@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Validator;
 use OpenApi\Attributes as OA;
 
 #[OA\Get(
-    path: '/api/v1/book-details',
+    path: '/api/v1/admin/book-details',
     tags: ['Admin / BookDetail'],
     operationId: 'getAllBookDetails',
     summary: 'Get all book details',
@@ -69,7 +69,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Get(
-    path: '/api/v1/book-details/get-one/{id}',
+    path: '/api/v1/admin/book-details/{id}',
     tags: ['Admin / BookDetail'],
     operationId: 'getBookDetail',
     summary: 'Get book detail',
@@ -103,7 +103,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Post(
-    path: '/api/v1/book-details/create',
+    path: '/api/v1/admin/book-details/create',
     tags: ['Admin / BookDetail'],
     operationId: 'createBookDetail',
     summary: 'Create book detail',
@@ -167,7 +167,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Put(
-    path: '/api/v1/book-details/update/{id}',
+    path: '/api/v1/admin/book-details/update/{id}',
     tags: ['Admin / BookDetail'],
     operationId: 'updateBookDetail',
     summary: 'Update book detail',
@@ -244,7 +244,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Delete(
-    path: '/api/v1/book-details/delete/{id}',
+    path: '/api/v1/admin/book-details/delete/{id}',
     tags: ['Admin / BookDetail'],
     operationId: 'deleteBookDetail',
     summary: 'Delete book detail',

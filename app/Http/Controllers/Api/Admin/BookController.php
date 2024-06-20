@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Validator;
 use OpenApi\Attributes as OA;
 
 #[OA\Get(
-    path: '/api/v1/books/admin/get-all',
+    path: '/api/v1/admin/books',
     tags: ['Admin / Book'],
     operationId: 'getAllBooks',
     summary: 'Get all books admin',
@@ -74,7 +74,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Get(
-    path: '/api/v1/books/admin/get-one/{id}',
+    path: '/api/v1/admin/books/{id}',
     tags: ['Admin / Book'],
     operationId: 'showBook',
     summary: 'Show book',
@@ -108,7 +108,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Post(
-    path: '/api/v1/books/create',
+    path: '/api/v1/admin/books/create',
     tags: ['Admin / Book'],
     operationId: 'createBook',
     summary: 'Create book',
@@ -151,7 +151,7 @@ use OpenApi\Attributes as OA;
 
 
 #[OA\Post(
-    path: '/api/v1/books/create-full',
+    path: '/api/v1/admin/books/create-full',
     tags: ['Admin / Book'],
     operationId: 'createFullBook',
     summary: 'Create full book',
@@ -222,7 +222,7 @@ use OpenApi\Attributes as OA;
 
 
 #[OA\Put(
-    path: '/api/v1/books/update/{id}',
+    path: '/api/v1/admin/books/update/{id}',
     tags: ['Admin / Book'],
     operationId: 'updateBook',
     summary: 'Update book',
@@ -274,7 +274,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Delete(
-    path: '/api/v1/books/delete/{id}',
+    path: '/api/v1/admin/books/delete/{id}',
     tags: ['Admin / Book'],
     operationId: 'deleteBook',
     summary: 'Delete book',

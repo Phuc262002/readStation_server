@@ -9,7 +9,8 @@ use Illuminate\Support\Facades\Validator;
 use OpenApi\Attributes as OA;
 
 #[OA\Get(
-    path: '/api/v1/posts/admin/get-all',
+    path: '/api/v1/admin/posts',
+    operationId: 'adminPostIndex',
     summary: 'Danh sách bài viết',
     description: 'Lấy danh sách bài viết',
     tags: ['Admin / Post'],

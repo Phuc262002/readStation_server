@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
 
 #[OA\Get(
-    path: '/api/v1/comments/admin/get-all',
+    path: '/api/v1/admin/comments',
     operationId: 'getCommentAdmin',
     tags: ['Admin / Comment'],
     summary: 'Get comments',

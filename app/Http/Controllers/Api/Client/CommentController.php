@@ -8,9 +8,9 @@ use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
 
 #[OA\Get(
-    path: '/api/v1/comments',
+    path: '/api/v1/public/comments',
     operationId: 'getComment',
-    tags: ['Comment'],
+    tags: ['Public / Comment'],
     summary: 'Get comments',
     description: 'Get comments',
     parameters: [
@@ -49,7 +49,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Post(
-    path: '/api/v1/comments/create',
+    path: '/api/v1/general/comments/create',
     operationId: 'createComment',
     tags: ['Comment'],
     summary: 'Create comment',
@@ -85,7 +85,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Put(
-    path: '/api/v1/comments/update/{id}',
+    path: '/api/v1/general/comments/update/{id}',
     operationId: 'updateComment',
     tags: ['Comment'],
     summary: 'Update comment',
@@ -133,7 +133,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Delete(
-    path: '/api/v1/comments/delete/{id}',
+    path: '/api/v1/general/comments/delete/{id}',
     operationId: 'deleteComment',
     tags: ['Comment'],
     summary: 'Delete comment',

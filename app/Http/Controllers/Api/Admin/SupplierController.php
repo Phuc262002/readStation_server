@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Validator;
 use OpenApi\Attributes as OA;
 
 #[OA\Get(
-    path: '/api/v1/suppliers',
+    path: '/api/v1/admin/suppliers',
     tags: ['Admin / Supplier'],
     operationId: 'getAllSuppliers',
     summary: 'Danh sách nhà cung cấp',
@@ -60,7 +60,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Get(
-    path: '/api/v1/suppliers/get-one/{id}',
+    path: '/api/v1/admin/suppliers/{id}',
     tags: ['Admin / Supplier'],
     operationId: 'getSupplier',
     summary: 'Chi tiết nhà cung cấp',
@@ -91,7 +91,7 @@ use OpenApi\Attributes as OA;
 
 
 #[OA\Post(
-    path: '/api/v1/suppliers/create',
+    path: '/api/v1/admin/suppliers/create',
     tags: ['Admin / Supplier'],
     operationId: 'createSupplier',
     summary: 'Tạo nhà cung cấp',
@@ -124,7 +124,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Put(
-    path: '/api/v1/suppliers/update/{id}',
+    path: '/api/v1/admin/suppliers/update/{id}',
     tags: ['Admin / Supplier'],
     operationId: 'updateSupplier',
     summary: 'Cập nhật nhà cung cấp',
@@ -165,7 +165,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Delete(
-    path: '/api/v1/suppliers/delete/{id}',
+    path: '/api/v1/admin/suppliers/delete/{id}',
     tags: ['Admin / Supplier'],
     operationId: 'deleteSupplier',
     summary: 'Xóa nhà cung cấp',

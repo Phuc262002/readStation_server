@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Validator;
 use OpenApi\Attributes as OA;
 
 #[OA\Get(
-    path: '/api/v1/bookcases',
+    path: '/api/v1/admin/bookcases',
     tags: ['Admin / Bookcase'],
     operationId: 'getAllBookcases',
     summary: 'Get all bookcases',
@@ -60,7 +60,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Get(
-    path: '/api/v1/bookcases/get-one/{id}',
+    path: '/api/v1/admin/bookcases/{id}',
     tags: ['Admin / Bookcase'],
     operationId: 'getBookcase',
     summary: 'Get bookcase by id',
@@ -94,7 +94,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Post(
-    path: '/api/v1/bookcases/create',
+    path: '/api/v1/admin/bookcases/create',
     tags: ['Admin / Bookcase'],
     operationId: 'createBookcase',
     summary: 'Create new bookcase',
@@ -127,7 +127,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Put(
-    path: '/api/v1/bookcases/update/{id}',
+    path: '/api/v1/admin/bookcases/update/{id}',
     tags: ['Admin / Bookcase'],
     operationId: 'updateBookcase',
     summary: 'Update bookcase by id',
@@ -178,7 +178,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Delete(
-    path: '/api/v1/bookcases/delete/{id}',
+    path: '/api/v1/admin/bookcases/delete/{id}',
     tags: ['Admin / Bookcase'],
     operationId: 'deleteBookcase',
     summary: 'Delete bookcase by id',

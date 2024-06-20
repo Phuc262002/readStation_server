@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Validator;
 use OpenApi\Attributes as OA;
 
 #[OA\Get(
-    path: '/api/v1/publishing-companies/admin/get-all',
+    path: '/api/v1/admin/publishing-companies',
     tags: ['Admin / Publishing Company'],
     operationId: 'getAllPublishingCompany',
     summary: 'Get all publishing companies',
@@ -60,7 +60,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Get(
-    path: '/api/v1/publishing-companies/get-one/{id}',
+    path: '/api/v1/admin/publishing-companies/{id}',
     tags: ['Admin / Publishing Company'],
     operationId: 'getPublishingCompany',
     summary: 'Get a publishing company',
@@ -94,7 +94,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Post(
-    path: '/api/v1/publishing-companies/create',
+    path: '/api/v1/admin/publishing-companies/create',
     tags: ['Admin / Publishing Company'],
     operationId: 'createPublishingCompany',
     summary: 'Create a new publishing company',
@@ -127,7 +127,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Put(
-    path: '/api/v1/publishing-companies/update/{id}',
+    path: '/api/v1/admin/publishing-companies/update/{id}',
     tags: ['Admin / Publishing Company'],
     operationId: 'updatePublishingCompany',
     summary: 'Update a publishing company',
@@ -177,7 +177,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Delete(
-    path: '/api/v1/publishing-companies/delete/{id}',
+    path: '/api/v1/admin/publishing-companies/delete/{id}',
     tags: ['Admin / Publishing Company'],
     operationId: 'deletePublishingCompany',
     summary: 'Delete a publishing company',

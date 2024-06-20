@@ -217,7 +217,7 @@ use PayOS\PayOS;
 
 
 #[OA\Post(
-    path: '/api/v1/wallet/cancel-transaction/{transaction_code}',
+    path: '/api/v1/admin/wallet/cancel-transaction/{transaction_code}',
     tags: ['Admin / Wallet'],
     operationId: 'cancelPaymentLinkOfTransctionAdmin',
     summary: 'Cancel payment link of transaction',
@@ -247,7 +247,7 @@ use PayOS\PayOS;
 )]
 
 #[OA\Get(
-    path: '/api/v1/wallet/get-payment-link/{transaction_code}',
+    path: '/api/v1/admin/wallet/get-payment-link/{transaction_code}',
     operationId: 'getPaymentLinkAdmin',
     tags: ['Admin / Wallet'],
     summary: 'Get payment link',

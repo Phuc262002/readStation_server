@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Validator;
 use OpenApi\Attributes as OA;
 
 #[OA\Get(
-    path: '/api/v1/invoice-enters',
+    path: '/api/v1/admin/invoice-enters',
     tags: ['Admin / Invoice Enter'],
     summary: 'Get all invoice enters',
     description: 'Lấy danh sách hóa đơn nhập',
@@ -60,7 +60,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Get(
-    path: '/api/v1/invoice-enters/{id}',
+    path: '/api/v1/admin/invoice-enters/{id}',
     tags: ['Admin / Invoice Enter'],
     summary: 'Get invoice enter by ID',
     description: 'Lấy thông tin hóa đơn nhập theo ID',
@@ -89,7 +89,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Post(
-    path: '/api/v1/invoice-enters/create',
+    path: '/api/v1/admin/invoice-enters/create',
     tags: ['Admin / Invoice Enter'],
     summary: 'Create new invoice enter',
     description: 'Tạo mới một nhà cung cấp',
@@ -138,7 +138,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Put(
-    path: '/api/v1/invoice-enters/update/{id}',
+    path: '/api/v1/admin/invoice-enters/update/{id}',
     tags: ['Admin / Invoice Enter'],
     summary: 'Update invoice enter by ID',
     description: 'Cập nhật thông tin hóa đơn nhập theo ID',

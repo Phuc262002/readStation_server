@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Validator;
 use OpenApi\Attributes as OA;
 
 #[OA\Get(
-    path: '/api/v1/categories/admin/get-all',
+    path: '/api/v1/admin/categories',
     tags: ['Admin / Category'],
     operationId: 'getAllCategory',
     summary: 'Get all categories (admin)',
@@ -67,7 +67,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Get(
-    path: '/api/v1/categories/get-one/{id}',
+    path: '/api/v1/admin/categories/{id}',
     tags: ['Admin / Category'],
     operationId: 'getCategory',
     summary: 'Get a category',
@@ -101,7 +101,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Post(
-    path: '/api/v1/categories/create',
+    path: '/api/v1/admin/categories/create',
     tags: ['Admin / Category'],
     operationId: 'createCategory',
     summary: 'Create a category',
@@ -135,7 +135,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Put(
-    path: '/api/v1/categories/update/{id}',
+    path: '/api/v1/admin/categories/update/{id}',
     tags: ['Admin / Category'],
     operationId: 'updateCategory',
     summary: 'Update a category',
@@ -187,7 +187,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Delete(
-    path: '/api/v1/categories/delete/{id}',
+    path: '/api/v1/admin/categories/delete/{id}',
     tags: ['Admin / Category'],
     operationId: 'deleteCategory',
     summary: 'Delete a category',

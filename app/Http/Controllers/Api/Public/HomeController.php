@@ -13,7 +13,7 @@ use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
 
 #[OA\Get(
-    path: '/api/v1/home/get-feautured-category',
+    path: '/api/v1/public/home/get-feautured-category',
     tags: ['Public / Home'],
     operationId: 'getFeaturedCategory',
     summary: 'Get featured categories',
@@ -27,7 +27,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Get(
-    path: '/api/v1/home/get-feautured-book',
+    path: '/api/v1/public/home/get-feautured-book',
     tags: ['Public / Home'],
     operationId: 'getFeaturedBook',
     summary: 'Get featured books',
@@ -41,7 +41,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Get(
-    path: '/api/v1/home/get-feautured-author',
+    path: '/api/v1/public/home/get-feautured-author',
     tags: ['Public / Home'],
     operationId: 'getFeaturedAuthor',
     summary: 'Get featured authors',
@@ -55,7 +55,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Get(
-    path: '/api/v1/home/get-recommend-book',
+    path: '/api/v1/public/home/get-recommend-book',
     tags: ['Public / Home'],
     operationId: 'bookRecommend',
     summary: 'Get recommended books',
@@ -69,7 +69,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Get(
-    path: '/api/v1/home/get-book-lastest',
+    path: '/api/v1/public/home/get-book-lastest',
     tags: ['Public / Home'],
     operationId: 'bookLatest',
     summary: 'Get latest books',
@@ -83,7 +83,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Get(
-    path: '/api/v1/home/get-statistic',
+    path: '/api/v1/public/home/get-statistic',
     tags: ['Public / Home'],
     operationId: 'statisticHome',
     summary: 'Get statistic home',
@@ -96,30 +96,30 @@ use OpenApi\Attributes as OA;
     ]
 )]
 
-#[OA\Post(
-    path: 'https://n8n.warriorcode.online/webhook/46036883-4977-485d-9cb7-eb8b57cbcdf1',
-    tags: ['Public / Contact'],
-    operationId: 'sendContactEmail',
-    summary: 'Send contact email',
-    description: 'Gửi đúng theo URL https://n8n.warriorcode.online/webhook/46036883-4977-485d-9cb7-eb8b57cbcdf1',
-    requestBody: new OA\RequestBody(
-        required: true,
-        content: new OA\JsonContent(
-            required: ['name', 'email', 'content'],
-            properties: [
-                new OA\Property(property: 'name', type: 'string'),
-                new OA\Property(property: 'email', type: 'string', format: 'email'),
-                new OA\Property(property: 'content', type: 'string')
-            ]
-        )
-    ),
-    responses: [
-        new OA\Response(
-            response: 200,
-            description: 'Send contact email successfully!',
-        ),
-    ]
-)]
+// #[OA\Post(
+//     path: 'https://n8n.warriorcode.online/webhook/46036883-4977-485d-9cb7-eb8b57cbcdf1',
+//     tags: ['Public / Contact'],
+//     operationId: 'sendContactEmail',
+//     summary: 'Send contact email',
+//     description: 'Gửi đúng theo URL https://n8n.warriorcode.online/webhook/46036883-4977-485d-9cb7-eb8b57cbcdf1',
+//     requestBody: new OA\RequestBody(
+//         required: true,
+//         content: new OA\JsonContent(
+//             required: ['name', 'email', 'content'],
+//             properties: [
+//                 new OA\Property(property: 'name', type: 'string'),
+//                 new OA\Property(property: 'email', type: 'string', format: 'email'),
+//                 new OA\Property(property: 'content', type: 'string')
+//             ]
+//         )
+//     ),
+//     responses: [
+//         new OA\Response(
+//             response: 200,
+//             description: 'Send contact email successfully!',
+//         ),
+//     ]
+// )]
 
 class HomeController extends Controller
 {

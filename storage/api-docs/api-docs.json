@@ -6,7 +6,7 @@
         "version": "1.0.0"
     },
     "paths": {
-        "/api/v1/authors/admin/get-all": {
+        "/api/v1/admin/authors": {
             "get": {
                 "tags": [
                     "Admin / Author"
@@ -74,7 +74,7 @@
                 ]
             }
         },
-        "/api/v1/authors/get-one/{id}": {
+        "/api/v1/admin/authors/{id}": {
             "get": {
                 "tags": [
                     "Admin / Author"
@@ -111,7 +111,7 @@
                 ]
             }
         },
-        "/api/v1/authors/create": {
+        "/api/v1/admin/authors/create": {
             "post": {
                 "tags": [
                     "Admin / Author"
@@ -165,7 +165,7 @@
                 ]
             }
         },
-        "/api/v1/authors/update/{id}": {
+        "/api/v1/admin/authors/update/{id}": {
             "put": {
                 "tags": [
                     "Admin / Author"
@@ -233,7 +233,7 @@
                 ]
             }
         },
-        "/api/v1/authors/delete/{id}": {
+        "/api/v1/admin/authors/delete/{id}": {
             "delete": {
                 "tags": [
                     "Admin / Author"
@@ -270,7 +270,7 @@
                 ]
             }
         },
-        "/api/v1/books/admin/get-all": {
+        "/api/v1/admin/books": {
             "get": {
                 "tags": [
                     "Admin / Book"
@@ -356,7 +356,7 @@
                 ]
             }
         },
-        "/api/v1/books/admin/get-one/{id}": {
+        "/api/v1/admin/books/{id}": {
             "get": {
                 "tags": [
                     "Admin / Book"
@@ -393,7 +393,7 @@
                 ]
             }
         },
-        "/api/v1/books/create": {
+        "/api/v1/admin/books/create": {
             "post": {
                 "tags": [
                     "Admin / Book"
@@ -467,7 +467,7 @@
                 ]
             }
         },
-        "/api/v1/books/create-full": {
+        "/api/v1/admin/books/create-full": {
             "post": {
                 "tags": [
                     "Admin / Book"
@@ -614,7 +614,7 @@
                 ]
             }
         },
-        "/api/v1/books/update/{id}": {
+        "/api/v1/admin/books/update/{id}": {
             "put": {
                 "tags": [
                     "Admin / Book"
@@ -710,7 +710,7 @@
                 ]
             }
         },
-        "/api/v1/books/delete/{id}": {
+        "/api/v1/admin/books/delete/{id}": {
             "delete": {
                 "tags": [
                     "Admin / Book"
@@ -750,7 +750,7 @@
                 ]
             }
         },
-        "/api/v1/book-details": {
+        "/api/v1/admin/book-details": {
             "get": {
                 "tags": [
                     "Admin / BookDetail"
@@ -823,7 +823,7 @@
                 ]
             }
         },
-        "/api/v1/book-details/get-one/{id}": {
+        "/api/v1/admin/book-details/{id}": {
             "get": {
                 "tags": [
                     "Admin / BookDetail"
@@ -860,7 +860,7 @@
                 ]
             }
         },
-        "/api/v1/book-details/create": {
+        "/api/v1/admin/book-details/create": {
             "post": {
                 "tags": [
                     "Admin / BookDetail"
@@ -966,7 +966,7 @@
                 ]
             }
         },
-        "/api/v1/book-details/update/{id}": {
+        "/api/v1/admin/book-details/update/{id}": {
             "put": {
                 "tags": [
                     "Admin / BookDetail"
@@ -1086,7 +1086,7 @@
                 ]
             }
         },
-        "/api/v1/book-details/delete/{id}": {
+        "/api/v1/admin/book-details/delete/{id}": {
             "delete": {
                 "tags": [
                     "Admin / BookDetail"
@@ -1126,7 +1126,7 @@
                 ]
             }
         },
-        "/api/v1/bookcases": {
+        "/api/v1/admin/bookcases": {
             "get": {
                 "tags": [
                     "Admin / Bookcase"
@@ -1193,7 +1193,7 @@
                 ]
             }
         },
-        "/api/v1/bookcases/get-one/{id}": {
+        "/api/v1/admin/bookcases/{id}": {
             "get": {
                 "tags": [
                     "Admin / Bookcase"
@@ -1230,7 +1230,7 @@
                 ]
             }
         },
-        "/api/v1/bookcases/create": {
+        "/api/v1/admin/bookcases/create": {
             "post": {
                 "tags": [
                     "Admin / Bookcase"
@@ -1282,7 +1282,7 @@
                 ]
             }
         },
-        "/api/v1/bookcases/update/{id}": {
+        "/api/v1/admin/bookcases/update/{id}": {
             "put": {
                 "tags": [
                     "Admin / Bookcase"
@@ -1355,7 +1355,7 @@
                 ]
             }
         },
-        "/api/v1/bookcases/delete/{id}": {
+        "/api/v1/admin/bookcases/delete/{id}": {
             "delete": {
                 "tags": [
                     "Admin / Bookcase"
@@ -1395,7 +1395,7 @@
                 ]
             }
         },
-        "/api/v1/categories/admin/get-all": {
+        "/api/v1/admin/categories": {
             "get": {
                 "tags": [
                     "Admin / Category"
@@ -1475,7 +1475,7 @@
                 ]
             }
         },
-        "/api/v1/categories/get-one/{id}": {
+        "/api/v1/admin/categories/{id}": {
             "get": {
                 "tags": [
                     "Admin / Category"
@@ -1512,7 +1512,7 @@
                 ]
             }
         },
-        "/api/v1/categories/create": {
+        "/api/v1/admin/categories/create": {
             "post": {
                 "tags": [
                     "Admin / Category"
@@ -1571,7 +1571,7 @@
                 ]
             }
         },
-        "/api/v1/categories/update/{id}": {
+        "/api/v1/admin/categories/update/{id}": {
             "put": {
                 "tags": [
                     "Admin / Category"
@@ -1656,7 +1656,7 @@
                 ]
             }
         },
-        "/api/v1/categories/delete/{id}": {
+        "/api/v1/admin/categories/delete/{id}": {
             "delete": {
                 "tags": [
                     "Admin / Category"
@@ -1696,7 +1696,7 @@
                 ]
             }
         },
-        "/api/v1/comments/admin/get-all": {
+        "/api/v1/admin/comments": {
             "get": {
                 "tags": [
                     "Admin / Comment"
@@ -1755,14 +1755,14 @@
                 ]
             }
         },
-        "/api/v1/invoice-enters": {
+        "/api/v1/admin/invoice-enters": {
             "get": {
                 "tags": [
                     "Admin / Invoice Enter"
                 ],
                 "summary": "Get all invoice enters",
                 "description": "Lấy danh sách hóa đơn nhập",
-                "operationId": "6762d2cc55e9d01624ba018f03f56ad5",
+                "operationId": "29f5e2762e8d5c683725233fe497fb19",
                 "parameters": [
                     {
                         "name": "page",
@@ -1823,14 +1823,14 @@
                 ]
             }
         },
-        "/api/v1/invoice-enters/{id}": {
+        "/api/v1/admin/invoice-enters/{id}": {
             "get": {
                 "tags": [
                     "Admin / Invoice Enter"
                 ],
                 "summary": "Get invoice enter by ID",
                 "description": "Lấy thông tin hóa đơn nhập theo ID",
-                "operationId": "6786ad540fb37654fa9e2de3b35cb856",
+                "operationId": "9f61eb204b3dc9c3b864752a89ca9930",
                 "parameters": [
                     {
                         "name": "id",
@@ -1857,14 +1857,14 @@
                 ]
             }
         },
-        "/api/v1/invoice-enters/create": {
+        "/api/v1/admin/invoice-enters/create": {
             "post": {
                 "tags": [
                     "Admin / Invoice Enter"
                 ],
                 "summary": "Create new invoice enter",
                 "description": "Tạo mới một nhà cung cấp",
-                "operationId": "29d6f8e1181eddc4e1232331a5cd3fdd",
+                "operationId": "7f70a01bb915e95a49e2f386dad19b10",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -1963,14 +1963,14 @@
                 ]
             }
         },
-        "/api/v1/invoice-enters/update/{id}": {
+        "/api/v1/admin/invoice-enters/update/{id}": {
             "put": {
                 "tags": [
                     "Admin / Invoice Enter"
                 ],
                 "summary": "Update invoice enter by ID",
                 "description": "Cập nhật thông tin hóa đơn nhập theo ID",
-                "operationId": "a4e2565a166f0afed990b5502c908b3b",
+                "operationId": "94b4ca36f8d878bdc24477f874e0b832",
                 "parameters": [
                     {
                         "name": "id",
@@ -2145,14 +2145,14 @@
                 ]
             }
         },
-        "/api/v1/posts/admin/get-all": {
+        "/api/v1/admin/posts": {
             "get": {
                 "tags": [
                     "Admin / Post"
                 ],
                 "summary": "Danh sách bài viết",
                 "description": "Lấy danh sách bài viết",
-                "operationId": "a67f67628d6c8c0048354370fd0642ac",
+                "operationId": "adminPostIndex",
                 "parameters": [
                     {
                         "name": "page",
@@ -2237,7 +2237,7 @@
                 ]
             }
         },
-        "/api/v1/publishing-companies/admin/get-all": {
+        "/api/v1/admin/publishing-companies": {
             "get": {
                 "tags": [
                     "Admin / Publishing Company"
@@ -2305,7 +2305,7 @@
                 ]
             }
         },
-        "/api/v1/publishing-companies/get-one/{id}": {
+        "/api/v1/admin/publishing-companies/{id}": {
             "get": {
                 "tags": [
                     "Admin / Publishing Company"
@@ -2342,7 +2342,7 @@
                 ]
             }
         },
-        "/api/v1/publishing-companies/create": {
+        "/api/v1/admin/publishing-companies/create": {
             "post": {
                 "tags": [
                     "Admin / Publishing Company"
@@ -2397,7 +2397,7 @@
                 ]
             }
         },
-        "/api/v1/publishing-companies/update/{id}": {
+        "/api/v1/admin/publishing-companies/update/{id}": {
             "put": {
                 "tags": [
                     "Admin / Publishing Company"
@@ -2469,7 +2469,7 @@
                 ]
             }
         },
-        "/api/v1/publishing-companies/delete/{id}": {
+        "/api/v1/admin/publishing-companies/delete/{id}": {
             "delete": {
                 "tags": [
                     "Admin / Publishing Company"
@@ -2509,7 +2509,7 @@
                 ]
             }
         },
-        "/api/v1/shelves": {
+        "/api/v1/admin/shelves": {
             "get": {
                 "tags": [
                     "Admin / Shelve"
@@ -2594,7 +2594,7 @@
                 ]
             }
         },
-        "/api/v1/shelves/get-one/{id}": {
+        "/api/v1/admin/shelves/{id}": {
             "get": {
                 "tags": [
                     "Admin / Shelve"
@@ -2631,7 +2631,7 @@
                 ]
             }
         },
-        "/api/v1/shelves/create": {
+        "/api/v1/admin/shelves/create": {
             "post": {
                 "tags": [
                     "Admin / Shelve"
@@ -2690,7 +2690,7 @@
                 ]
             }
         },
-        "/api/v1/shelves/update/{id}": {
+        "/api/v1/admin/shelves/update/{id}": {
             "put": {
                 "tags": [
                     "Admin / Shelve"
@@ -2769,7 +2769,7 @@
                 ]
             }
         },
-        "/api/v1/shelves/delete/{id}": {
+        "/api/v1/admin/shelves/delete/{id}": {
             "delete": {
                 "tags": [
                     "Admin / Shelve"
@@ -2809,7 +2809,7 @@
                 ]
             }
         },
-        "/api/v1/suppliers": {
+        "/api/v1/admin/suppliers": {
             "get": {
                 "tags": [
                     "Admin / Supplier"
@@ -2877,7 +2877,7 @@
                 ]
             }
         },
-        "/api/v1/suppliers/get-one/{id}": {
+        "/api/v1/admin/suppliers/{id}": {
             "get": {
                 "tags": [
                     "Admin / Supplier"
@@ -2911,7 +2911,7 @@
                 ]
             }
         },
-        "/api/v1/suppliers/create": {
+        "/api/v1/admin/suppliers/create": {
             "post": {
                 "tags": [
                     "Admin / Supplier"
@@ -2964,7 +2964,7 @@
                 ]
             }
         },
-        "/api/v1/suppliers/update/{id}": {
+        "/api/v1/admin/suppliers/update/{id}": {
             "put": {
                 "tags": [
                     "Admin / Supplier"
@@ -3022,7 +3022,7 @@
                 ]
             }
         },
-        "/api/v1/suppliers/delete/{id}": {
+        "/api/v1/admin/suppliers/delete/{id}": {
             "delete": {
                 "tags": [
                     "Admin / Supplier"
@@ -3768,7 +3768,7 @@
                 ]
             }
         },
-        "/api/v1/wallet/cancel-transaction/{transaction_code}": {
+        "/api/v1/admin/wallet/cancel-transaction/{transaction_code}": {
             "post": {
                 "tags": [
                     "Admin / Wallet"
@@ -3802,7 +3802,7 @@
                 ]
             }
         },
-        "/api/v1/wallet/get-payment-link/{transaction_code}": {
+        "/api/v1/admin/wallet/get-payment-link/{transaction_code}": {
             "get": {
                 "tags": [
                     "Admin / Wallet"
@@ -4364,10 +4364,10 @@
                 ]
             }
         },
-        "/api/v1/comments": {
+        "/api/v1/public/comments": {
             "get": {
                 "tags": [
-                    "Comment"
+                    "Public / Comment"
                 ],
                 "summary": "Get comments",
                 "description": "Get comments",
@@ -4413,7 +4413,7 @@
                 }
             }
         },
-        "/api/v1/comments/create": {
+        "/api/v1/general/comments/create": {
             "post": {
                 "tags": [
                     "Comment"
@@ -4466,7 +4466,7 @@
                 ]
             }
         },
-        "/api/v1/comments/update/{id}": {
+        "/api/v1/general/comments/update/{id}": {
             "put": {
                 "tags": [
                     "Comment"
@@ -4528,7 +4528,7 @@
                 ]
             }
         },
-        "/api/v1/comments/delete/{id}": {
+        "/api/v1/general/comments/delete/{id}": {
             "delete": {
                 "tags": [
                     "Comment"
@@ -4919,7 +4919,7 @@
                 ]
             }
         },
-        "/api/v1/posts/create": {
+        "/api/v1/general/posts/create": {
             "post": {
                 "tags": [
                     "Post"
@@ -4987,7 +4987,7 @@
                 ]
             }
         },
-        "/api/v1/posts/get/{id}": {
+        "/api/v1/general/posts/{id}": {
             "get": {
                 "tags": [
                     "Post"
@@ -5024,7 +5024,7 @@
                 ]
             }
         },
-        "/api/v1/posts/update/{id}": {
+        "/api/v1/general/posts/update/{id}": {
             "put": {
                 "tags": [
                     "Post"
@@ -5114,7 +5114,7 @@
                 ]
             }
         },
-        "/api/v1/posts/delete/{id}": {
+        "/api/v1/general/posts/delete/{id}": {
             "delete": {
                 "tags": [
                     "Post"
@@ -5396,7 +5396,7 @@
                 ]
             }
         },
-        "/api/v1/authors": {
+        "/api/v1/public/authors": {
             "get": {
                 "tags": [
                     "Public / Author"
@@ -5436,7 +5436,7 @@
                 }
             }
         },
-        "/api/v1/books": {
+        "/api/v1/public/books": {
             "get": {
                 "tags": [
                     "Public / Book"
@@ -5543,7 +5543,7 @@
                 }
             }
         },
-        "/api/v1/books/get-one/{slug}": {
+        "/api/v1/public/books/{slug}": {
             "get": {
                 "tags": [
                     "Public / Book"
@@ -5572,7 +5572,7 @@
                 }
             }
         },
-        "/api/v1/categories": {
+        "/api/v1/public/categories": {
             "get": {
                 "tags": [
                     "Public / Category"
@@ -5625,7 +5625,7 @@
                 }
             }
         },
-        "/api/v1/home/get-feautured-category": {
+        "/api/v1/public/home/get-feautured-category": {
             "get": {
                 "tags": [
                     "Public / Home"
@@ -5640,7 +5640,7 @@
                 }
             }
         },
-        "/api/v1/home/get-feautured-book": {
+        "/api/v1/public/home/get-feautured-book": {
             "get": {
                 "tags": [
                     "Public / Home"
@@ -5655,7 +5655,7 @@
                 }
             }
         },
-        "/api/v1/home/get-feautured-author": {
+        "/api/v1/public/home/get-feautured-author": {
             "get": {
                 "tags": [
                     "Public / Home"
@@ -5670,7 +5670,7 @@
                 }
             }
         },
-        "/api/v1/home/get-recommend-book": {
+        "/api/v1/public/home/get-recommend-book": {
             "get": {
                 "tags": [
                     "Public / Home"
@@ -5685,7 +5685,7 @@
                 }
             }
         },
-        "/api/v1/home/get-book-lastest": {
+        "/api/v1/public/home/get-book-lastest": {
             "get": {
                 "tags": [
                     "Public / Home"
@@ -5700,7 +5700,7 @@
                 }
             }
         },
-        "/api/v1/home/get-statistic": {
+        "/api/v1/public/home/get-statistic": {
             "get": {
                 "tags": [
                     "Public / Home"
@@ -5715,49 +5715,7 @@
                 }
             }
         },
-        "https://n8n.warriorcode.online/webhook/46036883-4977-485d-9cb7-eb8b57cbcdf1": {
-            "post": {
-                "tags": [
-                    "Public / Contact"
-                ],
-                "summary": "Send contact email",
-                "description": "Gửi đúng theo URL https://n8n.warriorcode.online/webhook/46036883-4977-485d-9cb7-eb8b57cbcdf1",
-                "operationId": "sendContactEmail",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "name",
-                                    "email",
-                                    "content"
-                                ],
-                                "properties": {
-                                    "name": {
-                                        "type": "string"
-                                    },
-                                    "email": {
-                                        "type": "string",
-                                        "format": "email"
-                                    },
-                                    "content": {
-                                        "type": "string"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Send contact email successfully!"
-                    }
-                }
-            }
-        },
-        "/api/v1/posts": {
+        "/api/v1/public/posts": {
             "get": {
                 "tags": [
                     "Public / Post"
@@ -5821,14 +5779,14 @@
                 }
             }
         },
-        "/api/v1/posts/get-one/{post}": {
+        "/api/v1/public/posts/{post}": {
             "get": {
                 "tags": [
                     "Public / Post"
                 ],
                 "summary": "Get a post by slug",
                 "description": "Get a post by slug",
-                "operationId": "getPost",
+                "operationId": "getPostPublic",
                 "parameters": [
                     {
                         "name": "post",
@@ -5850,7 +5808,7 @@
                 }
             }
         },
-        "/api/v1/publishing-companies": {
+        "/api/v1/public/publishing-companies": {
             "get": {
                 "tags": [
                     "Public / Publishing Company"

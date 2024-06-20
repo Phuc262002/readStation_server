@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Validator;
 use OpenApi\Attributes as OA;
 
 #[OA\Get(
-    path: '/api/v1/posts',
+    path: '/api/v1/public/posts',
     tags: ['Public / Post'],
     operationId: 'getAllPosts',
     summary: 'Get all posts',
@@ -57,9 +57,9 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Get(
-    path: '/api/v1/posts/get-one/{post}',
+    path: '/api/v1/public/posts/{post}',
     tags: ['Public / Post'],
-    operationId: 'getPost',
+    operationId: 'getPostPublic',
     summary: 'Get a post by slug',
     description: 'Get a post by slug',
     parameters: [

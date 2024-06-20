@@ -12,7 +12,7 @@ use OpenApi\Attributes as OA;
 use function PHPSTORM_META\map;
 
 #[OA\Get(
-    path: '/api/v1/books',
+    path: '/api/v1/public/books',
     tags: ['Public / Book'],
     operationId: 'getAllBooksPublic',
     summary: 'Get all books public',
@@ -88,7 +88,7 @@ use function PHPSTORM_META\map;
 )]
 
 #[OA\Get(
-    path: '/api/v1/books/get-one/{slug}',
+    path: '/api/v1/public/books/{slug}',
     tags: ['Public / Book'],
     operationId: 'getOneBook',
     summary: 'Get one book by slug',

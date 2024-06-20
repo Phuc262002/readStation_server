@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Validator;
 use OpenApi\Attributes as OA;
 
 #[OA\Get(
-    path: '/api/v1/authors/admin/get-all',
+    path: '/api/v1/admin/authors',
     tags: ['Admin / Author'],
     operationId: 'getAllAuthors',
     summary: 'Get all authors (admin)',
@@ -60,7 +60,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Get(
-    path: '/api/v1/authors/get-one/{id}',
+    path: '/api/v1/admin/authors/{id}',
     tags: ['Admin / Author'],
     operationId: 'getAuthor',
     summary: 'Get author by id',
@@ -94,7 +94,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Post(
-    path: '/api/v1/authors/create',
+    path: '/api/v1/admin/authors/create',
     tags: ['Admin / Author'],
     operationId: 'createAuthor',
     summary: 'Create author',
@@ -128,7 +128,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Put(
-    path: '/api/v1/authors/update/{id}',
+    path: '/api/v1/admin/authors/update/{id}',
     tags: ['Admin / Author'],
     operationId: 'updateAuthor',
     summary: 'Update author',
@@ -175,7 +175,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Delete(
-    path: '/api/v1/authors/delete/{id}',
+    path: '/api/v1/admin/authors/delete/{id}',
     tags: ['Admin / Author'],
     operationId: 'deleteAuthor',
     summary: 'Delete author',

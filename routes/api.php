@@ -61,18 +61,6 @@ Route::group([
         });
     });
 
-    // Home routes
-    Route::group([
-        "prefix" => "home"
-    ], function () {
-        Route::get('/get-feautured-author', [PublicHomeController::class, 'getFeaturedAuthor']);
-        Route::get('/get-feautured-book', [PublicHomeController::class, 'getFeaturedBook']);
-        Route::get('/get-feautured-category', [PublicHomeController::class, 'getFeaturedCategory']);
-        Route::get('/get-recommend-book', [PublicHomeController::class, 'bookRecommend']);
-        Route::get('/get-book-lastest', [PublicHomeController::class, 'bookLatest']);
-        Route::get('/get-statistic', [PublicHomeController::class, 'statisticHome']);
-    });
-
     // Account routes
     Route::group([
         "prefix" => "account",
@@ -140,153 +128,171 @@ Route::group([
             Route::get('/', [AdminOrderController::class, 'index']);
             Route::get('/{id}', [AdminOrderController::class, 'show']);
         });
-    });
 
-
-
-
-    Route::group([
-        "prefix" => "categories"
-    ], function () {
-        Route::get('/', [CategoryController::class, 'index']);
-
-        Route::group(["middleware" => ["auth:api"]], function () {
-            Route::get('/admin/get-all', [AdminCategoryController::class, 'getAllCategory']);
-            Route::get('/get-one/{id}', [AdminCategoryController::class, 'show']);
+        Route::group([
+            "prefix" => "categories"
+        ], function () {
+            Route::get('/', [AdminCategoryController::class, 'getAllCategory']);
+            Route::get('/{id}', [AdminCategoryController::class, 'show']);
             Route::post('/create', [AdminCategoryController::class, 'store']);
             Route::put('/update/{id}', [AdminCategoryController::class, 'update']);
             Route::delete('/delete/{id}', [AdminCategoryController::class, 'destroy']);
         });
-    });
 
-    Route::group([
-        "prefix" => "publishing-companies"
-    ], function () {
-        Route::get('/', [PublishingCompanyController::class, 'index']);
-
-        Route::group(["middleware" => ["auth:api"]], function () {
-            Route::get('/admin/get-all', [AdminPublishingCompanyController::class, 'getAllPublishingCompany']);
-            Route::get('/get-one/{id}', [AdminPublishingCompanyController::class, 'show']);
+        Route::group([
+            "prefix" => "publishing-companies"
+        ], function () {
+            Route::get('/', [AdminPublishingCompanyController::class, 'getAllPublishingCompany']);
+            Route::get('/{id}', [AdminPublishingCompanyController::class, 'show']);
             Route::post('/create', [AdminPublishingCompanyController::class, 'store']);
             Route::put('/update/{id}', [AdminPublishingCompanyController::class, 'update']);
             Route::delete('/delete/{id}', [AdminPublishingCompanyController::class, 'destroy']);
         });
-    });
 
-    Route::group([
-        "prefix" => "bookcases",
-        "middleware" => ["auth:api"]
-    ], function () {
-        Route::get('/', [BookcaseController::class, 'index']);
-        Route::get('/get-one/{id}', [BookcaseController::class, 'show']);
-        Route::post('/create', [BookcaseController::class, 'store']);
-        Route::put('/update/{id}', [BookcaseController::class, 'update']);
-        Route::delete('/delete/{id}', [BookcaseController::class, 'destroy']);
-    });
+        Route::group([
+            "prefix" => "authors"
+        ], function () {
+            Route::get('/', [AdminAuthorController::class, 'getAllAuthor']);
+            Route::get('/{id}', [AdminAuthorController::class, 'show']);
+            Route::post('/create', [AdminAuthorController::class, 'store']);
+            Route::put('/update/{id}', [AdminAuthorController::class, 'update']);
+            Route::delete('/delete/{id}', [AdminAuthorController::class, 'destroy']);
+        });
 
-    Route::group([
-        "prefix" => "shelves",
-        "middleware" => ["auth:api"]
-    ], function () {
-        Route::get('/', [ShelveController::class, 'index']);
-        Route::get('/get-one/{id}', [ShelveController::class, 'show']);
-        Route::post('/create', [ShelveController::class, 'store']);
-        Route::put('/update/{id}', [ShelveController::class, 'update']);
-        Route::delete('/delete/{id}', [ShelveController::class, 'destroy']);
-    });
+        Route::group([
+            "prefix" => "bookcases",
+        ], function () {
+            Route::get('/', [BookcaseController::class, 'index']);
+            Route::get('/{id}', [BookcaseController::class, 'show']);
+            Route::post('/create', [BookcaseController::class, 'store']);
+            Route::put('/update/{id}', [BookcaseController::class, 'update']);
+            Route::delete('/delete/{id}', [BookcaseController::class, 'destroy']);
+        });
 
-    Route::group([
-        "prefix" => "books"
-    ], function () {
-        Route::get('/', [BookController::class, 'index']);
-        Route::get('/get-one/{slug}', [BookController::class, 'show']);
+        Route::group([
+            "prefix" => "shelves",
+        ], function () {
+            Route::get('/', [ShelveController::class, 'index']);
+            Route::get('/{id}', [ShelveController::class, 'show']);
+            Route::post('/create', [ShelveController::class, 'store']);
+            Route::put('/update/{id}', [ShelveController::class, 'update']);
+            Route::delete('/delete/{id}', [ShelveController::class, 'destroy']);
+        });
 
-        Route::group(["middleware" => ["auth:api"]], function () {
-            Route::get('/admin/get-one/{id}', [AdminBookController::class, 'show']);
-            Route::get('/admin/get-all', [AdminBookController::class, 'getAllBook']);
+        Route::group([
+            "prefix" => "suppliers",
+        ], function () {
+            Route::get('/', [SupplierController::class, 'index']);
+            Route::get('/{id}', [SupplierController::class, 'show']);
+            Route::post('/create', [SupplierController::class, 'store']);
+            Route::put('/update/{id}', [SupplierController::class, 'update']);
+            Route::delete('/delete/{id}', [SupplierController::class, 'destroy']);
+        });
+
+        Route::group([
+            "prefix" => "books"
+        ], function () {
+            Route::get('/', [AdminBookController::class, 'getAllBook']);
+            Route::get('/{id}', [AdminBookController::class, 'show']);
             Route::post('/create', [AdminBookController::class, 'store']);
             Route::post('/create-full', [AdminBookController::class, 'createFullBook']);
             Route::put('/update/{id}', [AdminBookController::class, 'update']);
             Route::delete('/delete/{id}', [AdminBookController::class, 'destroy']);
         });
-    });
 
-    Route::group([
-        "prefix" => "posts"
-    ], function () {
-        Route::get('/', [PublicPostController::class, 'index']);
-        Route::get('/get-one/{slug}', [PublicPostController::class, 'show']);
+        Route::group([
+            "prefix" => "book-details",
+        ], function () {
+            Route::get('/', [BookDetailController::class, 'index']);
+            Route::get('/{id}', [BookDetailController::class, 'show']);
+            Route::post('/create', [BookDetailController::class, 'store']);
+            Route::put('/update/{id}', [BookDetailController::class, 'update']);
+            Route::delete('/delete/{id}', [BookDetailController::class, 'destroy']);
+        });
 
-        Route::group(["middleware" => ["auth:api"]], function () {
-            Route::post('/create', [PostController::class, 'store']);
-            Route::get('/get/{id}', [PostController::class, 'show']);
-            Route::put('/update/{id}', [PostController::class, 'update']);
-            Route::delete('/delete/{id}', [PostController::class, 'destroy']);
 
-            Route::get('/admin/get-all', [AdminPostController::class, 'index']);
-            Route::put('/admin/update/{id}', [AdminPostController::class, 'update']);
+
+        Route::group([
+            "prefix" => "invoice-enters",
+        ], function () {
+            Route::get('/', [InvoiceEnterController::class, 'index']);
+            Route::get('/{id}', [InvoiceEnterController::class, 'show']);
+            Route::post('/create', [InvoiceEnterController::class, 'store']);
+            Route::put('/update/{id}', [InvoiceEnterController::class, 'update']);
+        });
+
+        Route::group([
+            "prefix" => "posts"
+        ], function () {
+            Route::get('/', [AdminPostController::class, 'index']);
+        });
+
+        Route::group([
+            "prefix" => "comments"
+        ], function () {
+            Route::get('/', [AdminCommentController::class, 'index']);
         });
     });
 
+
+
+    // Public routes
     Route::group([
-        "prefix" => "comments"
+        "prefix" => "public"
     ], function () {
-        Route::get('/', [CommentController::class, 'index']);
+        // Home routes
+        Route::group([
+            "prefix" => "home"
+        ], function () {
+            Route::get('/get-feautured-author', [PublicHomeController::class, 'getFeaturedAuthor']);
+            Route::get('/get-feautured-book', [PublicHomeController::class, 'getFeaturedBook']);
+            Route::get('/get-feautured-category', [PublicHomeController::class, 'getFeaturedCategory']);
+            Route::get('/get-recommend-book', [PublicHomeController::class, 'bookRecommend']);
+            Route::get('/get-book-lastest', [PublicHomeController::class, 'bookLatest']);
+            Route::get('/get-statistic', [PublicHomeController::class, 'statisticHome']);
+        });
 
-        Route::group(["middleware" => ["auth:api"]], function () {
+        Route::group([
+            "prefix" => "books"
+        ], function () {
+            Route::get('/', [BookController::class, 'index']);
+            Route::get('/{slug}', [BookController::class, 'show']);
+        });
 
-            Route::get('/admin/get-all', [AdminCommentController::class, 'index']);
+        Route::group([
+            "prefix" => "posts"
+        ], function () {
+            Route::get('/', [PublicPostController::class, 'index']);
+            Route::get('/{slug}', [PublicPostController::class, 'show']);
+        });
 
+        Route::get('/categories', [CategoryController::class, 'index']);
+        Route::get('/publishing-companies', [PublishingCompanyController::class, 'index']);
+        Route::get('/authors', [AuthorController::class, 'index']);
+        Route::get('/comments', [CommentController::class, 'index']);
+    });
+
+
+    // General routes has auth
+    Route::group([
+        "prefix" => "general"
+    ], function () {
+        Route::group([
+            "prefix" => "posts"
+        ], function () {
+            Route::get('/{id}', [PostController::class, 'show']);
+            Route::post('/create', [PostController::class, 'store']);
+            Route::put('/update/{id}', [PostController::class, 'update']);
+            Route::delete('/delete/{id}', [PostController::class, 'destroy']);
+        });
+
+        Route::group([
+            "prefix" => "comments"
+        ], function () {
             Route::post('/create', [CommentController::class, 'store']);
             Route::put('/update/{id}', [CommentController::class, 'update']);
             Route::delete('/delete/{id}', [CommentController::class, 'destroy']);
         });
-    });
-
-    Route::group([
-        "prefix" => "book-details",
-        "middleware" => ["auth:api"]
-    ], function () {
-        Route::get('/', [BookDetailController::class, 'index']);
-        Route::get('/get-one/{id}', [BookDetailController::class, 'show']);
-        Route::post('/create', [BookDetailController::class, 'store']);
-        Route::put('/update/{id}', [BookDetailController::class, 'update']);
-        Route::delete('/delete/{id}', [BookDetailController::class, 'destroy']);
-    });
-
-    Route::group([
-        "prefix" => "authors"
-    ], function () {
-        Route::get('/', [AuthorController::class, 'index']);
-
-        Route::group(["middleware" => ["auth:api"]], function () {
-            Route::get('/admin/get-all', [AdminAuthorController::class, 'getAllAuthor']);
-            Route::get('/get-one/{id}', [AdminAuthorController::class, 'show']);
-            Route::post('/create', [AdminAuthorController::class, 'store']);
-            Route::put('/update/{id}', [AdminAuthorController::class, 'update']);
-            Route::delete('/delete/{id}', [AdminAuthorController::class, 'destroy']);
-        });
-    });
-
-    Route::group([
-        "prefix" => "suppliers",
-        "middleware" => ["auth:api"]
-    ], function () {
-        Route::get('/', [SupplierController::class, 'index']);
-        Route::get('/get-one/{id}', [SupplierController::class, 'show']);
-        Route::post('/create', [SupplierController::class, 'store']);
-        Route::put('/update/{id}', [SupplierController::class, 'update']);
-        Route::delete('/delete/{id}', [SupplierController::class, 'destroy']);
-    });
-
-    Route::group([
-        "prefix" => "invoice-enters",
-        "middleware" => ["auth:api"]
-    ], function () {
-        Route::get('/', [InvoiceEnterController::class, 'index']);
-        Route::get('/get-one/{id}', [InvoiceEnterController::class, 'show']);
-        Route::post('/create', [InvoiceEnterController::class, 'store']);
-        Route::put('/update/{id}', [InvoiceEnterController::class, 'update']);
     });
 
     Route::group([

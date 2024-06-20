@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Validator;
 use OpenApi\Attributes as OA;
 
 #[OA\Get(
-    path: '/api/v1/categories',
+    path: '/api/v1/public/categories',
     tags: ['Public / Category'],
     operationId: 'getAllCategories public',
     summary: 'Get all categories',

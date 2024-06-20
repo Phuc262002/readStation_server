@@ -67,7 +67,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Post(
-    path: '/api/v1/posts/create',
+    path: '/api/v1/general/posts/create',
     tags: ['Post'],
     operationId: 'createPost',
     summary: 'Create a new post',
@@ -106,7 +106,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Get(
-    path: '/api/v1/posts/get/{id}',
+    path: '/api/v1/general/posts/{id}',
     tags: ['Post'],
     operationId: 'getPostClient',
     summary: 'Get a post',
@@ -140,7 +140,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Put(
-    path: '/api/v1/posts/update/{id}',
+    path: '/api/v1/general/posts/update/{id}',
     tags: ['Post'],
     operationId: 'updatePost',
     summary: 'Update a post',
@@ -193,7 +193,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Delete(
-    path: '/api/v1/posts/delete/{id}',
+    path: '/api/v1/general/posts/delete/{id}',
     tags: ['Post'],
     operationId: 'deletePost',
     summary: 'Delete a post',

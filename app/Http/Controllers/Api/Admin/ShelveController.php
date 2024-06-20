@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Validator;
 use OpenApi\Attributes as OA;
 
 #[OA\Get(
-    path: '/api/v1/shelves',
+    path: '/api/v1/admin/shelves',
     tags: ['Admin / Shelve'],
     operationId: 'getAllShelves',
     summary: 'Danh sách kệ sách',
@@ -74,7 +74,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Get(
-    path: '/api/v1/shelves/get-one/{id}',
+    path: '/api/v1/admin/shelves/{id}',
     tags: ['Admin / Shelve'],
     operationId: 'getShelve',
     summary: 'Chi tiết kệ sách',
@@ -108,7 +108,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Post(
-    path: '/api/v1/shelves/create',
+    path: '/api/v1/admin/shelves/create',
     tags: ['Admin / Shelve'],
     operationId: 'createShelve',
     summary: 'Tạo kệ sách',
@@ -143,7 +143,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Put(
-    path: '/api/v1/shelves/update/{id}',
+    path: '/api/v1/admin/shelves/update/{id}',
     tags: ['Admin / Shelve'],
     operationId: 'updateShelve',
     summary: 'Cập nhật kệ sách',
@@ -196,7 +196,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Delete(
-    path: '/api/v1/shelves/delete/{id}',
+    path: '/api/v1/admin/shelves/delete/{id}',
     tags: ['Admin / Shelve'],
     operationId: 'deleteShelve',
     summary: 'Xóa kệ sách',
