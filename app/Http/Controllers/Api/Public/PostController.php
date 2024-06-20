@@ -57,14 +57,14 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Get(
-    path: '/api/v1/public/posts/{post}',
+    path: '/api/v1/public/posts/{slug}',
     tags: ['Public / Post'],
     operationId: 'getPostPublic',
     summary: 'Get a post by slug',
     description: 'Get a post by slug',
     parameters: [
         new OA\Parameter(
-            name: 'post',
+            name: 'slug',
             in: 'path',
             required: true,
             description: 'Slug của post',
