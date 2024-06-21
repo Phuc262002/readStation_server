@@ -11,6 +11,7 @@ class Order extends Model
 
     protected $fillable = [
         'order_code',
+        'receipt_date',
         'return_date',
         'max_extensions',
         'current_extensions',

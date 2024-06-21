@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('order_code');
             $table->date('return_date')->nullable();
+            $table->date('receipt_date')->nullable();
             $table->integer('max_extensions')->default(3);
             $table->integer('current_extensions')->default(0);
             $table->json('extension_dates')->nullable();
