@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\Admin\BookController as AdminBookController;
 use App\Http\Controllers\Api\Admin\BookDetailController;
 use App\Http\Controllers\Api\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Api\Admin\CommentController as AdminCommentController;
+use App\Http\Controllers\Api\Admin\DashboardController;
 use App\Http\Controllers\Api\Admin\InvoiceEnterController;
 use App\Http\Controllers\Api\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Api\Admin\PostController as AdminPostController;
@@ -70,9 +71,13 @@ Route::group([
         Route::put('/update-profile', [AccountController::class, 'updateProfile']);
 
         Route::get('/get-posts', [PostController::class, 'getPostAccount']);
-        Route::get('/get-comments', [CommentController::class, 'getCommentAccount']);
 
-
+        Route::group([
+            "prefix" => "comments"
+        ], function () {
+            Route::get('/get-my-comments', [CommentController::class, 'getCommentAccount']);
+            Route::get('/get-comments-my-post', [CommentController::class, 'getRepCommentAccount']);
+        });
 
         Route::group([
             "prefix" => "wallet"
@@ -231,6 +236,15 @@ Route::group([
             "prefix" => "comments"
         ], function () {
             Route::get('/', [AdminCommentController::class, 'index']);
+        });
+
+
+        Route::group([
+            "prefix" => "dashboard"
+        ], function () {
+            Route::get('/statistic-admin', [DashboardController::class, 'statisticAdmin']);
+            Route::get('/book-hire-top-by-month', [DashboardController::class, 'bookHireTopByMonth']);
+            Route::get('/invoice-enter-by-month', [DashboardController::class, 'invoiceEnterTopByMonth']);
         });
     });
 

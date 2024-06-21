@@ -171,7 +171,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Get(
-    path: '/api/v1/account/get-comments',
+    path: '/api/v1/account/comments/get-my-comments',
     operationId: 'getCommentAccount',
     tags: ['Account'],
     summary: 'Get comments of account',
@@ -206,6 +206,57 @@ use OpenApi\Attributes as OA;
         new OA\Response(
             response: 200,
             description: 'Get comments successfully'
+        )
+    ]
+)]
+
+#[OA\Get(
+    path: '/api/v1/account/comments/get-comments-my-post',
+    operationId: 'getRepCommentAccount',
+    tags: ['Account'],
+    summary: 'Get comments of account',
+    description: 'Get comments of account',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    parameters: [
+        new OA\Parameter(
+            name: 'page',
+            in: 'query',
+            required: false,
+            description: 'Số trang hiện tại',
+            schema: new OA\Schema(type: 'integer', default: 1)
+        ),
+        new OA\Parameter(
+            name: 'pageSize',
+            in: 'query',
+            required: false,
+            description: 'Số lượng mục trên mỗi trang',
+            schema: new OA\Schema(type: 'integer', default: 10)
+        ),
+        new OA\Parameter(
+            name: 'sort',
+            in: 'query',
+            required: false,
+            description: 'Sắp xếp theo thời gian tạo',
+            schema: new OA\Schema(type: 'string', enum: ['asc', 'desc'])
+        ),
+        new OA\Parameter(
+            name: 'post_id',
+            in: 'query',
+            required: false,
+            description: 'Id của bài viết',
+            schema: new OA\Schema(type: 'integer')
+        ),
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Get comments successfully'
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error'
         )
     ]
 )]
@@ -521,11 +572,73 @@ class CommentController extends Controller
             $query->select('id', 'title', 'slug');
         }]);
 
-        
+
         $query->where('user_id', auth()->user()->id);
         $total = $query->count();
 
         $comments = $query->orderBy('created_at', $sort)->paginate($pageSize, ['*'], 'page', $page);
+
+        return response()->json([
+            "status" => true,
+            "message" => "Get comments successfully",
+            "data" => [
+                'comments' => $comments->items(),
+                'page' => $comments->currentPage(),
+                'pageSize' => $comments->perPage(),
+                'lastPage' => $comments->lastPage(),
+                'totalResults' => $comments->total(),
+                'total' =>  $total
+            ]
+        ]);
+    }
+
+    public function getRepCommentAccount(Request $request)
+    {
+        $validator = validator($request->all(), [
+            'page' => 'integer',
+            'pageSize' => 'integer',
+            'sort' => 'in:asc,desc',
+            'post_id' => 'exists:posts,id'
+        ], [
+            'page.integer' => 'Trang phải là số nguyên',
+            'pageSize.integer' => 'Số lượng mục trên mỗi trang phải là số nguyên',
+            'sort.in' => 'Sắp xếp phải là asc hoặc desc',
+            'post_id.required' => 'Post id là bắt buộc',
+            'post_id.exists' => 'Post id không tồn tại'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                "status" => false,
+                "message" => "Validation error",
+                "errors" => $validator->errors()
+            ], 400);
+        }
+
+        $page = $request->input('page', 1);
+        $pageSize = $request->input('pageSize', 10);
+        $sort = $request->input('sort', 'desc');
+        $postId = $request->input('post_id');
+
+        $query = Comment::query()->with([
+            'user' => function ($query) {
+                $query->select('id', 'fullname', 'avatar', 'email');
+            },
+            'post' => function ($query) {
+                $query->select('id', 'title', 'slug', 'user_id');
+            }
+        ])->whereHas('post', function ($query) {
+            $query->where('user_id', auth()->user()->id);
+        });
+
+        if ($postId) {
+            $query->where('post_id', $postId);
+        }
+
+
+        $total = $query->count();
+
+        $comments = $query->where('status', 'published')->orderBy('created_at', $sort)->paginate($pageSize, ['*'], 'page', $page);
 
         return response()->json([
             "status" => true,

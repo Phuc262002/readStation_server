@@ -1755,6 +1755,51 @@
                 ]
             }
         },
+        "/api/v1/admin/dashboard/statistic-admin": {
+            "get": {
+                "tags": [
+                    "Admin / Dashboard"
+                ],
+                "summary": "Get statistic admin",
+                "description": "Get statistic admin",
+                "operationId": "statisticAdmin",
+                "responses": {
+                    "200": {
+                        "description": "Get statistic admin successfully!"
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/dashboard/book-hire-top-by-month": {
+            "get": {
+                "tags": [
+                    "Admin / Dashboard"
+                ],
+                "summary": "Get top books hire by month",
+                "description": "Get top books hire by month",
+                "operationId": "bookHireTopByMonth",
+                "responses": {
+                    "200": {
+                        "description": "Get top books hire by month successfully!"
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/dashboard/invoice-enter-by-month": {
+            "get": {
+                "tags": [
+                    "Admin / Dashboard"
+                ],
+                "summary": "Get top invoice enter by month",
+                "description": "Get top invoice enter by month",
+                "operationId": "invoiceEnterTopByMonth",
+                "responses": {
+                    "200": {
+                        "description": "Get top invoice enter by month successfully!"
+                    }
+                }
+            }
+        },
         "/api/v1/admin/invoice-enters": {
             "get": {
                 "tags": [
@@ -4569,7 +4614,7 @@
                 ]
             }
         },
-        "/api/v1/account/get-comments": {
+        "/api/v1/account/comments/get-my-comments": {
             "get": {
                 "tags": [
                     "Account"
@@ -4615,6 +4660,73 @@
                 "responses": {
                     "200": {
                         "description": "Get comments successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/account/comments/get-comments-my-post": {
+            "get": {
+                "tags": [
+                    "Account"
+                ],
+                "summary": "Get comments of account",
+                "description": "Get comments of account",
+                "operationId": "getRepCommentAccount",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Số trang hiện tại",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "pageSize",
+                        "in": "query",
+                        "description": "Số lượng mục trên mỗi trang",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sắp xếp theo thời gian tạo",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "post_id",
+                        "in": "query",
+                        "description": "Id của bài viết",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get comments successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
                     }
                 },
                 "security": [

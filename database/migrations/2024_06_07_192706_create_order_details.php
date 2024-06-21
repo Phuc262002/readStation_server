@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('order_id');
             $table->unsignedBigInteger('service_fee')->default(0);
+            $table->unsignedBigInteger('fine_fee')->default(0);
             $table->unsignedBigInteger('book_details_id');
             $table->date('return_date')->nullable();
             $table->integer('max_extensions')->default(3);
