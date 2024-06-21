@@ -44,7 +44,7 @@ use OpenApi\Attributes as OA;
             in: 'query',
             required: false,
             description: 'Post status',
-            schema: new OA\Schema(type: 'string', enum: ['wating_approve', 'draft', 'published', 'hidden', 'deleted'])
+            schema: new OA\Schema(type: 'string', enum: ['wating_approve', 'approve_canceled', 'draft', 'published', 'hidden', 'deleted'])
         ),
         new OA\Parameter(
             name: 'category_id',
@@ -168,7 +168,7 @@ use OpenApi\Attributes as OA;
                 new OA\Property(property: 'summary', type: 'string'),
                 new OA\Property(property: 'image', type: 'string'),
                 new OA\Property(property: 'reason_cancel', type: 'string', nullable: true, default: null),
-                new OA\Property(property: 'status', type: 'string', enum: ['wating_approve','draft', 'published','hidden']),
+                new OA\Property(property: 'status', type: 'string', enum: ['wating_approve', 'approve_canceled', 'draft', 'published','hidden']),
             ]
         )
     ),
@@ -237,12 +237,12 @@ class PostController extends Controller
             'page' => 'integer|min:1',
             'pageSize' => 'integer|min:1',
             'search' => 'string',
-            'status' => 'string|in:wating_approve,draft,published,hidden,deleted',
+            'status' => 'string|in:wating_approve,approve_canceled,draft,published,hidden,deleted',
             'category_id' => 'integer',
         ], [
             'page.integer' => 'Page phải là số nguyên.',
             'pageSize.integer' => 'PageSize phải là số nguyên.',
-            'status.in' => 'Trạng thái không hợp lệ.',
+            'status.in' => 'Trạng thái phải là wating_approve, approve_canceled, draft, published, hidden hoặc deleted.',
         ]);
 
         if ($validator->fails()) {

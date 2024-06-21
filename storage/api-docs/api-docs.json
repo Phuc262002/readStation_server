@@ -2201,6 +2201,7 @@
                             "type": "string",
                             "enum": [
                                 "wating_approve",
+                                "approve_canceled",
                                 "draft",
                                 "published",
                                 "hidden",
@@ -4887,6 +4888,7 @@
                             "type": "string",
                             "enum": [
                                 "wating_approve",
+                                "approve_canceled",
                                 "draft",
                                 "published",
                                 "hidden",
@@ -5082,6 +5084,7 @@
                                         "type": "string",
                                         "enum": [
                                             "wating_approve",
+                                            "approve_canceled",
                                             "draft",
                                             "published",
                                             "hidden"
@@ -5779,7 +5782,7 @@
                 }
             }
         },
-        "/api/v1/public/posts/{post}": {
+        "/api/v1/public/posts/{slug}": {
             "get": {
                 "tags": [
                     "Public / Post"
@@ -5789,7 +5792,7 @@
                 "operationId": "getPostPublic",
                 "parameters": [
                     {
-                        "name": "post",
+                        "name": "slug",
                         "in": "path",
                         "description": "Slug của post",
                         "required": true,
