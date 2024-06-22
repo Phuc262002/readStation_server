@@ -91,19 +91,43 @@ class DashboardController extends Controller
 
     public function bookHireTopByMonth(Request $request)
     {
+        // Get top book detail IDs based on completed orders in the last month
         $orderDetails = OrderDetail::where('status_od', 'completed')
             ->where('created_at', '>=', now()->subMonth())
             ->select('book_details_id')
             ->groupBy('book_details_id')
             ->orderByRaw('COUNT(book_details_id) DESC')
             ->limit(20)
+            ->pluck('book_details_id');
+
+        // Fetch the book details along with their relationships
+        $books = BookDetail::with([
+            'book.category',
+            'book.author',
+            'book.shelve',
+            'book.shelve.bookcase',
+            'book' => function ($query) {
+                $query->where('status', 'active');
+            }
+        ])
+            ->whereIn('id', $orderDetails)
             ->get();
 
-        $books = BookDetail::with(['book.category', 'book.author', 'book.shelve', 'book.shelve.bookcase', 'book' => function ($query) {
-            $query->where('status', 'active');
-        }])
-            ->whereIn('id', $orderDetails->pluck('book_details_id'))
-            ->get();
+        // Calculate the average rate, rating total, and hire count for each book
+        $books->each(function ($book) {
+            $orderDetails = $book->order_details
+                ->where('status_cmt', 'active')
+                ->where('status_od', 'completed');
+
+            $averageRate = $orderDetails->avg('rate');
+            $averageRateRounded = round($averageRate, 1);
+
+            $book->average_rate = $averageRateRounded;
+            $book->rating_total = $orderDetails->count();
+            $book->hire_count = $book->order_details->count(); // Count the total hires
+
+            unset($book->order_details);
+        });
 
         return response()->json([
             'status' => true,
@@ -111,6 +135,7 @@ class DashboardController extends Controller
             'data' => $books
         ]);
     }
+
 
     public function invoiceEnterTopByMonth(Request $request)
     {
