@@ -44,7 +44,7 @@ use OpenApi\Attributes as OA;
             in: 'query',
             required: false,
             description: 'Trạng thái',
-            schema: new OA\Schema(type: 'string', enum: ['active', 'inactive', 'deleted'])
+            schema: new OA\Schema(type: 'string', enum: ['draft','active', 'canceled'])
         ),
     ],
     responses: [
@@ -185,14 +185,14 @@ class InvoiceEnterController extends Controller
             'page' => 'integer|min:1',
             'pageSize' => 'integer|min:1',
             'search' => 'string',
-            'status' => 'string|in:active,inactive,deleted',
+            'status' => 'string|in:draft,active,canceled',
             'supplier_id' => 'integer|min:1'
         ], [
             'page.integer' => 'Trang phải là số nguyên.',
             'page.min' => 'Trang phải lớn hơn hoặc bằng 1.',
             'pageSize.integer' => 'Kích thước trang phải là số nguyên.',
             'pageSize.min' => 'Kích thước trang phải lớn hơn hoặc bằng 1.',
-            'status.in' => 'Status phải là active, inactive hoặc deleted',
+            'status.in' => 'Status phải là draft, active hoặc canceled.',
             'supplier_id.integer' => 'ID nhà cung cấp phải là số nguyên.',
         ]);
 
