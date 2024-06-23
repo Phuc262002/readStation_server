@@ -20,8 +20,10 @@ return new class extends Migration
             $table->enum('transaction_method', ['online', 'offline']);
             $table->enum('status', ['pending', 'completed', 'failed', 'canceled'])->default('pending');
             $table->dateTime('completed_at')->nullable();
+            $table->dateTime('expires_at')->nullable();
             $table->unsignedBigInteger('amount');
             $table->string('description')->nullable();
+            $table->json('bank_info')->nullable();
             $table->timestamps();
 
             $table->unique('id');

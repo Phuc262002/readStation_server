@@ -83,7 +83,7 @@ use OpenApi\Attributes as OA;
                 new OA\Property(property: 'total_fee', type: 'number', description: 'Tổng tiền'),
                 new OA\Property(
                     property: 'order_details',
-                    type: 'array', 
+                    type: 'array',
                     description: 'Chi tiết đơn hàng',
                     items: new OA\Items(
                         type: 'object',
@@ -271,7 +271,7 @@ class OrderController extends Controller
             if ($request->has('expired_date')) {
                 if (strtotime($validatedData['expired_date']) < strtotime(date('Y-m-d'))) {
                     return response()->json([
-                        'status' => 400,
+                        'status' => false,
                         'message' => 'Create order failed',
                         'errors' => 'Ngày hết hạn không hợp lệ'
                     ]);
@@ -279,7 +279,7 @@ class OrderController extends Controller
 
                 if (strtotime($validatedData['expired_date']) > strtotime('+4 days')) {
                     return response()->json([
-                        'status' => 400,
+                        'status' => false,
                         'message' => 'Create order failed',
                         'errors' => 'Ngày hết hạn không được quá 4 ngày'
                     ]);
@@ -292,14 +292,14 @@ class OrderController extends Controller
                 if ($wallet) {
                     if ($wallet->balance < $validatedData['total_fee']) {
                         return response()->json([
-                            'status' => 400,
+                            'status' => false,
                             'message' => 'Create order failed',
                             'errors' => 'Số dư trong ví không đủ'
                         ]);
                     }
                 } else {
                     return response()->json([
-                        'status' => 400,
+                        'status' => false,
                         'message' => 'Create order failed',
                         'errors' => 'Bạn chưa kích hoạt ví'
                     ]);
