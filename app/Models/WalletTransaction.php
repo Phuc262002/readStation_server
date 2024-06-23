@@ -21,7 +21,8 @@ class WalletTransaction extends Model
         'status',
         'amount',
         'completed_at',
-        'description'
+        'description',
+        'bank_info'
     ];
 
     protected $hidden = [
@@ -30,6 +31,10 @@ class WalletTransaction extends Model
 
     protected $attributes = [
         'status' => 'pending',
+    ];
+
+    protected $casts = [
+        'bank_info' => 'array',
     ];
 
     public function wallet()

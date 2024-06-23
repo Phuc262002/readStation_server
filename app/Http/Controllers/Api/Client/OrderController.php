@@ -49,7 +49,7 @@ use OpenApi\Attributes as OA;
     ],
     responses: [
         new OA\Response(
-            response: 200,
+            response: true,
             description: 'Get all order successfully'
         ),
         new OA\Response(
@@ -100,7 +100,7 @@ use OpenApi\Attributes as OA;
     ),
     responses: [
         new OA\Response(
-            response: 200,
+            response: true,
             description: 'Create order successfully'
         ),
         new OA\Response(
@@ -134,7 +134,7 @@ use OpenApi\Attributes as OA;
     ],
     responses: [
         new OA\Response(
-            response: 200,
+            response: true,
             description: 'Get order successfully'
         ),
         new OA\Response(
@@ -195,7 +195,7 @@ class OrderController extends Controller
         $orders = $query->orderBy('created_at', 'desc')->paginate($pageSize, ['*'], 'page', $page);
 
         return response()->json([
-            'status' => 200,
+            'status' => true,
             'message' => 'Get all order successfully',
             "data" => [
                 "orders" => $orders->items(),
@@ -319,7 +319,7 @@ class OrderController extends Controller
             }
 
             return response()->json([
-                'status' => 200,
+                'status' => true,
                 'message' => 'Create order successfully',
                 'data' => $order
             ]);
@@ -359,7 +359,7 @@ class OrderController extends Controller
         )->find($id);
 
         return response()->json([
-            'status' => 200,
+            'status' => true,
             'message' => 'Get order successfully',
             'data' => $order
         ]);
