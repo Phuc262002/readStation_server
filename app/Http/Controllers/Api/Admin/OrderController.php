@@ -9,6 +9,31 @@ use Illuminate\Support\Facades\Validator;
 use OpenApi\Attributes as OA;
 
 #[OA\Get(
+    path: '/api/v1/admin/orders/statistic',
+    operationId: 'adminOrderStatistic',
+    tags: ['Admin / Order'],
+    summary: 'Thống kê đơn hàng',
+    description: 'Thống kê đơn hàng',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Thống kê đơn hàng',
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error'
+        ),
+        new OA\Response(
+            response: 500,
+            description: 'Lỗi không xác định'
+        ),
+    ]
+)]
+
+#[OA\Get(
     path: '/api/v1/admin/orders',
     operationId: 'adminOrderIndex',
     tags: ['Admin / Order'],
@@ -102,6 +127,32 @@ use OpenApi\Attributes as OA;
 
 class OrderController extends Controller
 {
+    public function statisticOrder() {
+        $orders = Order::count();
+        $ordersHiring = Order::where('status', 'hiring')->count();
+        $ordersCompleted = Order::where('status', 'completed')->count();
+        $ordersOutOfDate = Order::where('status', 'out_of_date')->count();
+        $ordersPending = Order::where('status', 'pending')->count();
+        $ordersApproved = Order::where('status', 'approved')->count();
+        $ordersWatingTakeBook = Order::where('status', 'wating_take_book')->count();
+        $ordersCanceled = Order::where('status', 'canceled')->count();
+        
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Get statistic order success',
+            'data' => [
+                'orders' => $orders,
+                'ordersHiring' => $ordersHiring,
+                'ordersCompleted' => $ordersCompleted,
+                'ordersOutOfDate' => $ordersOutOfDate,
+                'ordersPending' => $ordersPending,
+                'ordersApproved' => $ordersApproved,
+                'ordersWatingTakeBook' => $ordersWatingTakeBook,
+                'ordersCanceled' => $ordersCanceled,
+            ]
+        ]);
+    }
     /**
      * Display a listing of the resource.
      */
@@ -229,25 +280,11 @@ class OrderController extends Controller
         }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Order $order)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Order $order)
     {
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Order $order)
     {
         //

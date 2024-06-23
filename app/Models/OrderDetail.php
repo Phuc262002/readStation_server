@@ -11,8 +11,10 @@ class OrderDetail extends Model
 
     protected $fillable = [
         'order_id',
+        'deposit_fee',
         'service_fee',
         'fine_fee',
+        'total_fee',
         'book_details_id',
         'return_date',
         'tomax_extensionstal',

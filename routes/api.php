@@ -130,6 +130,7 @@ Route::group([
         Route::group([
             "prefix" => "orders",
         ], function () {
+            Route::get('/statistic', [AdminOrderController::class, 'statisticOrder']);
             Route::get('/', [AdminOrderController::class, 'index']);
             Route::get('/{id}', [AdminOrderController::class, 'show']);
         });
@@ -321,7 +322,7 @@ Route::group([
     ], function () {
         Route::get('/remind-return-book', [RemindReturnBookController::class, 'remindReturnBook']);
     });
-
+    
     Route::group([
         "prefix" => "upload",
         "middleware" => ["auth:api"]

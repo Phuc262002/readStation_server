@@ -1846,9 +1846,9 @@
                         "schema": {
                             "type": "string",
                             "enum": [
+                                "draft",
                                 "active",
-                                "inactive",
-                                "deleted"
+                                "canceled"
                             ]
                         }
                     }
@@ -2067,6 +2067,32 @@
                     },
                     "400": {
                         "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/orders/statistic": {
+            "get": {
+                "tags": [
+                    "Admin / Order"
+                ],
+                "summary": "Thống kê đơn hàng",
+                "description": "Thống kê đơn hàng",
+                "operationId": "adminOrderStatistic",
+                "responses": {
+                    "200": {
+                        "description": "Thống kê đơn hàng"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Lỗi không xác định"
                     }
                 },
                 "security": [

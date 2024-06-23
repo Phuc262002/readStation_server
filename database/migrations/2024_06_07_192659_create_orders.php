@@ -29,8 +29,10 @@ return new class extends Migration
             $table->string('user_note')->nullable();
             $table->string('manager_note')->nullable();
             $table->unsignedBigInteger('deposit_fee')->default(0);
+            $table->unsignedBigInteger('service_fee')->default(0);
             $table->unsignedBigInteger('fine_fee')->default(0);
             $table->unsignedBigInteger('total_fee')->default(0);
+            $table->unsignedBigInteger('return_fee')->default(0);
             $table->enum('status', ['pending', 'approved', 'wating_take_book', 'hiring', 'increasing', 'wating_return', 'completed', 'canceled', 'out_of_date'])->default('pending');
             $table->timestamps();
 

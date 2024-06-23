@@ -26,8 +26,10 @@ class Order extends Model
         'user_note',
         'manager_note',
         'deposit_fee',
+        'service_fee',
         'fine_fee',
         'total_fee',
+        'return_fee',
         'status',
     ];
 
