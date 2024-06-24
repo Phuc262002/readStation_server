@@ -32,6 +32,7 @@ use App\Http\Controllers\Api\Public\CategoryController;
 use App\Http\Controllers\Api\Public\HomeController as PublicHomeController;
 use App\Http\Controllers\Api\Public\PostController as PublicPostController;
 use App\Http\Controllers\Api\Public\PublishingCompanyController;
+use App\Http\Controllers\Api\Public\ShippingMethodController as PublicShippingMethodController;
 use App\Http\Controllers\Api\Upload\CloudinaryController;
 use Illuminate\Support\Facades\Route;
 
@@ -297,6 +298,7 @@ Route::group([
         Route::get('/publishing-companies', [PublishingCompanyController::class, 'index']);
         Route::get('/authors', [AuthorController::class, 'index']);
         Route::get('/comments', [CommentController::class, 'index']);
+        Route::get('/shipping-methods', [PublicShippingMethodController::class, 'index']);
     });
 
 

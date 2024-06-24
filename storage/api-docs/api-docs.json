@@ -5126,7 +5126,7 @@
                                     "phone",
                                     "address",
                                     "deposit_fee",
-                                    "total_fee",
+                                    "total_all_fee",
                                     "order_details"
                                 ],
                                 "properties": {
@@ -6291,6 +6291,24 @@
                 "responses": {
                     "200": {
                         "description": "Get all publish companies successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/public/shipping-methods": {
+            "get": {
+                "tags": [
+                    "Public / Shipping Method"
+                ],
+                "summary": "Get all ShippingMethods",
+                "description": "Get all ShippingMethods",
+                "operationId": "getAllShippingMethodsPublic",
+                "responses": {
+                    "200": {
+                        "description": "Get all ShippingMethods successfully"
                     },
                     "400": {
                         "description": "Validation error"

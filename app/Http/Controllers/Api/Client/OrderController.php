@@ -72,7 +72,7 @@ use OpenApi\Attributes as OA;
     requestBody: new OA\RequestBody(
         required: true,
         content: new OA\JsonContent(
-            required: ['payment_method', 'payment_shipping', 'phone', 'address', 'deposit_fee', 'total_fee', 'order_details'],
+            required: ['payment_method', 'payment_shipping', 'phone', 'address', 'deposit_fee', 'total_all_fee', 'order_details'],
             properties: [
                 new OA\Property(property: 'payment_method', type: 'string', description: 'Phương thức thanh toán', enum: ['wallet', 'cash']),
                 new OA\Property(property: 'payment_shipping', type: 'string', description: 'Phương thức vận chuyển', enum: ['library', 'shipper']),
@@ -315,7 +315,7 @@ class OrderController extends Controller
                         ]);
                     }
 
-                    if ($wallet->balance < $validatedData['total_fee']) {
+                    if ($wallet->balance < $validatedData['total_all_fee']) {
                         return response()->json([
                             'status' => false,
                             'message' => 'Create order failed',
@@ -345,7 +345,7 @@ class OrderController extends Controller
                 $order->orderDetails()->createMany($orderDetails);
 
                 $wallet->update([
-                    'balance' => $wallet->balance - $validatedData['total_fee']
+                    'balance' => $wallet->balance - $validatedData['total_all_fee']
                 ]);
 
                 $transaction = WalletTransaction::create([
@@ -354,7 +354,7 @@ class OrderController extends Controller
                     'transaction_code' => $transaction_code,
                     'transaction_type' => 'payment',
                     'transaction_method' => 'wallet',
-                    'amount' => $validatedData['total_fee'],
+                    'amount' => $validatedData['total_all_fee'],
                     'status' => 'holding',
                     'description' => 'Thanh toán đơn thuê ' . $order->order_code,
                 ]);
