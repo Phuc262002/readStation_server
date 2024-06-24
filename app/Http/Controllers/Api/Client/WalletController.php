@@ -313,7 +313,7 @@ class WalletController extends Controller
     public function storeDeposit(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'amount' => 'required|numeric|min:20000',
+            'amount' => 'required|numeric|min:1000', // 20,000 VND
             'description' => 'required|string',
             'transaction_type' => 'required|string|in:deposit,withdraw',
         ], [
@@ -379,8 +379,8 @@ class WalletController extends Controller
                 $body["orderCode"] = $transaction_code;
                 $body["description"] = $request->description;
                 $body["expiredAt"] = now()->addMinutes(30)->getTimestamp();
-                $body["returnUrl"] = env('APP_URL') . "/success.html";
-                $body["cancelUrl"] = env('APP_URL') . "/cancel.html";
+                $body["returnUrl"] = "http://localhost:3000/account/wallet/transaction-success";
+                $body["cancelUrl"] = "http://localhost:3000/account/wallet/transaction-error";
 
                 $payOS = new PayOS($this->payOSClientId, $this->payOSApiKey, $this->payOSChecksumKey);
                 $response = $payOS->createPaymentLink($body);
