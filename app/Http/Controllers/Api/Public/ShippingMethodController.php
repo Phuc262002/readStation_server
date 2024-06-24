@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
 
 #[OA\Get(
-    path: '/api/v1/admin/public/shipping-methods',
+    path: '/api/v1/public/shipping-methods',
     tags: ['Public / Shipping Method'],
     operationId: 'getAllShippingMethodsPublic',
     summary: 'Get all ShippingMethods',
