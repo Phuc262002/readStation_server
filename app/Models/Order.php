@@ -65,4 +65,9 @@ class Order extends Model
     {
         return $this->belongsTo(WalletTransaction::class, 'transaction_id');
     }
+
+    public function shippingMethod()
+    {
+        return $this->belongsTo(ShippingMethod::class);
+    }
 }

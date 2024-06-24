@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Api\Admin\PostController as AdminPostController;
 use App\Http\Controllers\Api\Admin\PublishingCompanyController as AdminPublishingCompanyController;
 use App\Http\Controllers\Api\Admin\ShelveController;
+use App\Http\Controllers\Api\Admin\ShippingMethodController;
 use App\Http\Controllers\Api\Admin\SupplierController;
 use App\Http\Controllers\Api\Admin\UserController;
 use App\Http\Controllers\Api\Admin\WalletController as AdminWalletController;
@@ -247,6 +248,16 @@ Route::group([
             Route::get('/statistic-admin', [DashboardController::class, 'statisticAdmin']);
             Route::get('/book-hire-top-by-month', [DashboardController::class, 'bookHireTopByMonth']);
             Route::get('/invoice-enter-by-month', [DashboardController::class, 'invoiceEnterTopByMonth']);
+        });
+
+        Route::group([
+            "prefix" => "shipping-methods"
+        ], function () {
+            Route::get('/', [ShippingMethodController::class, 'index']);
+            Route::get('/{id}', [ShippingMethodController::class, 'show']);
+            Route::post('/create', [ShippingMethodController::class, 'store']);
+            Route::put('/update/{id}', [ShippingMethodController::class, 'update']);
+            Route::delete('/delete/{id}', [ShippingMethodController::class, 'destroy']);
         });
     });
 

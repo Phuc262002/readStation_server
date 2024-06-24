@@ -184,7 +184,7 @@ class OrderController extends Controller
         $status = $request->input('status');
 
 
-        $query = Order::query()->with('orderDetails')->where('user_id', auth()->id());
+        $query = Order::query()->with('orderDetails', 'shippingMethod')->where('user_id', auth()->id());
         $totalItems = $query->count();
         if ($status) {
             $query->where('status', $status);
@@ -410,6 +410,7 @@ class OrderController extends Controller
 
         $order = Order::with(
             'transaction',
+            'shippingMethod',
             'orderDetails',
             'orderDetails.bookDetail',
             'orderDetails.bookDetail.book',
