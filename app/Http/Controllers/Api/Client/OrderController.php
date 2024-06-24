@@ -49,7 +49,7 @@ use OpenApi\Attributes as OA;
     ],
     responses: [
         new OA\Response(
-            response: true,
+            response: 200,
             description: 'Get all order successfully'
         ),
         new OA\Response(
@@ -100,7 +100,7 @@ use OpenApi\Attributes as OA;
     ),
     responses: [
         new OA\Response(
-            response: true,
+            response: 200,
             description: 'Create order successfully'
         ),
         new OA\Response(
@@ -134,7 +134,7 @@ use OpenApi\Attributes as OA;
     ],
     responses: [
         new OA\Response(
-            response: true,
+            response: 200,
             description: 'Get order successfully'
         ),
         new OA\Response(
