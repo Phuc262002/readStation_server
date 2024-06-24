@@ -313,7 +313,7 @@ class WalletController extends Controller
     public function storeDeposit(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'amount' => 'required|numeric|min:1000', // 20,000 VND
+            'amount' => 'required|numeric|min:20000',
             'description' => 'required|string',
             'transaction_type' => 'required|string|in:deposit,withdraw',
         ], [
@@ -354,7 +354,8 @@ class WalletController extends Controller
 
         $transaction = $wallet->transactions()->create([
             'wallet_id' => $wallet->id,
-            'amount' => $request->amount,
+            // 'amount' => $request->amount,
+            'amount' => 2000,
             'description' => $request->description,
             'reference_id' => $transaction_code,
             'transaction_code' => $transaction_code,
