@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Client;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\WalletTransaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use OpenApi\Attributes as OA;
@@ -78,9 +79,12 @@ use OpenApi\Attributes as OA;
                 new OA\Property(property: 'phone', type: 'string', description: 'Số điện thoại'),
                 new OA\Property(property: 'address', type: 'string', description: 'Địa chỉ'),
                 new OA\Property(property: 'user_note', type: 'string', description: 'Ghi chú'),
-                new OA\Property(property: 'deposit_fee', type: 'number', description: 'Tiền đặt cọc'),
                 new OA\Property(property: 'expired_date', type: 'string', description: 'Ngày hết hạn'),
-                new OA\Property(property: 'total_fee', type: 'number', description: 'Tổng tiền'),
+                new OA\Property(property: 'shipping_method_id', type: 'integer', description: 'Id phương thức vận chuyển'),
+                new OA\Property(property: 'shipping_fee', type: 'number', description: 'Phí vận chuyển'),
+                new OA\Property(property: 'total_service_fee', type: 'integer', description: 'Tổng phí dịch vụ'),
+                new OA\Property(property: 'total_deposit_fee', type: 'number', description: 'Tiền đặt cọc'),
+                new OA\Property(property: 'total_all_fee', type: 'number', description: 'Tổng tiền'),
                 new OA\Property(
                     property: 'order_details',
                     type: 'array',
@@ -216,13 +220,18 @@ class OrderController extends Controller
             'phone' => 'required|string',
             'address' => 'required|string',
             'user_note' => 'string',
-            'deposit_fee' => 'required|numeric|min:0',
             'expired_date' => 'date',
-            'total_fee' => 'required|numeric|min:0',
+            'shipping_method_id' => 'integer|exists:shipping_methods,id',
+            'shipping_fee' => 'numeric|min:0',
+            'total_deposit_fee' => 'required|numeric|min:0',
+            'total_service_fee' => 'required|integer|min:1',
+            'total_all_fee' => 'required|numeric|min:0',
+
             'order_details' => 'required|array',
             'order_details.*.book_details_id' => 'required|integer',
             'order_details.*.service_fee' => 'required|integer|min:1',
             'order_details.*.deposit' => 'required|numeric|min:0',
+            'service_fee' => 'required|numeric|min:0',
         ], [
             'payment_method.required' => 'Trường phương thức thanh toán là bắt buộc',
             'payment_method.string' => 'Trường phương thức thanh toán phải là kiểu chuỗi',
@@ -235,16 +244,25 @@ class OrderController extends Controller
             'address.required' => 'Trường địa chỉ là bắt buộc',
             'address.string' => 'Trường địa chỉ phải là kiểu chuỗi',
             'user_note.string' => 'Trường ghi chú phải là kiểu chuỗi',
-            'deposit_fee.required' => 'Trường tiền đặt cọc là bắt buộc',
-            'deposit_fee.numeric' => 'Trường tiền đặt cọc phải là kiểu số',
-            'deposit_fee.min' => 'Trường tiền đặt cọc không được nhỏ hơn 0',
+            'total_deposit_fee.required' => 'Trường tiền đặt cọc là bắt buộc',
+            'total_deposit_fee.numeric' => 'Trường tiền đặt cọc phải là kiểu số',
+            'total_deposit_fee.min' => 'Trường tiền đặt cọc không được nhỏ hơn 0',
             'expired_date.date' => 'Trường ngày hết hạn phải là kiểu ngày',
             'fine_fee.required' => 'Trường tiền phạt là bắt buộc',
             'fine_fee.numeric' => 'Trường tiền phạt phải là kiểu số',
             'fine_fee.min' => 'Trường tiền phạt không được nhỏ hơn 0',
-            'total_fee.required' => 'Trường tổng tiền là bắt buộc',
-            'total_fee.numeric' => 'Trường tổng tiền phải là kiểu số',
-            'total_fee.min' => 'Trường tổng tiền không được nhỏ hơn 0',
+            'total_all_fee.required' => 'Trường tổng tiền là bắt buộc',
+            'total_all_fee.numeric' => 'Trường tổng tiền phải là kiểu số',
+            'total_all_fee.min' => 'Trường tổng tiền không được nhỏ hơn 0',
+            'shipping_method_id.integer' => 'Trường phương thức vận chuyển phải là kiểu số',
+            'shipping_method_id.exists' => 'Id phương thức vận chuyển không tồn tại',
+            'shipping_fee.numeric' => 'Trường phí vận chuyển phải là kiểu số',
+            'shipping_fee.min' => 'Trường phí vận chuyển không được nhỏ hơn 0',
+            'total_service_fee.required' => 'Trường tổng phí dịch vụ là bắt buộc',
+            'total_service_fee.integer' => 'Trường tổng phí dịch vụ phải là kiểu số',
+            'total_service_fee.min' => 'Trường tổng phí dịch vụ không được nhỏ hơn 0',
+
+
             'order_details.required' => 'Trường chi tiết đơn hàng là bắt buộc',
             'order_details.array' => 'Trường chi tiết đơn hàng phải là kiểu mảng',
             'order_details.*.book_details_id.required' => 'Trường id chi tiết sách là bắt buộc',
@@ -290,6 +308,14 @@ class OrderController extends Controller
                 $wallet = auth()->user()->wallet;
 
                 if ($wallet) {
+                    if ($wallet->status !== 'active') {
+                        return response()->json([
+                            'status' => false,
+                            'message' => 'Create order failed',
+                            'errors' => 'Ví của bạn đã bị khóa'
+                        ]);
+                    }
+
                     if ($wallet->balance < $validatedData['total_fee']) {
                         return response()->json([
                             'status' => false,
@@ -304,6 +330,39 @@ class OrderController extends Controller
                         'errors' => 'Bạn chưa kích hoạt ví'
                     ]);
                 }
+
+                $transaction_code = intval(substr(strtotime(now()) . rand(1000, 9999), -9));
+
+                $order = Order::create(array_merge($validatedData, [
+                    'user_id' => auth()->user()->id,
+                    'expired_date' => $request->has('expired_date') ? date('Y-m-d', strtotime($validatedData['expired_date'])) : date('Y-m-d', strtotime('+4 days')),
+                ]));
+
+                $orderDetails = $validatedData['order_details'];
+                foreach ($orderDetails as $key => $detail) {
+                    $orderDetails[$key]['expired_date'] = $request->has('expired_date') ? date('Y-m-d', strtotime($validatedData['expired_date'])) : date('Y-m-d', strtotime('+4 days'));
+                }
+
+                $order->orderDetails()->createMany($orderDetails);
+
+                $wallet->update([
+                    'balance' => $wallet->balance - $validatedData['total_fee']
+                ]);
+
+                $transaction = WalletTransaction::create([
+                    'wallet_id' => $wallet->id,
+                    'reference_id' => $transaction_code,
+                    'transaction_code' => $transaction_code,
+                    'transaction_type' => 'payment',
+                    'transaction_method' => 'wallet',
+                    'amount' => $validatedData['total_fee'],
+                    'status' => 'holding',
+                    'description' => 'Thanh toán đơn thuê ' . $order->order_code,
+                ]);
+
+                $order->update([
+                    'transaction_id' => $transaction->id
+                ]);
             } else {
                 $order = Order::create(array_merge($validatedData, [
                     'user_id' => auth()->user()->id,
@@ -350,6 +409,7 @@ class OrderController extends Controller
         }
 
         $order = Order::with(
+            'transaction',
             'orderDetails',
             'orderDetails.bookDetail',
             'orderDetails.bookDetail.book',

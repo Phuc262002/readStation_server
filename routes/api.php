@@ -82,6 +82,7 @@ Route::group([
         Route::group([
             "prefix" => "wallet"
         ], function () {
+            Route::get('/statistic', [WalletController::class, 'statistic']);
             Route::post('/create-transaction', [WalletController::class, 'storeDeposit']);
             Route::get('/get-payment-link/{transaction_code}', [WalletController::class, 'getPaymentLink']);
             Route::get('/transaction-history', [WalletController::class, 'transactionHistory']);

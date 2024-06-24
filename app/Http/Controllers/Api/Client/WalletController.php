@@ -11,6 +11,27 @@ use PayOS\PayOS;
 use OpenApi\Attributes as OA;
 
 #[OA\Get(
+    path: '/api/v1/account/wallet/statistic',
+    operationId: 'statistic',
+    tags: ['Wallet'],
+    summary: 'Statistic',
+    description: 'Statistic',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Statistic fetched successfully'
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error'
+        )
+    ]
+)]
+
+#[OA\Get(
     path: '/api/v1/account/wallet/transaction-history',
     operationId: 'transactionHistory',
     tags: ['Wallet'],
@@ -208,6 +229,25 @@ class WalletController extends Controller
         $this->payOSClientId = env("PAYOS_CLIENT_ID");
         $this->payOSApiKey = env("PAYOS_API_KEY");
         $this->payOSChecksumKey = env("PAYOS_CHECKSUM_KEY");
+    }
+
+    public function statistic()
+    {
+        $balance = Wallet::where('user_id', auth()->user()->id)->first()->balance;
+        $transactionsHolding = Wallet::with('transactions')->where('user_id', auth()->user()->id)->first()->transactions()->where('status', 'holding')->sum('amount');
+        $transactionsPending = Wallet::with('transactions')->where('user_id', auth()->user()->id)->first()->transactions()->where('status', 'pending')->where('transaction_type', '!=', 'withdraw')->sum('amount');
+        $transactionsWithdraw = Wallet::with('transactions')->where('user_id', auth()->user()->id)->first()->transactions()->where('transaction_type', 'withdraw')->sum('amount');
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Get statistic successfully',
+            'data' => [
+                'balance' => $balance,
+                'transactionsHolding' => intval($transactionsHolding),
+                'transactionsPending' => intval($transactionsPending),
+                'transactionsWithdraw' => intval($transactionsWithdraw),
+            ],
+        ]);
     }
 
     public function transactionHistory(Request $request)

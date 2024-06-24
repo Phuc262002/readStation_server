@@ -5295,6 +5295,29 @@
                 ]
             }
         },
+        "/api/v1/account/wallet/statistic": {
+            "get": {
+                "tags": [
+                    "Wallet"
+                ],
+                "summary": "Statistic",
+                "description": "Statistic",
+                "operationId": "statistic",
+                "responses": {
+                    "200": {
+                        "description": "Statistic fetched successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/account/wallet/transaction-history": {
             "get": {
                 "tags": [

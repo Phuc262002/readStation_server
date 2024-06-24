@@ -28,10 +28,10 @@ return new class extends Migration
             $table->boolean('has_wallet')->default(false);
             $table->json('citizen_identity_card')->nullable();
             $table->json('student_id_card')->nullable();
+            $table->string('province_id')->nullable();
+            $table->string('district_id')->nullable();
+            $table->string('ward_id')->nullable();
             $table->string('street')->nullable();
-            $table->string('province')->nullable();
-            $table->string('district')->nullable();
-            $table->string('ward')->nullable();
             $table->string('address_detail')->nullable();
             $table->string('phone')->unique()->nullable();
             $table->string('confirmation_code')->nullable()->default(NULL);
@@ -41,6 +41,9 @@ return new class extends Migration
             $table->enum('status', ['active', 'inactive', 'banned', 'deleted'])->default('active');
             $table->timestamps();
 
+            $table->foreign('province_id')->references('id')->on('provinces')->onDelete('cascade');
+            $table->foreign('district_id')->references('id')->on('districts')->onDelete('cascade');
+            $table->foreign('ward_id')->references('id')->on('wards')->onDelete('cascade');
             $table->foreign('role_id')->references('id')->on('roles')->onDelete('cascade');
         });
     }
