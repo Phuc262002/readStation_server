@@ -325,7 +325,7 @@ class OrderController extends Controller
             ]);
         } catch (\Throwable $th) {
             return response()->json([
-                'status' => 500,
+                'status' => false,
                 'message' => 'Create order failed',
                 'errors' => $th->getMessage()
             ]);
