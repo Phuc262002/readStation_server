@@ -3610,15 +3610,15 @@
                                         "description": "Street",
                                         "type": "string"
                                     },
-                                    "province": {
+                                    "province_id": {
                                         "description": "Province",
                                         "type": "string"
                                     },
-                                    "district": {
+                                    "district_id": {
                                         "description": "District",
                                         "type": "string"
                                     },
-                                    "ward": {
+                                    "ward_id": {
                                         "description": "Ward",
                                         "type": "string"
                                     },
@@ -3775,15 +3775,15 @@
                                         "description": "Street",
                                         "type": "string"
                                     },
-                                    "province": {
+                                    "province_id": {
                                         "description": "Province",
                                         "type": "string"
                                     },
-                                    "district": {
+                                    "district_id": {
                                         "description": "District",
                                         "type": "string"
                                     },
-                                    "ward": {
+                                    "ward_id": {
                                         "description": "Ward",
                                         "type": "string"
                                     },
@@ -4675,13 +4675,13 @@
                                     "street": {
                                         "type": "string"
                                     },
-                                    "province": {
+                                    "province_id": {
                                         "type": "string"
                                     },
-                                    "district": {
+                                    "district_id": {
                                         "type": "string"
                                     },
-                                    "ward": {
+                                    "ward_id": {
                                         "type": "string"
                                     },
                                     "address_detail": {
