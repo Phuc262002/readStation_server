@@ -354,8 +354,7 @@ class WalletController extends Controller
 
         $transaction = $wallet->transactions()->create([
             'wallet_id' => $wallet->id,
-            // 'amount' => $request->amount,
-            'amount' => 2000,
+            'amount' => $request->amount,
             'description' => $request->description,
             'reference_id' => $transaction_code,
             'transaction_code' => $transaction_code,

@@ -33,6 +33,7 @@ use App\Http\Controllers\Api\Public\HomeController as PublicHomeController;
 use App\Http\Controllers\Api\Public\PostController as PublicPostController;
 use App\Http\Controllers\Api\Public\PublishingCompanyController;
 use App\Http\Controllers\Api\Public\ShippingMethodController as PublicShippingMethodController;
+use App\Http\Controllers\Api\Shiip\ShiipController;
 use App\Http\Controllers\Api\Upload\CloudinaryController;
 use Illuminate\Support\Facades\Route;
 
@@ -344,5 +345,17 @@ Route::group([
         Route::get('/images', [CloudinaryController::class, 'getAllImages']);
         Route::post('/images', [CloudinaryController::class, 'upload']);
         Route::delete('/images/delete/{publicId}', [CloudinaryController::class, 'deleteImage']);
+    });
+
+    Route::group([
+        "prefix" => "shiip",
+    ], function () {
+        Route::get('/province', [ShiipController::class, 'getProvince']);
+        Route::get('/district', [ShiipController::class, 'getDistrict']);
+        Route::get('/ward', [ShiipController::class, 'getWard']);
+
+        Route::post('/create-province', [ShiipController::class, 'createProvince']);
+        Route::post('/create-district', [ShiipController::class, 'createDistrict']);
+        Route::post('/create-ward', [ShiipController::class, 'createWard']);
     });
 });
