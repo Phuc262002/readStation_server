@@ -28,8 +28,8 @@ return new class extends Migration
             $table->boolean('has_wallet')->default(false);
             $table->json('citizen_identity_card')->nullable();
             $table->json('student_id_card')->nullable();
-            $table->string('province_id')->nullable();
-            $table->string('district_id')->nullable();
+            $table->foreignId('province_id')->nullable();
+            $table->foreignId('district_id')->nullable();
             $table->string('ward_id')->nullable();
             $table->string('street')->nullable();
             $table->string('address_detail')->nullable();

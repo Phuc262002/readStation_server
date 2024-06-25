@@ -105,11 +105,11 @@ Route::group([
 
     // Admin routes
     Route::group([
-        "prefix" => "admin"
+        "prefix" => "admin",
+        "middleware" => ["auth:api"]
     ], function () {
         Route::group([
             "prefix" => "wallet",
-            "middleware" => ["auth:api"]
         ], function () {
             Route::get('get-all', [AdminWalletController::class, 'index']);
             Route::post('create-deposit', [AdminWalletController::class, 'storeDeposit']);
@@ -295,6 +295,14 @@ Route::group([
             Route::get('/{slug}', [PublicPostController::class, 'show']);
         });
 
+        Route::group([
+            "prefix" => "shiip",
+        ], function () {
+            Route::get('/province', [ShiipController::class, 'getProvince']);
+            Route::get('/district', [ShiipController::class, 'getDistrict']);
+            Route::get('/ward', [ShiipController::class, 'getWard']);
+        });
+
         Route::get('/categories', [CategoryController::class, 'index']);
         Route::get('/publishing-companies', [PublishingCompanyController::class, 'index']);
         Route::get('/authors', [AuthorController::class, 'index']);
@@ -305,7 +313,8 @@ Route::group([
 
     // General routes has auth
     Route::group([
-        "prefix" => "general"
+        "prefix" => "general",
+        "middleware" => ["auth:api"]
     ], function () {
         Route::group([
             "prefix" => "posts"

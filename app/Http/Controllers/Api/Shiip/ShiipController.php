@@ -7,6 +7,81 @@ use App\Models\District;
 use App\Models\Province;
 use App\Models\Ward;
 use Illuminate\Http\Request;
+use OpenApi\Attributes as OA;
+
+#[OA\Get(
+    path: '/api/v1/public/shiip/province',
+    tags: ['Public / Shiip'],
+    operationId: 'getProvince public',
+    summary: 'Get all province',
+    description: 'Get all province',
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Get all province successfully!',
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error',
+        ),
+    ],
+)]
+
+#[OA\Get(
+    path: '/api/v1/public/shiip/district?province_id={province_id}',
+    tags: ['Public / Shiip'],
+    operationId: 'getDistrict public',
+    summary: 'Get all district',
+    description: 'Get all district',
+    parameters: [
+        new OA\Parameter(
+            name: 'province_id',
+            in: 'query',
+            required: false,
+            description: 'ID của tỉnh thành',
+            schema: new OA\Schema(type: 'integer')
+        )
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Get all district successfully!',
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error',
+        ),
+    ],
+)]
+
+#[OA\Get(
+    path: '/api/v1/public/shiip/ward?district_id={district_id}',
+    tags: ['Public / Shiip'],
+    operationId: 'getWard public',
+    summary: 'Get all ward',
+    description: 'Get all ward',
+    parameters: [
+        new OA\Parameter(
+            name: 'district_id',
+            in: 'query',
+            required: false,
+            description: 'ID của quận huyện',
+            schema: new OA\Schema(type: 'integer')
+        )
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Get all ward successfully!',
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error',
+        ),
+    ],
+)]
+
+
 
 class ShiipController extends Controller
 {

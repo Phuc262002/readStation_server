@@ -6298,7 +6298,7 @@
                 }
             }
         },
-        "/api/v1/admin/public/shipping-methods": {
+        "/api/v1/public/shipping-methods": {
             "get": {
                 "tags": [
                     "Public / Shipping Method"
@@ -6309,6 +6309,82 @@
                 "responses": {
                     "200": {
                         "description": "Get all ShippingMethods successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/v1/public/shiip/province": {
+            "get": {
+                "tags": [
+                    "Public / Shiip"
+                ],
+                "summary": "Get all province",
+                "description": "Get all province",
+                "operationId": "getProvince public",
+                "responses": {
+                    "200": {
+                        "description": "Get all province successfully!"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/v1/public/shiip/district?province_id={province_id}": {
+            "get": {
+                "tags": [
+                    "Public / Shiip"
+                ],
+                "summary": "Get all district",
+                "description": "Get all district",
+                "operationId": "getDistrict public",
+                "parameters": [
+                    {
+                        "name": "province_id",
+                        "in": "query",
+                        "description": "ID của tỉnh thành",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get all district successfully!"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/v1/public/shiip/ward?district_id={district_id}": {
+            "get": {
+                "tags": [
+                    "Public / Shiip"
+                ],
+                "summary": "Get all ward",
+                "description": "Get all ward",
+                "operationId": "getWard public",
+                "parameters": [
+                    {
+                        "name": "district_id",
+                        "in": "query",
+                        "description": "ID của quận huyện",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get all ward successfully!"
                     },
                     "400": {
                         "description": "Validation error"

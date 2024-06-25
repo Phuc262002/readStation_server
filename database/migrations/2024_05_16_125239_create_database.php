@@ -329,25 +329,25 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('roles');
-        Schema::dropIfExists('users');
-        Schema::dropIfExists('wallets');
-        Schema::dropIfExists('wallet_transactions');
-        Schema::dropIfExists('verification_requests');
-        Schema::dropIfExists('categories');
-        Schema::dropIfExists('posts');
-        Schema::dropIfExists('comments');
-        Schema::dropIfExists('authors');
-        Schema::dropIfExists('publishing_companies');
-        Schema::dropIfExists('books');
-        Schema::dropIfExists('bookcases');
-        Schema::dropIfExists('shelves');
-        Schema::dropIfExists('suppliers');
-        Schema::dropIfExists('invoice_enters');
-        Schema::dropIfExists('invoice_enter_details');
-        Schema::dropIfExists('book_details');
-        Schema::dropIfExists('orders');
-        Schema::dropIfExists('order_details');
+        // Schema::dropIfExists('roles');
+        // Schema::dropIfExists('users');
+        // Schema::dropIfExists('wallets');
+        // Schema::dropIfExists('wallet_transactions');
+        // Schema::dropIfExists('verification_requests');
+        // Schema::dropIfExists('categories');
+        // Schema::dropIfExists('posts');
+        // Schema::dropIfExists('comments');
+        // Schema::dropIfExists('authors');
+        // Schema::dropIfExists('publishing_companies');
+        // Schema::dropIfExists('books');
+        // Schema::dropIfExists('bookcases');
+        // Schema::dropIfExists('shelves');
+        // Schema::dropIfExists('suppliers');
+        // Schema::dropIfExists('invoice_enters');
+        // Schema::dropIfExists('invoice_enter_details');
+        // Schema::dropIfExists('book_details');
+        // Schema::dropIfExists('orders');
+        // Schema::dropIfExists('order_details');
 
         Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
