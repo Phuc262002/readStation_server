@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('wards', function (Blueprint $table) {
-            $table->id();
+            $table->string('id')->primary();
             $table->foreignId('DistrictID');
             $table->string('WardName');
             $table->json('NameExtension');

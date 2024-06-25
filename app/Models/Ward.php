@@ -17,6 +17,7 @@ class Ward extends Model
     ];
 
     protected $casts = [
+        'id' => 'string',
         'NameExtension' => 'array',
     ];
 
