@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class BookDetail extends Model
 {
@@ -44,6 +45,17 @@ class BookDetail extends Model
     protected $casts = [
         'images' => 'array',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            if (empty($model->sku_origin)) {
+                $model->sku_origin = strtoupper(substr(md5(uniqid()), 0, 10));
+            }
+        });
+    }
 
     public function book()
     {

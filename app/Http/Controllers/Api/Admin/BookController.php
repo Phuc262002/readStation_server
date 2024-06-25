@@ -636,7 +636,7 @@ class BookController extends Controller
             'category_id' => "required",
             'shelve_id' => "nullable",
             'book_detail' => "required|array",
-            'book_detail.*.sku_origin' => "required",
+            'book_detail.*.sku_origin' => "nullable|string",
             'book_detail.*.poster' => "required",
             'book_detail.*.images' => "required|array",
             'book_detail.*.book_version' => "required",
