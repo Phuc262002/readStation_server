@@ -46,9 +46,9 @@ use OpenApi\Attributes as OA;
                 new OA\Property(property: 'gender', type: 'string', enum: ['male', 'female']),
                 new OA\Property(property: 'dob', type: 'string', format: 'date'),
                 new OA\Property(property: 'street', type: 'string'),
-                new OA\Property(property: 'province', type: 'string'),
-                new OA\Property(property: 'district', type: 'string'),
-                new OA\Property(property: 'ward', type: 'string'),
+                new OA\Property(property: 'province_id', type: 'string'),
+                new OA\Property(property: 'district_id', type: 'string'),
+                new OA\Property(property: 'ward_id', type: 'string'),
                 new OA\Property(property: 'address_detail', type: 'string'),
                 new OA\Property(property: 'phone', type: 'string')
             ]
