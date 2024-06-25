@@ -34,10 +34,11 @@ class ShippingMethodController extends Controller
      */
     public function index()
     {
-        $shippingMethods = ShippingMethod::all();
+        $shippingMethods = ShippingMethod::where('status', 'active')->get();
 
         return response()->json([
             'success' => true,
+            'message' => 'Shipping Methods',
             'data' => $shippingMethods,
         ]);
     }
