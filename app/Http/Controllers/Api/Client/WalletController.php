@@ -233,21 +233,35 @@ class WalletController extends Controller
 
     public function statistic()
     {
-        $balance = Wallet::where('user_id', auth()->user()->id)->first()->balance;
-        $transactionsHolding = Wallet::with('transactions')->where('user_id', auth()->user()->id)->first()->transactions()->where('status', 'holding')->sum('amount');
-        $transactionsPending = Wallet::with('transactions')->where('user_id', auth()->user()->id)->first()->transactions()->where('status', 'pending')->where('transaction_type', '!=', 'withdraw')->sum('amount');
-        $transactionsWithdraw = Wallet::with('transactions')->where('user_id', auth()->user()->id)->first()->transactions()->where('transaction_type', 'withdraw')->sum('amount');
+        try {
+            $wallet = Wallet::where('user_id', auth()->user()->id)->first();
+            if (!$wallet) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Ví chưa được kích hoạt',
+                ]);
+            }
+            $balance = Wallet::where('user_id', auth()->user()->id)->first()->balance;
+            $transactionsHolding = Wallet::with('transactions')->where('user_id', auth()->user()->id)->first()->transactions()->where('status', 'holding')->sum('amount');
+            $transactionsPending = Wallet::with('transactions')->where('user_id', auth()->user()->id)->first()->transactions()->where('status', 'pending')->where('transaction_type', '!=', 'withdraw')->sum('amount');
+            $transactionsWithdraw = Wallet::with('transactions')->where('user_id', auth()->user()->id)->first()->transactions()->where('transaction_type', 'withdraw')->sum('amount');
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Get statistic successfully',
-            'data' => [
-                'balance' => $balance,
-                'transactionsHolding' => intval($transactionsHolding),
-                'transactionsPending' => intval($transactionsPending),
-                'transactionsWithdraw' => intval($transactionsWithdraw),
-            ],
-        ]);
+            return response()->json([
+                'status' => true,
+                'message' => 'Get statistic successfully',
+                'data' => [
+                    'balance' => $balance,
+                    'transactionsHolding' => intval($transactionsHolding),
+                    'transactionsPending' => intval($transactionsPending),
+                    'transactionsWithdraw' => intval($transactionsWithdraw),
+                ],
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => $th->getMessage(),
+            ]);
+        }
     }
 
     public function transactionHistory(Request $request)
