@@ -125,7 +125,7 @@ class HomeController extends Controller
 {
     public function getFeaturedCategory(Request $request)
     {
-        $categories = Category::where('is_featured', true)->get();
+        $categories = Category::where('is_featured', true)->where('type', "book")->get();
 
         return response()->json([
             'status' => true,
