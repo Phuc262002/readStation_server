@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Client;
 
 use App\Http\Controllers\Controller;
+use App\Models\BookDetail;
 use App\Models\Order;
 use App\Models\WalletTransaction;
 use Illuminate\Http\Request;
@@ -283,6 +284,40 @@ class OrderController extends Controller
         }
 
         try {
+            $bookDetailsIds = collect($request->order_details)->pluck('book_details_id')->toArray();
+
+            foreach ($bookDetailsIds as $bookDetailsId) {
+                $bookDetail = BookDetail::find($bookDetailsId);
+
+                if (!$bookDetail) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Create order failed',
+                        'errors' => 'Id chi tiết sách không tồn tại'
+                    ]);
+                }
+
+                if ($bookDetail->status !== 'inactive') {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Create order failed',
+                        'errors' => 'Sách không còn trạng thái cho thuê'
+                    ]);
+                }
+
+                if($bookDetail->stock < 1){
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Create order failed',
+                        'errors' => 'Sách đã hết hàng'
+                    ]);
+                }
+            }
+
+
+
+
+
             $validatedData = $validator->validated();
 
             if ($request->has('expired_date')) {
@@ -374,6 +409,13 @@ class OrderController extends Controller
                 }
 
                 $order->orderDetails()->createMany($orderDetails);
+            }
+
+            foreach ($bookDetailsIds as $bookDetailsId) {
+                $bookDetail = BookDetail::find($bookDetailsId);
+                $bookDetail->update([
+                    'stock' => $bookDetail->stock - 1
+                ]);
             }
 
             return response()->json([
