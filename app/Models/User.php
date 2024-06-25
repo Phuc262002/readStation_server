@@ -35,9 +35,9 @@ class User extends Authenticatable implements JWTSubject
         'citizen_identity_card',
         'student_id_card',
         'street',
-        'province',
-        'district',
-        'ward',
+        'province_id',
+        'district_id',
+        'ward_id',
         'address_detail',
         'phone',
         'confirmation_code',
@@ -161,5 +161,20 @@ class User extends Authenticatable implements JWTSubject
     public function createWallet()
     {
         $this->wallet()->create();
+    }
+
+    public function province()
+    {
+        return $this->belongsTo(Province::class);
+    }
+
+    public function district()
+    {
+        return $this->belongsTo(District::class);
+    }
+
+    public function ward()
+    {
+        return $this->belongsTo(Ward::class);
     }
 }

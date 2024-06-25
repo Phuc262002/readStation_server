@@ -269,7 +269,7 @@ class UserController extends Controller
 
         // Tạo query ban đầu
         $query = User::query()
-            ->with('role');
+            ->with(['role', 'province', 'district', 'ward']);
 
         $totalItems = $query->count();
         $query = $query->filter($status);
@@ -455,7 +455,7 @@ class UserController extends Controller
             ], 400);
         }
 
-        $user = User::with('role')->find($id);
+        $user = User::with(['role', 'province', 'district', 'ward'])->find($id);
 
         return response()->json([
             "status" => true,

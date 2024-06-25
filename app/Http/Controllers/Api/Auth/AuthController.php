@@ -416,7 +416,7 @@ class AuthController extends Controller
 
     protected function createNewToken($token, $refreshToken)
     {
-        $user = User::with('role')->find(auth()->user()->id);
+        $user = User::with(['role', 'province', 'district', 'ward'])->find(auth()->user()->id);
         return response()->json([
             "status" => true,
             "message" => "Login successful",

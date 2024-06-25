@@ -71,7 +71,7 @@ class AccountController extends Controller
 {
     public function userProfile()
     {
-        $user = array_merge(User::with('role')->find(auth()->user()->id)->toArray(), [
+        $user = array_merge(User::with(['role', 'province', 'district', 'ward'])->find(auth()->user()->id)->toArray(), [
             'google_id' => auth()->user()->google_id ? true : false,
         ]);
 
@@ -114,7 +114,7 @@ class AccountController extends Controller
             ], 400);
         }
 
-        $user = User::with('role')->find(auth()->user()->id);
+        $user = User::with(['role', 'province', 'district', 'ward'])->find(auth()->user()->id);
 
         try {
             $user->update($validator->validated());
