@@ -34,6 +34,7 @@ return new class extends Migration
             $table->unsignedBigInteger('total_all_fee')->default(0);
             $table->unsignedBigInteger('return_fee')->default(0);
             $table->foreignId('shipping_method_id')->nullable();
+            $table->unsignedBigInteger('discount')->default(0);
             $table->enum('status', ['pending', 'approved', 'wating_take_book', 'hiring', 'increasing', 'wating_return', 'completed', 'canceled', 'out_of_date'])->default('pending');
             $table->timestamps();
 

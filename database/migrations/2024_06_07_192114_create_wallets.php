@@ -12,11 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('wallets', function (Blueprint $table) {
-            $table->uuid('id')->primary(); 
+            $table->uuid('id')->primary();
             $table->foreignUuid('user_id');
             $table->unsignedBigInteger('balance');
             $table->string('reason')->nullable();
-            $table->enum('status', ['active', 'locked', 'suspended', 'frozen'])->default('active');
+            $table->enum('status', ['active', 'none_verify', 'locked', 'suspended', 'frozen'])->default('active');
             $table->timestamps();
 
             $table->unique('id');

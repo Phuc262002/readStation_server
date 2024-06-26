@@ -21,6 +21,7 @@ class WalletTransaction extends Model
         'status',
         'amount',
         'completed_at',
+        'expired_at',
         'description',
         'bank_info',
         'verification_secret_code'

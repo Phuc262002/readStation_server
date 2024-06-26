@@ -32,6 +32,7 @@ class Order extends Model
         'shipping_method_id',
         'return_fee',
         'status',
+        'discount'
     ];
 
     protected static function boot()

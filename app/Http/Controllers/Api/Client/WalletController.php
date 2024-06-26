@@ -370,8 +370,8 @@ class WalletController extends Controller
             ]);
         }
 
-        $transactionDeposit = WalletTransaction::where('user_id', auth()->user()->id)->where('transaction_type', 'deposit')->where('status', 'pending');
-        $transactionWithdraw = WalletTransaction::where('user_id', auth()->user()->id)->where('transaction_type', 'withdraw')->where('status', 'pending');
+        $transactionDeposit = WalletTransaction::where('wallet_id', $wallet->id)->where('transaction_type', 'deposit')->where('status', 'pending');
+        $transactionWithdraw = WalletTransaction::where('wallet_id', $wallet->id)->where('transaction_type', 'withdraw')->where('status', 'pending');
 
         if ($request->transaction_type == 'deposit' && $transactionDeposit->count() > 0) {
             return response()->json([
@@ -403,6 +403,7 @@ class WalletController extends Controller
             'reference_id' => $transaction_code,
             'transaction_code' => $transaction_code,
             'transaction_type' => $request->transaction_type,
+            'expired_at' => $request->transaction_type == 'deposit' ? now()->addMinutes(30) : now()->addDay(2),
             'transaction_method' => 'online',
             'status' => 'pending'
         ]);

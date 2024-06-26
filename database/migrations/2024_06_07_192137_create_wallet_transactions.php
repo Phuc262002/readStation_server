@@ -20,7 +20,7 @@ return new class extends Migration
             $table->enum('transaction_method', ['online', 'offline', 'wallet']);
             $table->enum('status', ['pending', 'holding','completed', 'failed', 'canceled'])->default('pending');
             $table->dateTime('completed_at')->nullable();
-            $table->dateTime('expires_at')->nullable();
+            $table->dateTime('expired_at')->nullable();
             $table->unsignedBigInteger('amount');
             $table->string('description')->nullable();
             $table->json('verification_secret_code')->nullable();
