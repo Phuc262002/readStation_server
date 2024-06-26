@@ -218,8 +218,8 @@ class OrderController extends Controller
         $validator = Validator::make($request->all(), [
             'payment_method' => 'required|string|in:wallet,cash',
             'payment_shipping' => 'required|string|in:library,shipper',
-            'phone' => 'required|string',
-            'address' => 'required|string',
+            'phone' => 'nullable|string',
+            'address' => 'nullable|string',
             'user_note' => 'nullable|string',
             'expired_date' => 'nullable|date',
             'shipping_method_id' => 'nullable|integer|exists:shipping_methods,id',
@@ -239,10 +239,6 @@ class OrderController extends Controller
             'payment_shipping.required' => 'Trường phương thức vận chuyển là bắt buộc',
             'payment_shipping.string' => 'Trường phương thức vận chuyển phải là kiểu chuỗi',
             'payment_shipping.in' => 'Trường phương thức vận chuyển phải là library hoặc shipper',
-            'phone.required' => 'Trường số điện thoại là bắt buộc',
-            'phone.string' => 'Trường số điện thoại phải là kiểu chuỗi',
-            'address.required' => 'Trường địa chỉ là bắt buộc',
-            'address.string' => 'Trường địa chỉ phải là kiểu chuỗi',
             'user_note.string' => 'Trường ghi chú phải là kiểu chuỗi',
             'total_deposit_fee.required' => 'Trường tiền đặt cọc là bắt buộc',
             'total_deposit_fee.numeric' => 'Trường tiền đặt cọc phải là kiểu số',
@@ -284,6 +280,27 @@ class OrderController extends Controller
         }
 
         try {
+            if ($request->payment_shipping === 'shipper') {
+                $validator2 = Validator::make($request->all(), [
+                    'shipping_method_id' => 'required|integer|exists:shipping_methods,id',
+                    'phone' => 'required|string',
+                    'address' => 'required|string',
+                ], [
+                    'phone.required' => 'Trường số điện thoại là bắt buộc',
+                    'phone.string' => 'Trường số điện thoại phải là kiểu chuỗi',
+                    'address.required' => 'Trường địa chỉ là bắt buộc',
+                    'address.string' => 'Trường địa chỉ phải là kiểu chuỗi',
+                ]);
+
+                if ($validator2->fails()) {
+                    return response()->json([
+                        "staus" => false,
+                        "message" => "Validation error",
+                        "errors" => $validator2->errors()
+                    ], 400);
+                }
+            }
+
             $bookDetailsIds = collect($request->order_details)->pluck('book_details_id')->toArray();
 
             foreach ($bookDetailsIds as $bookDetailsId) {
@@ -297,7 +314,7 @@ class OrderController extends Controller
                     ]);
                 }
 
-                if ($bookDetail->status !== 'inactive') {
+                if ($bookDetail->status !== 'active') {
                     return response()->json([
                         'status' => false,
                         'message' => 'Create order failed',
@@ -305,7 +322,7 @@ class OrderController extends Controller
                     ]);
                 }
 
-                if($bookDetail->stock < 1){
+                if ($bookDetail->stock < 1) {
                     return response()->json([
                         'status' => false,
                         'message' => 'Create order failed',
