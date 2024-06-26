@@ -319,7 +319,7 @@ class UserController extends Controller
             'district_id' => 'nullable',
             'ward_id' => 'nullable',
             'address_detail' => 'nullable|string',
-            'phone' => 'required|string',
+            'phone' => 'required|regex:/^(0[35789])[0-9]{8}$/',
             'status' => 'nullable|string|in:active,inactive,banned,deleted',
         ], [
             'role_id.required' => 'Role id không được để trống.',
@@ -331,7 +331,8 @@ class UserController extends Controller
             'email.required' => 'Email không được để trống.',
             'email.email' => 'Email không đúng định dạng.',
             'email.unique' => 'Email đã tồn tại.',
-            'phone.required' => 'Số điện thoại không được để trống.'
+            'phone.required' => 'Số điện thoại không được để trống.',
+            'phone.regex' => 'Số điện thoại không đúng định dạng.',
         ]);
 
         if ($validator->fails()) {
@@ -404,7 +405,7 @@ class UserController extends Controller
 
                 $checkCCCD = new CheckCCCDController();
 
-                $response = $checkCCCD->checkCCCD($request);
+                $response = $checkCCCD->checkCCCDUser($request->citizen_identity_card['citizen_code'], $request->citizen_identity_card['citizen_name']);
 
                 if (!$response) {
                     return response()->json([
@@ -499,7 +500,7 @@ class UserController extends Controller
             'district_id' => 'nullable',
             'ward_id' => 'nullable',
             'address_detail' => 'nullable|string',
-            'phone' => 'required|string',
+            'phone' => 'required|regex:/^(0[35789])[0-9]{8}$/',
             'status' => 'nullable|string|in:active,inactive,banned,deleted',
         ], [
             'id.required' => 'Id không được để trống.',
@@ -510,7 +511,8 @@ class UserController extends Controller
             'fullname.required' => 'Fullname không được để trống.',
             'fullname.string' => 'Fullname phải là chuỗi.',
             'status.in' => 'Status phải là active, inactive, banned hoặc deleted.',
-            'phone.required' => 'Số điện thoại không được để trống.'
+            'phone.required' => 'Số điện thoại không được để trống.',
+            'phone.regex' => 'Số điện thoại không đúng định dạng.',
         ]);
 
         if ($validator->fails()) {
@@ -578,6 +580,18 @@ class UserController extends Controller
                         "status" => false,
                         "message" => "Validation error",
                         "errors" => $validator3->errors()
+                    ], 400);
+                }
+
+                $checkCCCD = new CheckCCCDController();
+
+                $response = $checkCCCD->checkCCCDUser($request->citizen_identity_card['citizen_code'], $request->citizen_identity_card['citizen_name']);
+
+                if (!$response) {
+                    return response()->json([
+                        "status" => false,
+                        "message" => "Validation error",
+                        "errors" => "CCCD không hợp lệ."
                     ], 400);
                 }
             }

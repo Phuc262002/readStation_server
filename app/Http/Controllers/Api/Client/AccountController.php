@@ -97,7 +97,7 @@ class AccountController extends Controller
             'district_id' => 'nullable|exists:districts,id',
             'ward_id' => 'nullable|exists:wards,id',
             'address_detail' => 'nullable|string',
-            'phone' => 'string|min:10|max:11',
+            'phone' => 'required|regex:/^(0[35789])[0-9]{8}$/',
         ], [
             'gender.in' => 'Giới tính phải là male hoặc female.',
             'dob.date' => 'Ngày sinh phải là một ngày.',
@@ -107,6 +107,7 @@ class AccountController extends Controller
             'province_id.exists' => 'Tỉnh/Thành phố không tồn tại.',
             'district_id.exists' => 'Quận/Huyện không tồn tại.',
             'ward_id.exists' => 'Xã/Phường không tồn tại.',
+            'phone.regex' => 'Số điện thoại không đúng định dạng.',
         ]);
 
         if ($validator->fails()) {

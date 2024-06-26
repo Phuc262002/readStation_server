@@ -118,7 +118,7 @@ class CheckCCCDController extends Controller
         }
     }
 
-    public static function checkCCCDUser($legal_id, $legal_name)
+    public function checkCCCDUser($legal_id, $legal_name)
     {
         $url = env('PAYOS_URL_CCCD');
         $token = DB::table('payos')->first()->token;
