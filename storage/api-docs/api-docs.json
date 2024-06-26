@@ -5847,6 +5847,53 @@
                 ]
             }
         },
+        "/api/v1/general/check-citizen": {
+            "post": {
+                "tags": [
+                    "General / Check Citizen"
+                ],
+                "summary": "Check CCCD",
+                "description": "Check CCCD",
+                "operationId": "checkCCCD",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "legal_id",
+                                    "legal_name"
+                                ],
+                                "properties": {
+                                    "legal_id": {
+                                        "description": "Legal ID",
+                                        "type": "string"
+                                    },
+                                    "legal_name": {
+                                        "description": "Legal Name",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/public/authors": {
             "get": {
                 "tags": [
