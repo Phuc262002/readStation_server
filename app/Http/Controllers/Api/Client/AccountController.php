@@ -93,9 +93,9 @@ class AccountController extends Controller
             'gender' => 'nullable|string|in:male,female',
             'dob' => 'nullable|date',
             'street' => 'nullable|string',
-            'province' => 'nullable|string',
-            'district' => 'nullable|string',
-            'ward' => 'nullable|string',
+            'province_id' => 'nullable|string|exists:provinces,id',
+            'district_id' => 'nullable|string|exists:districts,id',
+            'ward_id' => 'nullable|string|exists:wards,id',
             'address_detail' => 'nullable|string',
             'phone' => 'string|min:10|max:11',
         ], [
@@ -104,6 +104,9 @@ class AccountController extends Controller
             'phone.string' => 'Số điện thoại phải là một chuỗi.',
             'phone.min' => 'Số điện thoại phải có ít nhất 10 ký tự.',
             'phone.max' => 'Số điện thoại không được quá 11 ký tự.',
+            'province_id.exists' => 'Tỉnh/Thành phố không tồn tại.',
+            'district_id.exists' => 'Quận/Huyện không tồn tại.',
+            'ward_id.exists' => 'Xã/Phường không tồn tại.',
         ]);
 
         if ($validator->fails()) {
