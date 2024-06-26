@@ -403,6 +403,20 @@ class UserController extends Controller
                     ], 400);
                 }
 
+                $users = User::all();
+
+                foreach ($users as $user) {
+                    if ($user->citizen_identity_card) {
+                        if ($user->citizen_identity_card['citizen_code'] == $request->citizen_identity_card['citizen_code']) {
+                            return response()->json([
+                                "status" => false,
+                                "message" => "Validation error",
+                                "errors" => "CCCD/CMND đã tồn tại trong hệ thống."
+                            ], 400);
+                        }
+                    }
+                }
+
                 $checkCCCD = new CheckCCCDController();
 
                 $response = $checkCCCD->checkCCCDUser($request->citizen_identity_card['citizen_code'], $request->citizen_identity_card['citizen_name']);
@@ -411,7 +425,7 @@ class UserController extends Controller
                     return response()->json([
                         "status" => false,
                         "message" => "Validation error",
-                        "errors" => "CCCD không hợp lệ."
+                        "errors" => "Tên ứng với CCCD/CMND đang sai, vui lòng kiểm tra lại."
                     ], 400);
                 }
             }
@@ -591,7 +605,7 @@ class UserController extends Controller
                     return response()->json([
                         "status" => false,
                         "message" => "Validation error",
-                        "errors" => "CCCD không hợp lệ."
+                        "errors" => "Tên ứng với CCCD/CMND đang sai, vui lòng kiểm tra lại."
                     ], 400);
                 }
             }
