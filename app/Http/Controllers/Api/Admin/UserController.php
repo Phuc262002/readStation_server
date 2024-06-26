@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Admin;
 
+use App\Http\Controllers\Api\PayOS\CheckCCCDController;
 use App\Http\Controllers\Controller;
 use App\Mail\InfomationAccount;
 use App\Models\User;
@@ -398,6 +399,18 @@ class UserController extends Controller
                         "status" => false,
                         "message" => "Validation error",
                         "errors" => $validator3->errors()
+                    ], 400);
+                }
+
+                $checkCCCD = new CheckCCCDController();
+
+                $response = $checkCCCD->checkCCCD($request);
+
+                if (!$response) {
+                    return response()->json([
+                        "status" => false,
+                        "message" => "Validation error",
+                        "errors" => "CCCD không hợp lệ."
                     ], 400);
                 }
             }

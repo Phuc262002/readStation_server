@@ -118,6 +118,59 @@ class CheckCCCDController extends Controller
         }
     }
 
+    public static function checkCCCDUser($legal_id, $legal_name)
+    {
+        $url = env('PAYOS_URL_CCCD');
+        $token = DB::table('payos')->first()->token;
+
+        $cccd = [
+            "legal_id" => $legal_id,
+            "legal_name" => $legal_name,
+        ];
+
+        $data = json_encode($cccd);
+
+        try {
+            $ch = curl_init($url);
+
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Content-Type: application/json',
+                'Authorization: Bearer ' . $token,
+            ]);
+
+            $response = curl_exec($ch);
+            $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE); // Get HTTP status code
+
+            if ($http_code == 401) {
+                // If unauthorized, attempt to login again
+                $loginResponse = $this->loginPayOS();
+
+                // Check if login was successful
+                if ($loginResponse->getStatusCode() == 200) {
+                    // Retry checkCCCD with new token
+                    $token = DB::table('payos')->first()->token;
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                        'Content-Type: application/json',
+                        'Authorization: Bearer ' . $token,
+                    ]);
+                    $response = curl_exec($ch);
+                } else {
+                    // Return error if login failed
+                    return false;
+                }
+            }
+
+            curl_close($ch);
+
+            return json_decode($response)->code == 00 ? true : false;
+        } catch (\Throwable $th) {
+            return false;
+        }
+    }
+
     public function loginPayOS()
     {
         $url = env('PAYOS_URL_LOGIN');
