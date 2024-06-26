@@ -23,7 +23,7 @@ return new class extends Migration
             $table->dateTime('expired_at')->nullable();
             $table->unsignedBigInteger('amount');
             $table->string('description')->nullable();
-            $table->json('verification_secret_code')->nullable();
+            $table->string('verification_secret_code')->nullable();
             $table->json('bank_info')->nullable();
             $table->timestamps();
 
