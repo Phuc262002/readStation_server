@@ -370,6 +370,30 @@ class WalletController extends Controller
             ]);
         }
 
+        $transactionDeposit = WalletTransaction::where('user_id', auth()->user()->id)->where('transaction_type', 'deposit')->where('status', 'pending');
+        $transactionWithdraw = WalletTransaction::where('user_id', auth()->user()->id)->where('transaction_type', 'withdraw')->where('status', 'pending');
+
+        if ($request->transaction_type == 'deposit' && $transactionDeposit->count() > 0) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Hiện tại bạn đang có một giao dịch nạp tiền đang chờ xử lý',
+            ]);
+        }
+
+        if ($request->transaction_type == 'withdraw' && $transactionWithdraw->count() > 0) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Hiện tại bạn đang có một giao dịch rút tiền đang chờ xử lý',
+            ]);
+        }
+
+        if ($request->transaction_type == 'withdraw' && $wallet->balance < $request->amount) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Số dư không đủ',
+            ]);
+        }
+
         $transaction_code = intval(substr(strtotime(now()) . rand(1000, 9999), -9));
 
         $transaction = $wallet->transactions()->create([
