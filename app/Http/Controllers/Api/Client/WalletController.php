@@ -311,6 +311,12 @@ class WalletController extends Controller
                 ->paginate($pageSize, ['*'], 'page', $page);
         }
 
+        $transactions->getCollection()->transform(function ($transaction) {
+            return array_merge($transaction->toArray(), [
+                'verification_secret_code' => $transaction->verification_secret_code,
+            ]);
+        });
+
         return response()->json([
             'status' => true,
             'message' => 'Success',

@@ -37,6 +37,7 @@ class WalletTransaction extends Model
 
     protected $hidden = [
         'wallet_id',
+        'verification_secret_code',
     ];
 
     protected $attributes = [
