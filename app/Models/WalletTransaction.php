@@ -22,8 +22,18 @@ class WalletTransaction extends Model
         'amount',
         'completed_at',
         'description',
-        'bank_info'
+        'bank_info',
+        'verification_secret_code'
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            $model->verification_secret_code = strtoupper(substr(md5(uniqid()), 0, 10));
+        });
+    }
 
     protected $hidden = [
         'wallet_id',
