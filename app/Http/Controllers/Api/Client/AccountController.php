@@ -93,9 +93,9 @@ class AccountController extends Controller
             'gender' => 'nullable|string|in:male,female',
             'dob' => 'nullable|date',
             'street' => 'nullable|string',
-            'province_id' => 'nullable|string|exists:provinces,id',
-            'district_id' => 'nullable|string|exists:districts,id',
-            'ward_id' => 'nullable|string|exists:wards,id',
+            'province_id' => 'nullable|exists:provinces,id',
+            'district_id' => 'nullable|exists:districts,id',
+            'ward_id' => 'nullable|exists:wards,id',
             'address_detail' => 'nullable|string',
             'phone' => 'string|min:10|max:11',
         ], [
