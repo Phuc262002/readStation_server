@@ -294,7 +294,7 @@ class OrderController extends Controller
             'payment_method' => 'required|string|in:wallet,cash',
             'delivery_method' => 'required|string|in:pickup,shipper',
             'user_note' => 'nullable|string',
-            'discount' => 'nullable|date',
+            'discount' => 'nullable|numeric|min:0',
             'total_deposit_fee' => 'required|numeric|min:0',
             'total_service_fee' => 'required|integer|min:1',
             'total_shipping_fee' => 'required|numeric|min:0',
