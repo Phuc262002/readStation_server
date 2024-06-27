@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Order;
+use App\Models\LoanOrders;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use OpenApi\Attributes as OA;
@@ -11,7 +11,7 @@ use OpenApi\Attributes as OA;
 #[OA\Get(
     path: '/api/v1/admin/orders/statistic',
     operationId: 'adminOrderStatistic',
-    tags: ['Admin / Order'],
+    tags: ['Admin / Orders'],
     summary: 'Thống kê đơn hàng',
     description: 'Thống kê đơn hàng',
     security: [
@@ -36,7 +36,7 @@ use OpenApi\Attributes as OA;
 #[OA\Get(
     path: '/api/v1/admin/orders',
     operationId: 'adminOrderIndex',
-    tags: ['Admin / Order'],
+    tags: ['Admin / Orders'],
     summary: 'Danh sách đơn hàng',
     description: 'Danh sách đơn hàng',
     security: [
@@ -94,7 +94,7 @@ use OpenApi\Attributes as OA;
 #[OA\Get(
     path: '/api/v1/admin/orders/{id}',
     operationId: 'adminOrderShow',
-    tags: ['Admin / Order'],
+    tags: ['Admin / Orders'],
     summary: 'Chi tiết đơn hàng',
     description: 'Chi tiết đơn hàng',
     security: [
@@ -128,14 +128,14 @@ use OpenApi\Attributes as OA;
 class OrderController extends Controller
 {
     public function statisticOrder() {
-        $orders = Order::count();
-        $ordersHiring = Order::where('status', 'hiring')->count();
-        $ordersCompleted = Order::where('status', 'completed')->count();
-        $ordersOutOfDate = Order::where('status', 'out_of_date')->count();
-        $ordersPending = Order::where('status', 'pending')->count();
-        $ordersApproved = Order::where('status', 'approved')->count();
-        $ordersWatingTakeBook = Order::where('status', 'wating_take_book')->count();
-        $ordersCanceled = Order::where('status', 'canceled')->count();
+        $orders = LoanOrders::count();
+        $ordersHiring = LoanOrders::where('status', 'active')->count();
+        $ordersCompleted = LoanOrders::where('status', 'completed')->count();
+        $ordersOutOfDate = LoanOrders::where('status', 'overdue')->count();
+        $ordersPending = LoanOrders::where('status', 'pending')->count();
+        $ordersApproved = LoanOrders::where('status', 'approved')->count();
+        $ordersWatingTakeBook = LoanOrders::where('status', 'in_transit')->count();
+        $ordersCanceled = LoanOrders::where('status', 'canceled')->count();
         
 
         return response()->json([
@@ -161,13 +161,13 @@ class OrderController extends Controller
         $validator = Validator::make($request->all(), [
             'page' => 'integer',
             'pageSize' => 'integer',
-            'status' => 'in:pending,approved,wating_take_book,hiring,increasing,wating_return,completed,canceled,out_of_date',
+            'status' => 'in:pending,approved,ready_for_pickup,preparing_shipment,in_transit,extended,active,returning,completed,canceled,overdue',
             'search' => 'string',
             'sort' => 'in:asc,desc',
         ], [
             'page.integer' => 'Số trang phải là số nguyên',
             'pageSize.integer' => 'Số lượng phải là số nguyên',
-            'status.in' => 'Trạng thái phải là pending,approved,wating_take_book,hiring,increasing,wating_return,completed,canceled,out_of_date',
+            'status.in' => 'Trạng thái phải là pending,approved,ready_for_pickup,preparing_shipment,in_transit,extended,active,returning,completed,canceled,overdue',
             'search.string' => 'Tìm kiếm phải là chuỗi',
             'sort.in' => 'Sắp xếp phải là asc hoặc desc',
         ]);
@@ -186,7 +186,7 @@ class OrderController extends Controller
         $search = $request->input('search');
         $sort = $request->input('sort', 'desc');
 
-        $query = Order::query()->with(['user', 'orderDetails']);
+        $query = LoanOrders::query()->with(['user', 'loanOrderDetails']);
 
         if ($status) {
             $query->where('status', $status);
@@ -218,29 +218,10 @@ class OrderController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
     public function show(Request $request, $id)
     {
         $validator = Validator::make(['id' => $id], [
-            'id' => 'required|integer|exists:orders,id'
+            'id' => 'required|integer|exists:loan_orders,id'
         ], [
             'id.required' => 'Id không được để trống',
             'id.integer' => 'Id phải là số nguyên',
@@ -257,15 +238,18 @@ class OrderController extends Controller
 
 
         try {
-            $order = Order::with([
+            $order = LoanOrders::with([
                 'user',
-                'orderDetails',
+                'shippingMethod',
+                'loanOrderDetails',
+                'extensions.extensionDetails',
+                'loanOrderDetails.returnHistories',
                 'transaction',
-                'orderDetails.bookDetail',
-                'orderDetails.bookDetail.book',
-                'orderDetails.bookDetail.book.author',
-                'orderDetails.bookDetail.book.category',
-                'orderDetails.bookDetail.publishingCompany',
+                'loanOrderDetails.bookDetails',
+                'loanOrderDetails.bookDetails.book',
+                // 'loanOrderDetails.bookDetails.book.author',
+                // 'loanOrderDetails.bookDetails.book.category',
+                // 'loanOrderDetails.bookDetails.publishingCompany',
             ])->find($id);
 
             return response()->json([
@@ -275,17 +259,18 @@ class OrderController extends Controller
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
-                'message' => 'Lỗi không xác định'
+                'message' => 'Lỗi không xác định',
+                'errors' => $th->getMessage()
             ], 500);
         }
     }
 
-    public function update(Request $request, Order $order)
+    public function update(Request $request, LoanOrders $order)
     {
         //
     }
 
-    public function destroy(Order $order)
+    public function destroy(LoanOrders $order)
     {
         //
     }

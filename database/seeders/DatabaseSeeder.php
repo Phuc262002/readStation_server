@@ -39,5 +39,12 @@ class DatabaseSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
         ]]);
+
+        DB::table('payos')->insert([[
+            'id' => '1',
+            'token' => '123',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]]);
     }
 }

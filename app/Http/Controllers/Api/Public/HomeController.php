@@ -7,7 +7,7 @@ use App\Models\Author;
 use App\Models\Book;
 use App\Models\BookDetail;
 use App\Models\Category;
-use App\Models\OrderDetail;
+use App\Models\LoanOrderDetails;
 use App\Models\User;
 use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
@@ -174,7 +174,7 @@ class HomeController extends Controller
 
     public function bookRecommend(Request $request)
     {
-        $orderDetails = OrderDetail::select('book_details_id')
+        $orderDetails = LoanOrderDetails::select('book_details_id')
             ->groupBy('book_details_id')
             ->orderByRaw('COUNT(book_details_id) DESC')
             ->limit(16)
@@ -213,7 +213,7 @@ class HomeController extends Controller
     {
         $totalBooks = Book::where('status', 'active')->count();
         $totalAuthors = Author::where('status', 'active')->count();
-        $totalBookOrders = OrderDetail::select('book_details_id')
+        $totalBookOrders = LoanOrderDetails::select('book_details_id')
         ->groupBy('book_details_id')
         ->orderByRaw('COUNT(book_details_id) DESC')
         ->count();

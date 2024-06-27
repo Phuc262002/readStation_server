@@ -2079,7 +2079,7 @@
         "/api/v1/admin/orders/statistic": {
             "get": {
                 "tags": [
-                    "Admin / Order"
+                    "Admin / Orders"
                 ],
                 "summary": "Thống kê đơn hàng",
                 "description": "Thống kê đơn hàng",
@@ -2105,7 +2105,7 @@
         "/api/v1/admin/orders": {
             "get": {
                 "tags": [
-                    "Admin / Order"
+                    "Admin / Orders"
                 ],
                 "summary": "Danh sách đơn hàng",
                 "description": "Danh sách đơn hàng",
@@ -2182,7 +2182,7 @@
         "/api/v1/admin/orders/{id}": {
             "get": {
                 "tags": [
-                    "Admin / Order"
+                    "Admin / Orders"
                 ],
                 "summary": "Chi tiết đơn hàng",
                 "description": "Chi tiết đơn hàng",
@@ -5037,10 +5037,10 @@
                 ]
             }
         },
-        "/api/v1/account/order/get-all": {
+        "/api/v1/account/orders": {
             "get": {
                 "tags": [
-                    "Account"
+                    "Account / Orders"
                 ],
                 "summary": "Get all order",
                 "description": "Get all order",
@@ -5107,10 +5107,10 @@
                 ]
             }
         },
-        "/api/v1/account/order/create": {
+        "/api/v1/account/orders/create": {
             "post": {
                 "tags": [
-                    "Account"
+                    "Account / Orders"
                 ],
                 "summary": "Create order",
                 "description": "Create order",
@@ -5122,7 +5122,7 @@
                             "schema": {
                                 "required": [
                                     "payment_method",
-                                    "payment_shipping",
+                                    "delivery_method",
                                     "phone",
                                     "address",
                                     "deposit_fee",
@@ -5138,7 +5138,7 @@
                                             "cash"
                                         ]
                                     },
-                                    "payment_shipping": {
+                                    "delivery_method": {
                                         "description": "Phương thức vận chuyển",
                                         "type": "string",
                                         "enum": [
@@ -5146,27 +5146,33 @@
                                             "shipper"
                                         ]
                                     },
-                                    "phone": {
-                                        "description": "Số điện thoại",
-                                        "type": "string"
-                                    },
-                                    "address": {
-                                        "description": "Địa chỉ",
-                                        "type": "string"
-                                    },
                                     "user_note": {
                                         "description": "Ghi chú",
                                         "type": "string"
                                     },
-                                    "expired_date": {
-                                        "description": "Ngày hết hạn",
-                                        "type": "string"
+                                    "delivery_info": {
+                                        "description": "Thông tin giao hàng",
+                                        "properties": {
+                                            "fullname": {
+                                                "description": "Họ tên",
+                                                "type": "string"
+                                            },
+                                            "phone": {
+                                                "description": "Số điện thoại",
+                                                "type": "string"
+                                            },
+                                            "address": {
+                                                "description": "Địa chỉ",
+                                                "type": "string"
+                                            }
+                                        },
+                                        "type": "object"
                                     },
                                     "shipping_method_id": {
                                         "description": "Id phương thức vận chuyển",
                                         "type": "integer"
                                     },
-                                    "shipping_fee": {
+                                    "total_shipping_fee": {
                                         "description": "Phí vận chuyển",
                                         "type": "number"
                                     },
@@ -5200,7 +5206,7 @@
                                                     "description": "Phí dịch vụ",
                                                     "type": "integer"
                                                 },
-                                                "deposit": {
+                                                "deposit_fee": {
                                                     "description": "Tiền đặt cọc",
                                                     "type": "number"
                                                 }
@@ -5232,10 +5238,10 @@
                 ]
             }
         },
-        "/api/v1/account/order/get-one/{id}": {
+        "/api/v1/account/orders/{id}": {
             "get": {
                 "tags": [
-                    "Account"
+                    "Account / Orders"
                 ],
                 "summary": "Get order",
                 "description": "Get order",
@@ -5257,6 +5263,80 @@
                     },
                     "400": {
                         "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/account/orders/cancel/{id}": {
+            "put": {
+                "tags": [
+                    "Account / Orders"
+                ],
+                "summary": "Cancel order",
+                "description": "Cancel order",
+                "operationId": "cancelOrder",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id của order",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Cancel order successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Cancel order failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/account/orders/extension/{id}": {
+            "post": {
+                "tags": [
+                    "Account / Orders"
+                ],
+                "summary": "Extension all order",
+                "description": "Extension all order",
+                "operationId": "extensionAllOrder",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id của order",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Extension all order successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Extension all order failed"
                     }
                 },
                 "security": [

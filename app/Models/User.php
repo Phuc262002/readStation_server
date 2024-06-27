@@ -141,7 +141,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function order()
     {
-        return $this->hasMany(Order::class);
+        return $this->hasMany(LoanOrders::class);
     }
 
     public function comment()

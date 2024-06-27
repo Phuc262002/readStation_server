@@ -95,12 +95,13 @@ Route::group([
         });
 
         Route::group([
-            "prefix" => "order"
+            "prefix" => "orders"
         ], function () {
-            Route::get('/get-all', [OrderController::class, 'index']);
-            Route::get('/get-one/{id}', [OrderController::class, 'show']);
+            Route::get('/', [OrderController::class, 'index']);
+            Route::get('/{id}', [OrderController::class, 'show']);
             Route::post('/create', [OrderController::class, 'store']);
-            Route::put('/update/{order}', [OrderController::class, 'update']);
+            Route::put('/cancel/{id}', [OrderController::class, 'cancelOrder']);
+            Route::post('/extension/{id}', [OrderController::class, 'extensionAllOrder']);
         });
     });
 

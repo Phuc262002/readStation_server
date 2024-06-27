@@ -64,7 +64,7 @@ class BookDetail extends Model
 
     public function order_details()
     {
-        return $this->hasMany(OrderDetail::class, 'book_details_id');
+        return $this->hasMany(LoanOrderDetails::class, 'book_details_id');
     }
 
     public function publishingCompany()

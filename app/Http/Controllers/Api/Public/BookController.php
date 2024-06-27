@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Public;
 use App\Http\Controllers\Controller;
 use App\Models\Book;
 use App\Models\BookDetail;
+use App\Models\BookReviews;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use OpenApi\Attributes as OA;
@@ -210,28 +211,24 @@ class BookController extends Controller
         $books = $query->orderBy('created_at', 'desc')->paginate($pageSize, ['*'], 'page', $page);
 
         $filteredBooks = $books->getCollection()->filter(function ($book) use ($rating) {
-            $averageRate = $book->order_details
-                ->where('status_cmt', 'active')
-                ->where('status_od', 'completed')
-                ->avg('rate');
-            $averageRateRounded = round($averageRate, 1);
+            $bookReviews = BookReviews::where('book_details_id', $book->id);;
+            $averageRateRounded = round($bookReviews->avg('rating'), 1);
+
             $book->average_rate = $averageRateRounded;
-            $book->rating_total = $book->order_details
-                ->where('status_cmt', 'active')
-                ->where('status_od', 'completed')
-                ->count();
+            $book->rating_total = $bookReviews->count();
+            $book->hire_count = $book->order_details->count();
             unset($book->order_details);
-        
+
             if ($rating) {
                 return $averageRateRounded >= $rating && $averageRateRounded <= $rating + 1;
             }
-        
+
             return true; // Nếu không có rating, giữ lại tất cả các sách
         });
-        
+
         // Cập nhật lại bộ sưu tập với những sách đã lọc
         $books->setCollection($filteredBooks);
-        
+
 
         return response()->json([
             "status" => true,
@@ -269,8 +266,6 @@ class BookController extends Controller
         $book = BookDetail::with([
             'publishingCompany',
             'order_details',
-            'order_details.order',
-            'order_details.order.user',
             'book.category',
             'book.author',
             'book.shelve',
@@ -283,26 +278,19 @@ class BookController extends Controller
             ->where('status', 'active')
             ->first();
 
-        $averageRate = $book->order_details
-            ->where('status_cmt', 'active')
-            ->where('status_od', 'completed')
-            ->avg('rate');
-        $averageRateRounded = round($averageRate, 1);
+        $bookReviews = BookReviews::with('user')->where('book_details_id', $book->id);;
+        $averageRateRounded = round($bookReviews->avg('rating'), 1);
+
         $book->average_rate = $averageRateRounded;
+        $book->rating_total = $bookReviews->count();
 
-
-        $book->rating_total = $book->order_details
-            ->where('status_cmt', 'active')
-            ->where('status_od', 'completed')->count();
-        $rating_comments = $book->order_details->map(function ($orderDetail) {
-            $orderDetail->only(['rate', 'comment', 'date_rate', 'order']);
-
-            return [
-                'rate' => $orderDetail->rate,
-                'comment' => $orderDetail->comment,
-                'date_rate' => $orderDetail->date_rate,
-                'user' => $orderDetail->order->user->only(['fullname', 'avatar'])
-            ];
+        $rating_comments = $bookReviews->get()->map(function ($review) {
+            return array_merge(
+                $review->only(
+                    ['id', 'rating', 'review_text', 'review_date'],
+                ),
+                ['user' => $review->user->only(['id', 'fullname', 'avatar'])]
+            );
         });
 
         $book->order_count = $book->order_details->where('status_od', 'completed')->count();

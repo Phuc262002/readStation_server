@@ -5,8 +5,9 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Bookcase;
 use App\Models\BookDetail;
+use App\Models\BookReviews;
 use App\Models\InvoiceEnter;
-use App\Models\OrderDetail;
+use App\Models\LoanOrderDetails;
 use App\Models\Post;
 use App\Models\Shelve;
 use App\Models\User;
@@ -68,8 +69,8 @@ class DashboardController extends Controller
         $book = BookDetail::count();
         $post = Post::count();
 
-        $serviceFeeSum = OrderDetail::where('status_od', 'completed')->sum('service_fee');
-        $fineFeeSum = OrderDetail::where('status_od', 'completed')->sum('fine_fee');
+        $serviceFeeSum = LoanOrderDetails::where('status', 'completed')->sum('service_fee');
+        $fineFeeSum = LoanOrderDetails::where('status', 'completed')->sum('fine_amount');
 
         $revenue = $serviceFeeSum + $fineFeeSum;
 
@@ -92,7 +93,7 @@ class DashboardController extends Controller
     public function bookHireTopByMonth(Request $request)
     {
         // Get top book detail IDs based on completed orders in the last month
-        $orderDetails = OrderDetail::where('status_od', 'completed')
+        $orderDetails = LoanOrderDetails::where('status', 'completed')
             ->where('created_at', '>=', now()->subMonth())
             ->select('book_details_id')
             ->groupBy('book_details_id')
@@ -115,15 +116,12 @@ class DashboardController extends Controller
 
         // Calculate the average rate, rating total, and hire count for each book
         $books->each(function ($book) {
-            $orderDetails = $book->order_details
-                ->where('status_cmt', 'active')
-                ->where('status_od', 'completed');
-
-            $averageRate = $orderDetails->avg('rate');
-            $averageRateRounded = round($averageRate, 1);
+            $bookReviews = BookReviews::where('book_details_id', $book->id);
+                ;
+            $averageRateRounded = round($bookReviews->avg('rating'), 1);
 
             $book->average_rate = $averageRateRounded;
-            $book->rating_total = $orderDetails->count();
+            $book->rating_total = $bookReviews->count(); 
             $book->hire_count = $book->order_details->count(); // Count the total hires
 
             unset($book->order_details);
