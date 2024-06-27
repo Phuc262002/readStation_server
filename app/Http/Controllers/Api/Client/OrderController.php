@@ -783,6 +783,7 @@ class OrderController extends Controller
 
             foreach ($order->loanOrderDetails as $orderDetail) {
                 $orderDetail->update([
+                    'current_due_date' => date('Y-m-d', strtotime($orderDetail->current_due_date . ' + 4 days')),
                     'status' => 'extended'
                 ]);
             }
