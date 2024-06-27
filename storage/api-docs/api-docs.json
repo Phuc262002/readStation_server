@@ -5130,10 +5130,11 @@
                             "schema": {
                                 "required": [
                                     "payment_method",
+                                    "discount",
                                     "delivery_method",
-                                    "phone",
-                                    "address",
-                                    "deposit_fee",
+                                    "total_deposit_fee",
+                                    "total_service_fee",
+                                    "total_shipping_fee",
                                     "total_all_fee",
                                     "order_details"
                                 ],
@@ -5157,6 +5158,10 @@
                                     "user_note": {
                                         "description": "Ghi chú",
                                         "type": "string"
+                                    },
+                                    "discount": {
+                                        "description": "Giảm giá",
+                                        "type": "number"
                                     },
                                     "delivery_info": {
                                         "description": "Thông tin giao hàng",
