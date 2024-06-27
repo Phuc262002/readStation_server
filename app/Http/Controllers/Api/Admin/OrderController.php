@@ -64,7 +64,7 @@ use OpenApi\Attributes as OA;
             description: 'Trạng thái đơn hàng',
             schema: new OA\Schema(
                 type: 'string',
-                enum: ['pending', 'approved', 'wating_take_book', 'hiring', 'increasing', 'wating_return', 'completed', 'canceled', 'out_of_date']
+                enum: ['pending', 'approved', 'ready_for_pickup', 'preparing_shipment', 'in_transit', 'extended', 'active', 'returning', 'completed', 'canceled', 'overdue']
             )
         ),
         new OA\Parameter(

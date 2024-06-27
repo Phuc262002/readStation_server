@@ -41,7 +41,7 @@ use OpenApi\Attributes as OA;
             in: 'query',
             required: false,
             description: 'Trạng thái của order',
-            schema: new OA\Schema(type: 'string', enum: ['pending', 'hiring', 'completed', 'canceled', 'out_of_date'])
+            schema: new OA\Schema(type: 'string', enum: ['pending', 'approved', 'ready_for_pickup', 'preparing_shipment', 'in_transit', 'extended', 'active', 'returning', 'completed', 'canceled', 'overdue'])
         ),
         new OA\Parameter(
             name: 'search',

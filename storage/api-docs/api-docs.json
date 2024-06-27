@@ -2141,13 +2141,15 @@
                             "enum": [
                                 "pending",
                                 "approved",
-                                "wating_take_book",
-                                "hiring",
-                                "increasing",
-                                "wating_return",
+                                "ready_for_pickup",
+                                "preparing_shipment",
+                                "in_transit",
+                                "extended",
+                                "active",
+                                "returning",
                                 "completed",
                                 "canceled",
-                                "out_of_date"
+                                "overdue"
                             ]
                         }
                     },
@@ -5075,10 +5077,16 @@
                             "type": "string",
                             "enum": [
                                 "pending",
-                                "hiring",
+                                "approved",
+                                "ready_for_pickup",
+                                "preparing_shipment",
+                                "in_transit",
+                                "extended",
+                                "active",
+                                "returning",
                                 "completed",
                                 "canceled",
-                                "out_of_date"
+                                "overdue"
                             ]
                         }
                     },
