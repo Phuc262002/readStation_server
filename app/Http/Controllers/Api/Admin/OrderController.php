@@ -127,7 +127,8 @@ use OpenApi\Attributes as OA;
 
 class OrderController extends Controller
 {
-    public function statisticOrder() {
+    public function statisticOrder()
+    {
         $orders = LoanOrders::count();
         $ordersHiring = LoanOrders::where('status', 'active')->count();
         $ordersCompleted = LoanOrders::where('status', 'completed')->count();
@@ -136,7 +137,7 @@ class OrderController extends Controller
         $ordersApproved = LoanOrders::where('status', 'approved')->count();
         $ordersWatingTakeBook = LoanOrders::where('status', 'in_transit')->count();
         $ordersCanceled = LoanOrders::where('status', 'canceled')->count();
-        
+
 
         return response()->json([
             'status' => true,
@@ -242,14 +243,18 @@ class OrderController extends Controller
                 'user',
                 'shippingMethod',
                 'loanOrderDetails',
-                'extensions.extensionDetails',
-                'loanOrderDetails.returnHistories',
-                'transaction',
                 'loanOrderDetails.bookDetails',
+                'loanOrderDetails.extensionsDetails',
+                // 'loanOrderDetails.bookDetails.publishingCompany',
+                // 'loanOrderDetails.bookDetails.publishingCompany',
                 'loanOrderDetails.bookDetails.book',
                 // 'loanOrderDetails.bookDetails.book.author',
                 // 'loanOrderDetails.bookDetails.book.category',
-                // 'loanOrderDetails.bookDetails.publishingCompany',
+                // 'loanOrderDetails.bookDetails.book.shelve',
+                // 'loanOrderDetails.bookDetails.book.shelve.bookcase',
+                'transaction',
+                'extensions',
+                // 'extensions.extensionDetails',
             ])->find($id);
 
             return response()->json([
