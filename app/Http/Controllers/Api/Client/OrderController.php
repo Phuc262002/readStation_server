@@ -75,11 +75,12 @@ use OpenApi\Attributes as OA;
     requestBody: new OA\RequestBody(
         required: true,
         content: new OA\JsonContent(
-            required: ['payment_method', 'delivery_method', 'phone', 'address', 'deposit_fee', 'total_all_fee', 'order_details'],
+            required: ['payment_method', 'discount', 'delivery_method', 'total_deposit_fee', 'total_service_fee', 'total_shipping_fee', 'total_all_fee', 'order_details'],
             properties: [
                 new OA\Property(property: 'payment_method', type: 'string', description: 'Phương thức thanh toán', enum: ['wallet', 'cash']),
                 new OA\Property(property: 'delivery_method', type: 'string', description: 'Phương thức vận chuyển', enum: ['library', 'shipper']),
                 new OA\Property(property: 'user_note', type: 'string', description: 'Ghi chú'),
+                new OA\Property(property: 'discount', type: 'number', description: 'Giảm giá'),
                 new OA\Property(
                     property: 'delivery_info',
                     type: 'object',
