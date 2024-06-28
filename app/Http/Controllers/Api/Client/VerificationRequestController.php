@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Client;
 
 use App\Http\Controllers\Api\PayOS\CheckCCCDController;
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\Models\VerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -303,6 +304,20 @@ class VerificationRequestController extends Controller
                     "message" => "Validation error",
                     "errors" => $validator3->errors()
                 ], 400);
+            }
+
+            $users = User::all();
+
+            foreach ($users as $user) {
+                if ($user->citizen_identity_card) {
+                    if ($user->citizen_identity_card['citizen_code'] == $request->verification_card_type['citizen_code']) {
+                        return response()->json([
+                            "status" => false,
+                            "message" => "Validation error",
+                            "errors" => "CCCD/CMND đã tồn tại trong hệ thống."
+                        ], 400);
+                    }
+                }
             }
 
             $checkCCCD = new CheckCCCDController();

@@ -788,6 +788,20 @@ class WalletController extends Controller
         try {
             $wallet = Wallet::where('user_id', $request->user_id)->first();
 
+            $users = User::all();
+
+            foreach ($users as $user) {
+                if ($user->citizen_identity_card) {
+                    if ($user->citizen_identity_card['citizen_code'] == $request->citizen_code) {
+                        return response()->json([
+                            "status" => false,
+                            "message" => "Validation error",
+                            "errors" => "CCCD/CMND đã tồn tại trong hệ thống."
+                        ], 400);
+                    }
+                }
+            }
+
             if (!$wallet) {
                 $wallet = Wallet::create([
                     'user_id' => $request->user_id,
