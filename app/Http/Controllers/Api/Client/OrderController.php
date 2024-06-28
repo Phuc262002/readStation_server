@@ -588,16 +588,15 @@ class OrderController extends Controller
             'loanOrderDetails',
             'loanOrderDetails.bookDetails',
             'loanOrderDetails.extensionsDetails',
-            // 'loanOrderDetails.bookDetails.publishingCompany',
-            // 'loanOrderDetails.bookDetails.publishingCompany',
+            'loanOrderDetails.bookDetails.publishingCompany',
             'loanOrderDetails.bookDetails.book',
-            // 'loanOrderDetails.bookDetails.book.author',
-            // 'loanOrderDetails.bookDetails.book.category',
-            // 'loanOrderDetails.bookDetails.book.shelve',
-            // 'loanOrderDetails.bookDetails.book.shelve.bookcase',
+            'loanOrderDetails.bookDetails.book.author',
+            'loanOrderDetails.bookDetails.book.category',
+            'loanOrderDetails.bookDetails.book.shelve',
+            'loanOrderDetails.bookDetails.book.shelve.bookcase',
             'transaction',
             'extensions',
-            // 'extensions.extensionDetails',
+            'extensions.extensionDetails',
         )->find($id);
 
         return response()->json([
