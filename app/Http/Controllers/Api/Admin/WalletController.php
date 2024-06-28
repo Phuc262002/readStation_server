@@ -446,6 +446,15 @@ class WalletController extends Controller
         }
 
         try {
+            $wallet->history()->create([
+                'previous_balance' => $wallet->balance,
+                'new_balance' => $wallet->balance + $transaction->amount,
+                'previous_status' => $wallet->status,
+                'new_status' => $wallet->status,
+                'action' => 'deposit',
+                'reason' => 'Nạp tiền vào ví',
+            ]);
+
             $wallet->update([
                 'balance' => $wallet->balance + $transaction->amount
             ]);
@@ -530,6 +539,15 @@ class WalletController extends Controller
             ]);
         }
 
+        $wallet->history()->create([
+            'previous_balance' => $wallet->balance,
+            'new_balance' => $wallet->balance,
+            'previous_status' => $wallet->status,
+            'new_status' => $wallet->status,
+            'action' => 'update_status',
+            'reason' => 'Cập nhật trạng thái ví',
+        ]);
+
         $wallet->update([
             'status' => $request->status,
             'reason' => $request->reason,
@@ -608,6 +626,14 @@ class WalletController extends Controller
             $wallet = Wallet::where('user_id', auth()->user()->id)->first();
 
             if ($request->status == 'completed') {
+                $wallet->history()->create([
+                    'previous_balance' => $wallet->balance,
+                    'new_balance' => $wallet->balance + $transaction->amount,
+                    'previous_status' => $wallet->status,
+                    'new_status' => $wallet->status,
+                    'action' => 'deposit',
+                    'reason' => 'Nạp tiền vào ví',
+                ]);
                 $wallet->update([
                     'balance' => $wallet->balance + $transaction->amount
                 ]);
@@ -791,6 +817,13 @@ class WalletController extends Controller
                             'date_of_issue' => $request->date_of_issue,
                             'place_of_issue' => $request->place_of_issue,
                         ],
+                    ]);
+
+                    $wallet->history()->create([
+                        'previous_status' => 'none_verify',
+                        'new_status' => 'active',
+                        'action' => 'update_status',
+                        'reason' => 'Xác minh ví',
                     ]);
 
                     $wallet->update([

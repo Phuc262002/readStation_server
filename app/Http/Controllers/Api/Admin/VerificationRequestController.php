@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\VerificationRequest;
+use App\Models\Wallet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use OpenApi\Attributes as OA;
@@ -307,12 +308,31 @@ class VerificationRequestController extends Controller
                         ],
                     ]);
 
+                    $wallet = Wallet::where('user_id', $user->id)->first();
                     if ($user->wallet()->count() === 0) {
                         $user->wallet()->create([
                             'balance' => 0
                         ]);
+
+                        $wallet->history()->create([
+                            'previous_balance' => $wallet->balance,
+                            'new_balance' => $wallet->balance,
+                            'previous_status' => 'active',
+                            'new_status' => 'active',
+                            'action' => 'update_status',
+                            'reason' => 'Xác minh ví',
+                        ]);
                     } else {
                         if ($user->wallet()->first()->status === 'none_verify') {
+                            $wallet->history()->create([
+                                'previous_balance' => $wallet->balance,
+                                'new_balance' => $wallet->balance,
+                                'previous_status' => 'none_verify',
+                                'new_status' => 'active',
+                                'action' => 'update_status',
+                                'reason' => 'Xác minh ví',
+                            ]);
+
                             $user->wallet()->first()->update([
                                 'status' => 'active'
                             ]);

@@ -485,6 +485,15 @@ class OrderController extends Controller
 
                 $order->loanOrderDetails()->createMany($orderDetails);
 
+                $wallet->history()->create([
+                    'previous_balance' => $wallet->balance,
+                    'new_balance' => $wallet->balance - $validatedData['total_all_fee'],
+                    'previous_status' => $wallet->status,
+                    'new_status' => $wallet->status,
+                    'action' => 'update_balance',
+                    'reason' => 'payment',
+                ]);
+
                 $wallet->update([
                     'balance' => $wallet->balance - $validatedData['total_all_fee']
                 ]);
@@ -670,6 +679,15 @@ class OrderController extends Controller
                     'description' => 'Hoàn tiền đơn thuê ' . $order->order_code,
                 ]);
 
+                $wallet->history()->create([
+                    'previous_balance' => $wallet->balance,
+                    'new_balance' => $wallet->balance + $transaction->amount,
+                    'previous_status' => $wallet->status,
+                    'new_status' => $wallet->status,
+                    'action' => 'update_balance',
+                    'reason' => 'refund',
+                ]);
+
                 $wallet->update([
                     'balance' => $wallet->balance + $transaction->amount
                 ]);
@@ -770,6 +788,15 @@ class OrderController extends Controller
                 'status' => 'completed',
                 'completed_at' => now(),
                 'description' => 'Thanh toán gia hạn đơn thuê ' . $order->order_code,
+            ]);
+
+            $wallet->history()->create([
+                'previous_balance' => $wallet->balance,
+                'new_balance' => $wallet->balance - $extension_fee,
+                'previous_status' => $wallet->status,
+                'new_status' => $wallet->status,
+                'action' => 'update_balance',
+                'reason' => 'payment',
             ]);
 
             $wallet->update([
