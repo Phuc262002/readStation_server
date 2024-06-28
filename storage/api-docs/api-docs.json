@@ -4353,6 +4353,76 @@
                 ]
             }
         },
+        "/api/v1/admin/wallet/verification-wallet": {
+            "post": {
+                "tags": [
+                    "Admin / Wallet"
+                ],
+                "summary": "Verification wallet",
+                "description": "Verification wallet",
+                "operationId": "verificationWalletAdmin",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "user_id",
+                                    "citizen_name",
+                                    "citizen_code",
+                                    "date_of_issue",
+                                    "place_of_issue"
+                                ],
+                                "properties": {
+                                    "user_id": {
+                                        "description": "ID người dùng",
+                                        "type": "string",
+                                        "example": "1"
+                                    },
+                                    "citizen_name": {
+                                        "description": "Họ tên",
+                                        "type": "string",
+                                        "example": "Nguyễn Văn A"
+                                    },
+                                    "citizen_code": {
+                                        "description": "Số CCCD/CMND",
+                                        "type": "string",
+                                        "example": "123456789"
+                                    },
+                                    "date_of_issue": {
+                                        "description": "Ngày cấp",
+                                        "type": "string",
+                                        "example": "2021-01-01"
+                                    },
+                                    "place_of_issue": {
+                                        "description": "Nơi cấp",
+                                        "type": "string",
+                                        "example": "Hà Nội"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Verification wallet successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Verification wallet failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/auth/login": {
             "post": {
                 "tags": [

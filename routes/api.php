@@ -126,6 +126,7 @@ Route::group([
             Route::post('create-deposit', [AdminWalletController::class, 'storeDeposit']);
             Route::get('get-user-wallet-transactions-history/{id}', [AdminWalletController::class, 'show']);
             Route::put('update-status/{id}', [AdminWalletController::class, 'update']);
+            Route::post('verification-wallet', [AdminWalletController::class, 'verificationWallet']);
 
             Route::put('update-transaction-status/{id}', [AdminWalletController::class, 'updateTransactionStatus']);
             Route::post('cancel-transaction/{transaction_code}', [AdminWalletController::class, 'cancelPaymentLinkOfTransction']);

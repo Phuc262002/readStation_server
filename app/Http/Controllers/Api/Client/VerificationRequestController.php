@@ -210,7 +210,6 @@ class VerificationRequestController extends Controller
             'verification_card_image.front.string' => 'Ảnh mặt trước thẻ phải là chuỗi.',
             'verification_card_image.back.required' => 'Ảnh mặt sau thẻ là bắt buộc.',
             'verification_card_image.back.string' => 'Ảnh mặt sau thẻ phải là chuỗi.',
-            'verification_card_info.required' => 'Thông tin thẻ là bắt buộc.',
         ]);
 
         if ($validator->fails()) {
@@ -228,6 +227,27 @@ class VerificationRequestController extends Controller
                     'message' => 'Bạn đã gửi yêu cầu xác thực thẻ ' . $request->verification_card_type . ' rồi.',
                 ]);
             }
+        }
+
+        if (auth()->user()->role->name == 'student' && $request->verification_card_type == 'student_card') {
+            return response()->json([
+                'status' => false,
+                'message' => 'Bạn đang là sinh viên, không thể xác thực thẻ sinh viên.',
+            ]);
+        }
+
+        if (auth()->user()->role->name === 'admin' || auth()->user()->role->name == 'manager') {
+            return response()->json([
+                'status' => false,
+                'message' => 'Bạn Không có quyền thực hiện hành động này.',
+            ]);
+        }
+
+        if (auth()->user()->user_verified_at) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Tài khoản của bạn đã được xác thực.',
+            ]);
         }
 
         if ($request->verification_card_type == 'student_card') {

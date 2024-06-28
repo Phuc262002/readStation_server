@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Api\Admin;
 
+use App\Http\Controllers\Api\PayOS\CheckCCCDController;
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\Models\Wallet;
 use App\Models\WalletTransaction;
 use Illuminate\Http\Request;
@@ -276,6 +278,43 @@ use PayOS\PayOS;
     ]
 )]
 
+#[OA\Post(
+    path: '/api/v1/admin/wallet/verification-wallet',
+    tags: ['Admin / Wallet'],
+    operationId: 'verificationWalletAdmin',
+    summary: 'Verification wallet',
+    description: 'Verification wallet',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            required: ['user_id', 'citizen_name', 'citizen_code', 'date_of_issue', 'place_of_issue'],
+            properties: [
+                new OA\Property(property: 'user_id', type: 'string', description: 'ID người dùng', example: '1'),
+                new OA\Property(property: 'citizen_name', type: 'string', description: 'Họ tên', example: 'Nguyễn Văn A'),
+                new OA\Property(property: 'citizen_code', type: 'string', description: 'Số CCCD/CMND', example: '123456789'),
+                new OA\Property(property: 'date_of_issue', type: 'string', description: 'Ngày cấp', example: '2021-01-01'),
+                new OA\Property(property: 'place_of_issue', type: 'string', description: 'Nơi cấp', example: 'Hà Nội'),
+            ]
+        )
+    ),
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Verification wallet successfully'
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error'
+        ),
+        new OA\Response(
+            response: 500,
+            description: 'Verification wallet failed'
+        )
+    ]
+)]
 
 class WalletController extends Controller
 {
@@ -689,6 +728,94 @@ class WalletController extends Controller
                 "message" => $th->getMessage(),
                 "data" => null
             ]);
+        }
+    }
+
+    public function verificationWallet(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            "user_id" => "required|exists:users,id",
+            'citizen_name' => 'required|string',
+            'citizen_code' => 'required|string',
+            'date_of_issue' => 'required|date',
+            'place_of_issue' => 'required|string',
+        ], [
+            'user_id.required' => 'Vui lòng nhập ID người dùng',
+            'user_id.exists' => 'ID người dùng không tồn tại',
+            'citizen_name.required' => 'Vui lòng nhập họ tên',
+            'citizen_name.string' => 'Họ tên phải là chuỗi',
+            'citizen_code.required' => 'Vui lòng nhập số CMND/CCCD',
+            'citizen_code.string' => 'Số CMND/CCCD phải là chuỗi',
+            'date_of_issue.required' => 'Vui lòng nhập ngày cấp',
+            'date_of_issue.date' => 'Ngày cấp phải là ngày',
+            'place_of_issue.required' => 'Vui lòng nhập nơi cấp',
+            'place_of_issue.string' => 'Nơi cấp phải là chuỗi',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => $validator->errors(),
+            ]);
+        }
+
+        try {
+            $wallet = Wallet::where('user_id', $request->user_id)->first();
+
+            if (!$wallet) {
+                $wallet = Wallet::create([
+                    'user_id' => $request->user_id,
+                    'balance' => 0,
+                ]);
+            } else {
+                if ($wallet->status == 'none_verify') {
+                    $checkCCCD = new CheckCCCDController();
+
+                    $response = $checkCCCD->checkCCCDUser($request->citizen_code, $request->citizen_name);
+
+                    if (!$response) {
+                        return response()->json([
+                            "status" => false,
+                            "message" => "Validation error",
+                            "errors" => "Tên ứng với CCCD/CMND đang sai, vui lòng kiểm tra lại."
+                        ], 400);
+                    }
+
+                    $user = User::find($request->user_id);
+                    $user->update([
+                        'user_verified_at' => now(),
+                        'has_wallet' => true,
+                        'citizen_identity_card' => [
+                            'citizen_name' => $request->citizen_name,
+                            'citizen_code' => $request->citizen_code,
+                            'date_of_issue' => $request->date_of_issue,
+                            'place_of_issue' => $request->place_of_issue,
+                        ],
+                    ]);
+
+                    $wallet->update([
+                        'status' => 'active',
+                    ]);
+
+                    return response()->json([
+                        "status" => true,
+                        "message" => "Success",
+                        "data" => $wallet
+                    ]);
+                } else {
+                    return response()->json([
+                        "status" => false,
+                        "message" => "Validation error",
+                        "errors" => "Ví đã được xác minh"
+                    ], 400);
+                }
+            }
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => false,
+                "message" => "Lỗi hệ thống",
+                "errors" => $th->getMessage(),
+            ], 500);
         }
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\Models\VerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -253,16 +254,79 @@ class VerificationRequestController extends Controller
             if ($verification_request->status !== 'pending') {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Verification request is not pending',
+                    'message' => 'Yêu cầu xác thực đã được xử lý',
                 ]);
             }
 
-            $verification_request->update([
-                'status' => $request->status,
-                'reason' => $request->reason,
-                'user_handle_id' => auth()->user()->id,
-                'verification_date' => now()
-            ]);
+            $user = User::find($verification_request->user_request_id);
+
+            if ($verification_request->verification_card_type === 'student_card') {
+
+                if ($request->status === 'approved') {
+                    $verification_request->update([
+                        'status' => $request->status,
+                        'reason' => $request->reason,
+                        'user_handle_id' => auth()->user()->id,
+                        'verification_date' => now()
+                    ]);
+
+                    $user->update([
+                        'role_id' => 2,
+                        'student_id_card' => [
+                            'student_name' => $verification_request->verification_card_info['student_name'],
+                            'student_code' => $verification_request->verification_card_info['student_code'],
+                            'student_card_expired' => $verification_request->verification_card_info['student_card_expired'],
+                            'place_of_study' => $verification_request->verification_card_info['place_of_study'],
+                        ],
+                    ]);
+                } else {
+                    $verification_request->update([
+                        'status' => $request->status,
+                        'reason' => $request->reason,
+                        'user_handle_id' => auth()->user()->id,
+                        'verification_date' => now()
+                    ]);
+                }
+            } else {
+                if ($request->status === 'approved') {
+                    $verification_request->update([
+                        'status' => $request->status,
+                        'reason' => $request->reason,
+                        'user_handle_id' => auth()->user()->id,
+                        'verification_date' => now()
+                    ]);
+
+                    $user->update([
+                        'user_verified_at' => now(),
+                        'has_wallet' => true,
+                        'citizen_identity_card' => [
+                            'citizen_name' => $verification_request->verification_card_info['citizen_name'],
+                            'citizen_code' => $verification_request->verification_card_info['citizen_code'],
+                            'date_of_issue' => $verification_request->verification_card_info['date_of_issue'],
+                            'place_of_issue' => $verification_request->verification_card_info['place_of_issue']
+                        ],
+                    ]);
+
+                    if ($user->wallet()->count() === 0) {
+                        $user->wallet()->create([
+                            'balance' => 0
+                        ]);
+                    } else {
+                        if ($user->wallet()->first()->status === 'none_verify') {
+                            $user->wallet()->first()->update([
+                                'status' => 'active'
+                            ]);
+                        }
+                    }
+                } else {
+                    $verification_request->update([
+                        'status' => $request->status,
+                        'reason' => $request->reason,
+                        'user_handle_id' => auth()->user()->id,
+                        'verification_date' => now()
+                    ]);
+                }
+            }
 
             return response()->json([
                 'status' => true,
@@ -273,6 +337,7 @@ class VerificationRequestController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'Update verification_request failed',
+                'errors' => $th->getMessage(),
             ]);
         }
     }
