@@ -3830,6 +3830,173 @@
                 ]
             }
         },
+        "/api/v1/admin/verification-requests": {
+            "get": {
+                "tags": [
+                    "Admin / Verification Request"
+                ],
+                "summary": "Get all verification requests",
+                "description": "Get all verification requests",
+                "operationId": "adminVerificationRequestIndex",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Số trang hiện tại",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "pageSize",
+                        "in": "query",
+                        "description": "Số lượng mục trên mỗi trang",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "verification_card_type",
+                        "in": "query",
+                        "description": "Lọc theo loại thẻ",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "student_card",
+                                "citizen_card"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Lọc theo trạng thái",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "pending",
+                                "approved",
+                                "rejected"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get all wallets successfully"
+                    },
+                    "500": {
+                        "description": "Get all wallets failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/verification-requests/{id}": {
+            "get": {
+                "tags": [
+                    "Admin / Verification Request"
+                ],
+                "summary": "Get a verification request",
+                "description": "Get a verification request",
+                "operationId": "adminVerificationRequestShow",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID của verification request",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get verification request successfully"
+                    },
+                    "500": {
+                        "description": "Get verification request failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/verification-requests/update/{id}": {
+            "put": {
+                "tags": [
+                    "Admin / Verification Request"
+                ],
+                "summary": "Update a verification request",
+                "description": "Update a verification request",
+                "operationId": "adminVerificationRequestUpdate",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID của verification request",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "status",
+                                    "reason"
+                                ],
+                                "properties": {
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "approved",
+                                            "rejected"
+                                        ]
+                                    },
+                                    "reason": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Update verification request successfully"
+                    },
+                    "500": {
+                        "description": "Update verification request failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/admin/wallet/get-all": {
             "get": {
                 "tags": [
@@ -3879,7 +4046,8 @@
                                 "active",
                                 "locked",
                                 "suspended",
-                                "frozen"
+                                "frozen",
+                                "none_verify"
                             ]
                         }
                     }
@@ -5666,6 +5834,163 @@
                     },
                     "500": {
                         "description": "Delete post failed!"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/account/verification-requests": {
+            "get": {
+                "tags": [
+                    "Account / Verification Request"
+                ],
+                "summary": "Get all verification requests",
+                "description": "Get all verification requests",
+                "operationId": "clientVerificationRequestIndex",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Số trang hiện tại",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "pageSize",
+                        "in": "query",
+                        "description": "Số lượng mục trên mỗi trang",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "verification_card_type",
+                        "in": "query",
+                        "description": "Lọc theo loại thẻ",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "student_card",
+                                "citizen_card"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Lọc theo trạng thái",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "pending",
+                                "approved",
+                                "rejected"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get all wallets successfully"
+                    },
+                    "500": {
+                        "description": "Get all wallets failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/account/verification-requests/create": {
+            "post": {
+                "tags": [
+                    "Account / Verification Request"
+                ],
+                "summary": "Create a verification request",
+                "description": "Create a verification request",
+                "operationId": "clientVerificationRequestStore",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "verification_card_type",
+                                    "verification_card_image",
+                                    "verification_card_info"
+                                ],
+                                "properties": {
+                                    "verification_card_type": {
+                                        "description": "Loại thẻ",
+                                        "type": "string",
+                                        "enum": [
+                                            "student_card",
+                                            "citizen_card"
+                                        ]
+                                    },
+                                    "verification_card_image": {
+                                        "description": "Ảnh thẻ",
+                                        "properties": {
+                                            "front": {
+                                                "description": "Ảnh mặt trước thẻ",
+                                                "type": "string"
+                                            },
+                                            "back": {
+                                                "description": "Ảnh mặt sau thẻ",
+                                                "type": "string"
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    "verification_card_info": {
+                                        "description": "Thông tin thẻ",
+                                        "properties": {
+                                            "student_name": {
+                                                "description": "Tên sinh viên",
+                                                "type": "string"
+                                            },
+                                            "student_code": {
+                                                "description": "Mã số sinh viên",
+                                                "type": "string"
+                                            },
+                                            "student_card_expired": {
+                                                "description": "Ngày hết hạn thẻ",
+                                                "type": "string",
+                                                "format": "date"
+                                            },
+                                            "place_of_study": {
+                                                "description": "Tên trường",
+                                                "type": "string"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Create verification request successfully"
+                    },
+                    "500": {
+                        "description": "Create verification request failed"
                     }
                 },
                 "security": [

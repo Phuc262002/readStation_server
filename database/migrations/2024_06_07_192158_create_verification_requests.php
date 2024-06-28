@@ -14,11 +14,10 @@ return new class extends Migration
         Schema::create('verification_requests', function (Blueprint $table) {
             $table->id();
             $table->foreignUuid('user_request_id');
-            $table->foreignUuid('user_handle_id');
-            $table->enum('verification_card_type', ['student_id_card', 'id_card_number']);
-            $table->string('verification_card_image');
+            $table->foreignUuid('user_handle_id')->nullable();
+            $table->enum('verification_card_type', ['student_card', 'citizen_card']);
+            $table->json('verification_card_image');
             $table->json('verification_card_info');
-            $table->date('card_expired');
             $table->string('reason')->nullable();
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->dateTime('verification_date')->nullable();

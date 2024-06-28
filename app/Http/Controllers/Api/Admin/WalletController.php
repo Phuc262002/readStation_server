@@ -46,7 +46,7 @@ use PayOS\PayOS;
             in: 'query',
             required: false,
             description: 'Lọc theo trạng thái',
-            schema: new OA\Schema(type: 'string', enum: ['active', 'locked', 'suspended', 'frozen'])
+            schema: new OA\Schema(type: 'string', enum: ['active', 'locked', 'suspended', 'frozen', 'none_verify'])
         ),
     ],
     responses: [
@@ -307,7 +307,7 @@ class WalletController extends Controller
             'pageSize.min' => 'Kích thước trang phải lớn hơn hoặc bằng 1.',
             'search.string' => 'Tìm kiếm phải là chuỗi.',
             'status.string' => 'Trạng thái phải là chuỗi.',
-            'status.in' => 'Trạng thái phải là active, locked, suspended hoặc frozen.',
+            'status.in' => 'Trạng thái phải là active, locked, suspended hoặc frozen, none_verify.',
         ]);
 
         if ($validator->fails()) {

@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\Admin\ShelveController;
 use App\Http\Controllers\Api\Admin\ShippingMethodController;
 use App\Http\Controllers\Api\Admin\SupplierController;
 use App\Http\Controllers\Api\Admin\UserController;
+use App\Http\Controllers\Api\Admin\VerificationRequestController;
 use App\Http\Controllers\Api\Admin\WalletController as AdminWalletController;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Auth\PasswordController;
@@ -25,6 +26,7 @@ use App\Http\Controllers\Api\Client\AccountController;
 use App\Http\Controllers\Api\Client\CommentController;
 use App\Http\Controllers\Api\Client\OrderController;
 use App\Http\Controllers\Api\Client\PostController;
+use App\Http\Controllers\Api\Client\VerificationRequestController as ClientVerificationRequestController;
 use App\Http\Controllers\Api\Client\WalletController;
 use App\Http\Controllers\Api\PayOS\CheckCCCDController;
 use App\Http\Controllers\Api\Public\AuthorController;
@@ -102,6 +104,13 @@ Route::group([
             Route::post('/create', [OrderController::class, 'store']);
             Route::put('/cancel/{id}', [OrderController::class, 'cancelOrder']);
             Route::post('/extension/{id}', [OrderController::class, 'extensionAllOrder']);
+        });
+
+        Route::group([
+            "prefix" => "verification-requests"
+        ], function () {
+            Route::get('/', [ClientVerificationRequestController::class, 'index']);
+            Route::post('/create', [ClientVerificationRequestController::class, 'store']);
         });
     });
 
@@ -262,6 +271,14 @@ Route::group([
             Route::post('/create', [ShippingMethodController::class, 'store']);
             Route::put('/update/{id}', [ShippingMethodController::class, 'update']);
             Route::delete('/delete/{id}', [ShippingMethodController::class, 'destroy']);
+        });
+
+        Route::group([
+            "prefix" => "verification-requests"
+        ], function () {
+            Route::get('/', [VerificationRequestController::class, 'index']);
+            Route::get('/{id}', [VerificationRequestController::class, 'show']);
+            Route::put('/update/{id}', [VerificationRequestController::class, 'update']);
         });
     });
 
