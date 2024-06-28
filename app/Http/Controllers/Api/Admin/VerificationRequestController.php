@@ -212,7 +212,7 @@ class VerificationRequestController extends Controller
         }
 
         try {
-            $verification_request = VerificationRequest::with('userRequest')->find($id);
+            $verification_request = VerificationRequest::with(['userRequest', 'userRequest.role'])->find($id);
 
             return response()->json([
                 'status' => true,
