@@ -836,6 +836,8 @@ class WalletController extends Controller
                     $wallet->history()->create([
                         'previous_status' => 'none_verify',
                         'new_status' => 'active',
+                        'previous_balance' => $wallet->balance,
+                        'new_balance' => $wallet->balance,
                         'action' => 'update_status',
                         'reason' => 'Xác minh ví',
                     ]);
