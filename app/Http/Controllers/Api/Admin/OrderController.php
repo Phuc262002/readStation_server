@@ -151,7 +151,7 @@ use OpenApi\Attributes as OA;
             description: 'Trạng thái đơn hàng',
             schema: new OA\Schema(
                 type: 'string',
-                enum: ['pending', 'approved', 'ready_for_pickup', 'preparing_shipment', 'in_transit', 'extended', 'active', 'returning', 'completed', 'canceled', 'overdue']
+                enum: ['pending', 'approved', 'ready_for_pickup', 'preparing_shipment', 'in_transit', 'extended', 'active', 'returning', 'completed', 'canceled']
             )
         ),
         new OA\Parameter(
