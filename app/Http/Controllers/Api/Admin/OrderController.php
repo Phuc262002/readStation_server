@@ -613,8 +613,21 @@ class OrderController extends Controller
                 ], 400);
             }
 
+            foreach ($order->loanOrderDetails as $orderDetail) {
+                $orderDetail->update([
+                    'status' => 'active',
+                    'original_due_date' => date('Y-m-d', strtotime($order->current_due_date . ' + 4 days')),
+                    'current_due_date' => date('Y-m-d', strtotime($order->current_due_date . ' + 4 days')),
+                ]);
+            }
+
             $order->update([
-                'status' => 'active'
+                'status' => 'active',
+                'loan_date' => now(),
+                'pickup_date' => now(),
+                'delivered_date' => now(),
+                'original_due_date' => date('Y-m-d', strtotime($order->current_due_date . ' + 4 days')),
+                'current_due_date' => date('Y-m-d', strtotime($order->current_due_date . ' + 4 days')),
             ]);
 
             return response()->json([
