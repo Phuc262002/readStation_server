@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\LoanOrders;
+use App\Models\Wallet;
+use App\Models\WalletTransaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use OpenApi\Attributes as OA;
@@ -113,6 +115,57 @@ use OpenApi\Attributes as OA;
         new OA\Response(
             response: 200,
             description: 'Chi tiết đơn hàng',
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error'
+        ),
+        new OA\Response(
+            response: 500,
+            description: 'Lỗi không xác định'
+        ),
+    ]
+)]
+
+#[OA\Put(
+    path: '/api/v1/admin/orders/update/{id}',
+    operationId: 'adminOrderUpdate',
+    tags: ['Admin / Orders'],
+    summary: 'Cập nhật trạng thái đơn hàng',
+    description: 'Cập nhật trạng thái đơn hàng',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    parameters: [
+        new OA\Parameter(
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Id đơn hàng',
+            schema: new OA\Schema(type: 'integer')
+        ),
+        new OA\Parameter(
+            name: 'status',
+            in: 'query',
+            required: true,
+            description: 'Trạng thái đơn hàng',
+            schema: new OA\Schema(
+                type: 'string',
+                enum: ['pending', 'approved', 'ready_for_pickup', 'preparing_shipment', 'in_transit', 'extended', 'active', 'returning', 'completed', 'canceled', 'overdue']
+            )
+        ),
+        new OA\Parameter(
+            name: 'reason_cancel',
+            in: 'query',
+            required: false,
+            description: 'Lý do hủy đơn hàng',
+            schema: new OA\Schema(type: 'string')
+        ),
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Cập nhật trạng thái đơn hàng',
         ),
         new OA\Response(
             response: 400,
@@ -368,10 +421,57 @@ class OrderController extends Controller
                 ], 400);
             }
 
+            foreach ($order->loanOrderDetails as $orderDetail) {
+                $orderDetail->bookDetails->update([
+                    'stock' => $orderDetail->bookDetails->stock + 1
+                ]);
+
+                $orderDetail->update([
+                    'status' => 'canceled',
+                    'reason_cancel' => $request->reason_cancel
+                ]);
+            }
+
             $order->update([
                 'status' => 'canceled',
-                'reason_cancel' => $request->reason_cancel
+
             ]);
+
+            $transaction = WalletTransaction::find($order->transaction_id);
+
+            if ($transaction) {
+                $transaction->update([
+                    'status' => 'canceled'
+                ]);
+
+                $wallet = Wallet::find($transaction->wallet_id);
+
+                $transaction_code = intval(substr(strtotime(now()) . rand(1000, 9999), -9));
+                $transaction = WalletTransaction::create([
+                    'wallet_id' => $wallet->id,
+                    'reference_id' => $transaction_code,
+                    'transaction_code' => $transaction_code,
+                    'transaction_type' => 'refund',
+                    'transaction_method' => 'wallet',
+                    'amount' => $transaction->amount,
+                    'status' => 'completed',
+                    'completed_at' => now(),
+                    'description' => 'Hoàn tiền đơn thuê ' . $order->order_code,
+                ]);
+
+                $wallet->history()->create([
+                    'previous_balance' => $wallet->balance,
+                    'new_balance' => $wallet->balance + $transaction->amount,
+                    'previous_status' => $wallet->status,
+                    'new_status' => $wallet->status,
+                    'action' => 'update_balance',
+                    'reason' => 'refund',
+                ]);
+
+                $wallet->update([
+                    'balance' => $wallet->balance + $transaction->amount
+                ]);
+            }
 
             return response()->json([
                 'status' => true,

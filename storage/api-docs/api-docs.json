@@ -2218,6 +2218,74 @@
                 ]
             }
         },
+        "/api/v1/admin/orders/update/{id}": {
+            "put": {
+                "tags": [
+                    "Admin / Orders"
+                ],
+                "summary": "Cập nhật trạng thái đơn hàng",
+                "description": "Cập nhật trạng thái đơn hàng",
+                "operationId": "adminOrderUpdate",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id đơn hàng",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Trạng thái đơn hàng",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "pending",
+                                "approved",
+                                "ready_for_pickup",
+                                "preparing_shipment",
+                                "in_transit",
+                                "extended",
+                                "active",
+                                "returning",
+                                "completed",
+                                "canceled",
+                                "overdue"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "reason_cancel",
+                        "in": "query",
+                        "description": "Lý do hủy đơn hàng",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Cập nhật trạng thái đơn hàng"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Lỗi không xác định"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/admin/posts": {
             "get": {
                 "tags": [
