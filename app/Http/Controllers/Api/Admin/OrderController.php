@@ -599,10 +599,10 @@ class OrderController extends Controller
         try {
             $order = LoanOrders::find($id);
 
-            if ($order->status != 'active') {
+            if ($order->status == 'active') {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Đơn hàng không ở trạng thái đang mượn',
+                    'message' => 'Đơn hàng đã được mượn',
                 ], 400);
             }
 
