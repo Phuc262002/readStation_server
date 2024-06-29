@@ -149,6 +149,7 @@ Route::group([
             Route::get('/statistic', [AdminOrderController::class, 'statisticOrder']);
             Route::get('/', [AdminOrderController::class, 'index']);
             Route::get('/{id}', [AdminOrderController::class, 'show']);
+            Route::put('/update/{id}', [AdminOrderController::class, 'update']);
         });
 
         Route::group([

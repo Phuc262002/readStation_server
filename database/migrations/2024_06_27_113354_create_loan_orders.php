@@ -19,6 +19,7 @@ return new class extends Migration
             $table->enum('payment_method', ['wallet', 'cash']);
             $table->foreignUuid('transaction_id')->nullable();
             $table->string('user_note')->nullable();
+            $table->string('reason_cancel')->nullable();
 
             $table->unsignedTinyInteger('max_extensions')->default(3);
             $table->unsignedTinyInteger('current_extensions')->default(0);

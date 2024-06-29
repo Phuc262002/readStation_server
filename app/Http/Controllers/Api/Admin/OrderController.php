@@ -269,13 +269,298 @@ class OrderController extends Controller
         }
     }
 
-    public function update(Request $request, LoanOrders $order)
+    public function update(Request $request, $id)
     {
-        //
+        $validator = Validator::make(array_merge(['id' => $id], $request->all()), [
+            'id' => 'required|integer|min:1|exists:loan_orders,id',
+            'status' => 'required|string|in:pending,approved,ready_for_pickup,preparing_shipment,in_transit,extended,active,returning,completed,canceled,overdue',
+            'reason_cancel' => 'required_if:status,canceled',
+        ], [
+            'id.required' => 'Trường id là bắt buộc.',
+            'id.integer' => 'Id phải là một số nguyên.',
+            'id.min' => 'Id phải lớn hơn hoặc bằng 1.',
+            'id.exists' => 'Id không tồn tại.',
+            'status.required' => 'Trường status là bắt buộc.',
+            'status.string' => 'Trường status phải là chuỗi.',
+            'status.in' => 'Trường status phải là pending,approved,ready_for_pickup,preparing_shipment,in_transit,extended,active,completed,canceled',
+            'reason_cancel.required_if' => 'Lý do hủy đơn hàng là bắt buộc.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                "staus" => false,
+                "message" => "Validation error",
+                "errors" => $validator->errors()
+            ], 400);
+        }
+
+        switch ($request->status) {
+            case 'approved':
+                return $this->approvedOrder($id);
+                break;
+            case 'ready_for_pickup':
+                return $this->readyForPickupOrder($id);
+                break;
+            case 'preparing_shipment':
+                return $this->preparingShipmentOrder($id);
+                break;
+            case 'in_transit':
+                return $this->inTransitOrder($id);
+                break;
+            case 'extended':
+                break;
+            case 'active':
+                return $this->activeOrder($id);
+                break;
+            case 'completed':
+                return $this->completedOrder($id);
+                break;
+            case 'canceled':
+                return $this->cancelOrder($id, $request);
+                break;
+            default:
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Trạng thái không hợp lệ',
+                ], 400);
+                break;
+        }
     }
 
-    public function destroy(LoanOrders $order)
+    public function approvedOrder($id)
     {
-        //
+        try {
+            $order = LoanOrders::find($id);
+
+            if ($order->status != 'pending') {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Đơn hàng không ở trạng thái chờ duyệt',
+                ], 400);
+            }
+
+            $order->update([
+                'status' => 'approved'
+            ]);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Duyệt đơn hàng thành công',
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Duyệt đơn hàng thất bại',
+                'errors' => $th->getMessage()
+            ], 500);
+        }
+    }
+
+    public function cancelOrder($id, $request)
+    {
+        try {
+            $order = LoanOrders::find($id);
+
+            if ($order->status != 'pending') {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Đơn hàng không ở trạng thái chờ duyệt',
+                ], 400);
+            }
+
+            $order->update([
+                'status' => 'canceled',
+                'reason_cancel' => $request->reason_cancel
+            ]);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Hủy đơn hàng thành công',
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Hủy đơn hàng thất bại',
+                'errors' => $th->getMessage()
+            ], 500);
+        }
+    }
+
+    public function readyForPickupOrder($id)
+    {
+        try {
+            $order = LoanOrders::find($id);
+
+            if ($order->delivery_method == 'shipper') {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Đơn hàng không phải là hình thức nhận sách tại thư viện',
+                ], 400);
+            }
+
+            if ($order->status != 'approved') {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Đơn hàng không ở trạng thái đã duyệt',
+                ], 400);
+            }
+
+            $order->update([
+                'status' => 'ready_for_pickup'
+            ]);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Sách đã sẵn sàng để lấy',
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Sách đã sẵn sàng để lấy',
+                'errors' => $th->getMessage()
+            ], 500);
+        }
+    }
+
+    public function preparingShipmentOrder($id)
+    {
+        try {
+            $order = LoanOrders::find($id);
+
+            if ($order->delivery_method == 'pickup') {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Đơn hàng không phải là hình thức giao hàng',
+                ], 400);
+            }
+
+            if ($order->status != 'approved') {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Đơn hàng không ở trạng thái đã duyệt',
+                ], 400);
+            }
+
+            $order->update([
+                'status' => 'preparing_shipment'
+            ]);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Chuẩn bị giao hàng thành công',
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Chuẩn bị giao hàng thất bại',
+                'errors' => $th->getMessage()
+            ], 500);
+        }
+    }
+
+    public function inTransitOrder($id)
+    {
+        try {
+            $order = LoanOrders::find($id);
+
+            if ($order->delivery_method == 'pickup') {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Đơn hàng không phải là hình thức giao hàng',
+                ], 400);
+            }
+
+            if ($order->status != 'approved') {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Đơn hàng không ở trạng thái đã duyệt',
+                ], 400);
+            }
+
+            $order->update([
+                'status' => 'in_transit'
+            ]);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Đang giao hàng',
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Đang giao hàng thất bại',
+                'errors' => $th->getMessage()
+            ], 500);
+        }
+    }
+
+    public function activeOrder($id)
+    {
+        try {
+            $order = LoanOrders::find($id);
+
+            if ($order->status != 'active') {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Đơn hàng không ở trạng thái đang mượn',
+                ], 400);
+            }
+
+            if ($order->status != 'ready_for_pickup' && $order->status != 'in_transit') {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Đơn hàng không ở trạng thái đã sẵn sàng để lấy hoặc đang giao',
+                ], 400);
+            }
+
+            $order->update([
+                'status' => 'active'
+            ]);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Đơn hàng đang mượn',
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Đơn hàng đang mượn thất bại',
+                'errors' => $th->getMessage()
+            ], 500);
+        }
+    }
+
+    public function completedOrder($id)
+    {
+        // try {
+        //     $order = LoanOrders::find($id);
+
+        //     if ($order->status != 'active') {
+        //         return response()->json([
+        //             'status' => false,
+        //             'message' => 'Đơn hàng không ở trạng thái đang mượn',
+        //         ], 400);
+        //     }
+
+        //     $order->update([
+        //         'status' => 'completed'
+        //     ]);
+
+        //     return response()->json([
+        //         'status' => true,
+        //         'message' => 'Hoàn thành đơn hàng',
+        //     ]);
+        // } catch (\Throwable $th) {
+        //     return response()->json([
+        //         'status' => false,
+        //         'message' => 'Hoàn thành đơn hàng thất bại',
+        //         'errors' => $th->getMessage()
+        //     ], 500);
+        // }
+
+        return response()->json([
+            'status' => false,
+            'message' => 'Chức năng này chưa được hỗ trợ',
+        ], 400);
     }
 }

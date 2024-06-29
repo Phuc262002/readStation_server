@@ -17,6 +17,7 @@ class LoanOrders extends Model
         'payment_method',
         'transaction_id',
         'user_note',
+        'reason_cancel',
         'max_extensions',
         'current_extensions',
         'loan_date',
