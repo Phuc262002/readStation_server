@@ -132,6 +132,7 @@ class AccountController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'Update profile failed',
+                'errors' => $th->getMessage(),
             ], 400);
         }
     }
