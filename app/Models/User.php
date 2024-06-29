@@ -81,7 +81,10 @@ class User extends Authenticatable implements JWTSubject
         'role_id',
         'confirmation_code',
         'confirmation_code_expired_in',
-        'id'
+        'id',
+        'province_id',
+        'district_id',
+        'ward_id',
     ];
 
     /**
