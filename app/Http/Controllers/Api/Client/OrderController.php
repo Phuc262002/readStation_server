@@ -274,7 +274,7 @@ class OrderController extends Controller
         $status = $request->input('status');
 
 
-        $query = LoanOrders::query()->with(['loanOrderDetails', 'shippingMethod', 'transaction', 'extensionDetails'])->where('user_id', auth()->id());
+        $query = LoanOrders::query()->with(['loanOrderDetails', 'shippingMethod', 'transactions', 'extensionDetails'])->where('user_id', auth()->id());
         $totalItems = $query->count();
         if ($status) {
             $query->where('status', $status);
@@ -597,7 +597,7 @@ class OrderController extends Controller
                 'status' => 'canceled'
             ]);
 
-            $transaction = Transaction::find($order->transaction_id);
+            $transaction = Transaction::where('loan_order_id', $order->id)->first();
 
             if ($transaction) {
                 $transaction->update([
