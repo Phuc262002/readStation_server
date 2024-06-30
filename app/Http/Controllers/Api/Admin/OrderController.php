@@ -304,7 +304,7 @@ class OrderController extends Controller
                 'loanOrderDetails.bookDetails.book.category',
                 'loanOrderDetails.bookDetails.book.shelve',
                 'loanOrderDetails.bookDetails.book.shelve.bookcase',
-                'transaction',
+                'transactions',
                 'extensions',
                 'extensions.extensionDetails',
             ])->find($id);
@@ -437,22 +437,11 @@ class OrderController extends Controller
 
             ]);
 
-            $transaction = Transaction::find($order->transaction_id);
+            $transaction = Transaction::where('loan_order_id', $order->id)->first();
 
             if ($transaction) {
                 $transaction->update([
                     'status' => 'canceled'
-                ]);
-
-                $transaction_code = intval(substr(strtotime(now()) . rand(1000, 9999), -9));
-                $transaction = Transaction::create([
-                    'transaction_code' => $transaction_code,
-                    'transaction_type' => 'refund',
-                    'transaction_method' => 'wallet',
-                    'amount' => $transaction->amount,
-                    'status' => 'completed',
-                    'completed_at' => now(),
-                    'description' => 'Hoàn tiền đơn thuê ' . $order->order_code,
                 ]);
             }
 
