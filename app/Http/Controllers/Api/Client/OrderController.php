@@ -6,11 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\BookDetail;
 use App\Models\Extensions;
 use App\Models\LoanOrders;
-use App\Models\Wallet;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use OpenApi\Attributes as OA;
+use PayOS\PayOS;
 
 #[OA\Get(
     path: '/api/v1/account/orders',
@@ -55,6 +55,45 @@ use OpenApi\Attributes as OA;
         new OA\Response(
             response: 200,
             description: 'Get all order successfully'
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error',
+        ),
+    ]
+)]
+
+#[OA\Post(
+    path: '/api/v1/account/orders/payment/{id}',
+    operationId: 'paymentOrder',
+    tags: ['Account / Orders'],
+    summary: 'Payment order',
+    description: 'Payment order',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    parameters: [
+        new OA\Parameter(
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Id của order',
+            schema: new OA\Schema(type: 'integer')
+        ),
+    ],
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            required: ['payment_portal'],
+            properties: [
+                new OA\Property(property: 'payment_portal', type: 'string', description: 'Cổng thanh toán', enum: ['payos', 'vnpay']),
+            ]
+        )
+    ),
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Payment order successfully'
         ),
         new OA\Response(
             response: 400,
@@ -144,7 +183,7 @@ use OpenApi\Attributes as OA;
             name: 'id',
             in: 'path',
             required: true,
-            description: 'Id của order',
+            description: 'Id hoặc mã đơn hàng',
             schema: new OA\Schema(type: 'integer')
         ),
     ],
@@ -444,6 +483,7 @@ class OrderController extends Controller
 
                 $order = LoanOrders::create(array_merge($request->all(), [
                     'user_id' => auth()->user()->id,
+                    'status' => 'wating_payment',
                 ]));
 
                 $orderDetails = $request->order_details;
@@ -500,6 +540,8 @@ class OrderController extends Controller
                 ]);
             }
 
+            $order = LoanOrders::find($order->id);
+
             return response()->json([
                 'status' => true,
                 'message' => 'Create order successfully',
@@ -517,7 +559,7 @@ class OrderController extends Controller
     public function show($id)
     {
         $validator = Validator::make(['id' => $id], [
-            'id' => 'required|exists:loan_orders,id',
+            'id' => 'required',
         ], [
             'id.required' => 'Trường id là bắt buộc',
             'id.exists' => 'Id không tồn tại',
@@ -531,28 +573,122 @@ class OrderController extends Controller
             ], 400);
         }
 
-        $order = LoanOrders::with(
-            'user',
-            'shippingMethod',
-            'loanOrderDetails',
-            'loanOrderDetails.bookDetails',
-            'loanOrderDetails.extensionsDetails',
-            'loanOrderDetails.bookDetails.publishingCompany',
-            'loanOrderDetails.bookDetails.book',
-            'loanOrderDetails.bookDetails.book.author',
-            'loanOrderDetails.bookDetails.book.category',
-            'loanOrderDetails.bookDetails.book.shelve',
-            'loanOrderDetails.bookDetails.book.shelve.bookcase',
-            'transactions',
-            'extensions',
-            'extensions.extensionDetails',
-        )->find($id);
+        try {
+            $query = LoanOrders::query()->with(
+                'user',
+                'shippingMethod',
+                'loanOrderDetails',
+                'loanOrderDetails.bookDetails',
+                'loanOrderDetails.extensionsDetails',
+                'loanOrderDetails.bookDetails.publishingCompany',
+                'loanOrderDetails.bookDetails.book',
+                'loanOrderDetails.bookDetails.book.author',
+                'loanOrderDetails.bookDetails.book.category',
+                'loanOrderDetails.bookDetails.book.shelve',
+                'loanOrderDetails.bookDetails.book.shelve.bookcase',
+                'transactions',
+                'extensions',
+                'extensions.extensionDetails',
+            );
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Get order successfully',
-            'data' => $order
+            if (is_numeric($id)) {
+                $order = $query->where('id', $id)->first();
+            } else {
+                $order = $query->where('order_code', $id)->first();
+            }
+
+            if (!$order) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Get order failed',
+                    'errors' => 'Id hoặc mã đơn hàng không tồn tại'
+                ]);
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Get order successfully',
+                'data' => $order
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Get order failed',
+                'errors' => $th->getMessage()
+            ]);
+        }
+    }
+
+    public function paymentOrder(Request $request, $id)
+    {
+        $validator = Validator::make(array_merge(['id' => $id], $request->all()), [
+            'id' => 'required|exists:loan_orders,id',
+            'payment_portal' => 'required|string|in:payos,vnpay',
+        ], [
+            'id.required' => 'Trường id là bắt buộc',
+            'id.exists' => 'Id không tồn tại',
+            'payment_portal.required' => 'Trường cổng thanh toán là bắt buộc',
+            'payment_portal.string' => 'Trường cổng thanh toán phải là kiểu chuỗi',
+            'payment_portal.in' => 'Trường cổng thanh toán phải là payos hoặc vnpay',
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                "staus" => false,
+                "message" => "Validation error",
+                "errors" => $validator->errors()
+            ], 400);
+        }
+
+        $loanOrder = LoanOrders::find($id);
+        $transaction = Transaction::where('loan_order_id', $loanOrder->id)->first();
+
+        if ($loanOrder->status !== 'wating_payment') {
+            return response()->json([
+                'status' => false,
+                'message' => 'Payment order failed',
+                'errors' => 'Không thể thanh toán đơn hàng'
+            ]);
+        }
+
+        try {
+            if ($request->payment_portal === 'payos') {
+                $body = $request->input();
+                $body["amount"] = intval($transaction->amount);
+                $body["orderCode"] = intval($transaction->transaction_code);
+                $body["description"] =  $loanOrder->order_code;
+                $body["expiredAt"] = now()->addMinutes(30)->getTimestamp();
+                $body["returnUrl"] = "http://localhost:3000/account/wallet/transaction-success";
+                $body["cancelUrl"] = "http://localhost:3000/account/wallet/transaction-error";
+                $payOS = new PayOS($this->payOSClientId, $this->payOSApiKey, $this->payOSChecksumKey);
+
+                $response = $payOS->createPaymentLink($body);
+
+                $transaction->update([
+                    'status' => 'pending',
+                    'expired_at' => now()->addMinutes(30),
+                    'extra_info' => $response
+                ]);
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Payment order successfully',
+                    'data' => $response
+                ]);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Payment order failed',
+                    'errors' => 'Cổng thanh toán không hỗ trợ'
+                ]);
+            }
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => $th->getCode(),
+                "message" => $th->getMessage(),
+                "data" => null
+            ]);
+        }
     }
 
     public function cancelOrder($id)

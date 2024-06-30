@@ -4994,6 +4994,63 @@
                 ]
             }
         },
+        "/api/v1/account/orders/payment/{id}": {
+            "post": {
+                "tags": [
+                    "Account / Orders"
+                ],
+                "summary": "Payment order",
+                "description": "Payment order",
+                "operationId": "paymentOrder",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id của order",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "payment_portal"
+                                ],
+                                "properties": {
+                                    "payment_portal": {
+                                        "description": "Cổng thanh toán",
+                                        "type": "string",
+                                        "enum": [
+                                            "payos",
+                                            "vnpay"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Payment order successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/account/orders/create": {
             "post": {
                 "tags": [
@@ -5151,7 +5208,7 @@
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "Id của order",
+                        "description": "Id hoặc mã đơn hàng",
                         "required": true,
                         "schema": {
                             "type": "integer"

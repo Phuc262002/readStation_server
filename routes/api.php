@@ -90,6 +90,7 @@ Route::group([
             Route::get('/{id}', [OrderController::class, 'show']);
             Route::post('/create', [OrderController::class, 'store']);
             Route::put('/cancel/{id}', [OrderController::class, 'cancelOrder']);
+            Route::post('/payment/{id}', [OrderController::class, 'paymentOrder']);
             Route::post('/extension/{id}', [OrderController::class, 'extensionAllOrder']);
         });
 
