@@ -50,6 +50,6 @@ class ReturnHistory extends Model
 
     public function shippingFeeTransaction()
     {
-        return $this->belongsTo(WalletTransaction::class, 'return_shipping_fee', 'id');
+        return $this->belongsTo(Transaction::class, 'return_shipping_fee', 'id');
     }
 }

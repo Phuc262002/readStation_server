@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\LoanOrders;
 use App\Models\Wallet;
-use App\Models\WalletTransaction;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use OpenApi\Attributes as OA;
@@ -437,7 +437,7 @@ class OrderController extends Controller
 
             ]);
 
-            $transaction = WalletTransaction::find($order->transaction_id);
+            $transaction = Transaction::find($order->transaction_id);
 
             if ($transaction) {
                 $transaction->update([
@@ -447,7 +447,7 @@ class OrderController extends Controller
                 $wallet = Wallet::find($transaction->wallet_id);
 
                 $transaction_code = intval(substr(strtotime(now()) . rand(1000, 9999), -9));
-                $transaction = WalletTransaction::create([
+                $transaction = Transaction::create([
                     'wallet_id' => $wallet->id,
                     'reference_id' => $transaction_code,
                     'transaction_code' => $transaction_code,

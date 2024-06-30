@@ -16,7 +16,6 @@ use App\Http\Controllers\Api\Admin\ShippingMethodController;
 use App\Http\Controllers\Api\Admin\SupplierController;
 use App\Http\Controllers\Api\Admin\UserController;
 use App\Http\Controllers\Api\Admin\VerificationRequestController;
-use App\Http\Controllers\Api\Admin\WalletController as AdminWalletController;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Auth\PasswordController;
 use App\Http\Controllers\Api\Auth\VerifyEmailController;
@@ -27,7 +26,6 @@ use App\Http\Controllers\Api\Client\CommentController;
 use App\Http\Controllers\Api\Client\OrderController;
 use App\Http\Controllers\Api\Client\PostController;
 use App\Http\Controllers\Api\Client\VerificationRequestController as ClientVerificationRequestController;
-use App\Http\Controllers\Api\Client\WalletController;
 use App\Http\Controllers\Api\PayOS\CheckCCCDController;
 use App\Http\Controllers\Api\Public\AuthorController;
 use App\Http\Controllers\Api\Public\BookController;
@@ -86,17 +84,6 @@ Route::group([
         });
 
         Route::group([
-            "prefix" => "wallet"
-        ], function () {
-            Route::get('/statistic', [WalletController::class, 'statistic']);
-            Route::post('/create-transaction', [WalletController::class, 'storeDeposit']);
-            Route::get('/get-payment-link/{transaction_code}', [WalletController::class, 'getPaymentLink']);
-            Route::get('/transaction-history', [WalletController::class, 'transactionHistory']);
-            Route::put('/update-transaction-status/{transaction_code}', [WalletController::class, 'updateTransactionStatus']);
-            Route::post('/cancel-transaction/{transaction_code}', [WalletController::class, 'cancelPaymentLinkOfTransction']);
-        });
-
-        Route::group([
             "prefix" => "orders"
         ], function () {
             Route::get('/', [OrderController::class, 'index']);
@@ -119,20 +106,6 @@ Route::group([
         "prefix" => "admin",
         "middleware" => ["auth:api"]
     ], function () {
-        Route::group([
-            "prefix" => "wallet",
-        ], function () {
-            Route::get('get-all', [AdminWalletController::class, 'index']);
-            Route::post('create-deposit', [AdminWalletController::class, 'storeDeposit']);
-            Route::get('get-user-wallet-transactions-history/{id}', [AdminWalletController::class, 'show']);
-            Route::put('update-status/{id}', [AdminWalletController::class, 'update']);
-            Route::post('verification-wallet', [AdminWalletController::class, 'verificationWallet']);
-
-            Route::put('update-transaction-status/{id}', [AdminWalletController::class, 'updateTransactionStatus']);
-            Route::post('cancel-transaction/{transaction_code}', [AdminWalletController::class, 'cancelPaymentLinkOfTransction']);
-            Route::get('get-payment-link/{transaction_code}', [AdminWalletController::class, 'getPaymentLink']);
-        });
-
         Route::group([
             "prefix" => "users",
         ], function () {

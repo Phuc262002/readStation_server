@@ -7,7 +7,7 @@ use App\Models\BookDetail;
 use App\Models\Extensions;
 use App\Models\LoanOrders;
 use App\Models\Wallet;
-use App\Models\WalletTransaction;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use OpenApi\Attributes as OA;
@@ -75,9 +75,10 @@ use OpenApi\Attributes as OA;
     requestBody: new OA\RequestBody(
         required: true,
         content: new OA\JsonContent(
-            required: ['payment_method', 'discount', 'delivery_method', 'total_deposit_fee', 'total_service_fee', 'total_shipping_fee', 'total_all_fee', 'order_details'],
+            required: ['payment_method', 'payment_portal', 'discount', 'delivery_method', 'total_deposit_fee', 'total_service_fee', 'total_shipping_fee', 'total_all_fee', 'order_details'],
             properties: [
-                new OA\Property(property: 'payment_method', type: 'string', description: 'Phương thức thanh toán', enum: ['wallet', 'cash']),
+                new OA\Property(property: 'payment_method', type: 'string', description: 'Phương thức thanh toán', enum: ['online', 'cash']),
+                new OA\Property(property: 'payment_portal', type: 'string', description: 'Cổng thanh toán', enum: ['payos', 'vnpay']),
                 new OA\Property(property: 'delivery_method', type: 'string', description: 'Phương thức vận chuyển', enum: ['library', 'shipper']),
                 new OA\Property(property: 'user_note', type: 'string', description: 'Ghi chú'),
                 new OA\Property(property: 'discount', type: 'number', description: 'Giảm giá'),
@@ -229,6 +230,19 @@ use OpenApi\Attributes as OA;
 
 class OrderController extends Controller
 {
+    private string $payOSClientId;
+    private string $payOSApiKey;
+    private string $payOSChecksumKey;
+
+
+
+    public function __construct()
+    {
+        $this->payOSClientId = env("PAYOS_CLIENT_ID");
+        $this->payOSApiKey = env("PAYOS_API_KEY");
+        $this->payOSChecksumKey = env("PAYOS_CHECKSUM_KEY");
+    }
+
     public function index(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -291,7 +305,7 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'payment_method' => 'required|string|in:wallet,cash',
+            'payment_method' => 'required|string|in:online,cash',
             'delivery_method' => 'required|string|in:pickup,shipper',
             'user_note' => 'nullable|string',
             'discount' => 'nullable|numeric|min:0',
@@ -346,18 +360,6 @@ class OrderController extends Controller
         }
 
         try {
-
-            // $allOrder = LoanOrders::where('user_id', auth()->id())->get();
-
-            // foreach ($allOrder as $order) {
-            //     if (in_array($order->status, ['pending', 'approved', 'ready_for_pickup', 'preparing_shipment', 'in_transit', 'active', 'extended'])) {
-            //         return response()->json([
-            //             'status' => false,
-            //             'message' => 'Create order failed',
-            //             'errors' => 'Bạn hiện đang có đơn hàng đang chờ xử lý, vui lòng chờ đơn hàng hiện tại được xử lý xong'
-            //         ]);
-            //     }
-            // }
 
             if ($request->delivery_method === 'shipper') {
                 $validator2 = Validator::make($request->all(), [
@@ -420,136 +422,66 @@ class OrderController extends Controller
                 }
             }
 
+            if ($request->payment_method === 'online') {
 
+                $validator3 = Validator::make($request->all(), [
+                    'payment_portal' => 'required|string|in:payos,vnpay',
+                ], [
+                    'payment_portal.required' => 'Trường cổng thanh toán là bắt buộc',
+                    'payment_portal.string' => 'Trường cổng thanh toán phải là kiểu chuỗi',
+                    'payment_portal.in' => 'Trường cổng thanh toán phải là payos hoặc vnpay',
+                ]);
 
-
-
-            $validatedData = $validator->validated();
-
-            if ($request->has('expired_date')) {
-                if (strtotime($validatedData['expired_date']) < strtotime(date('Y-m-d'))) {
+                if ($validator3->fails()) {
                     return response()->json([
-                        'status' => false,
-                        'message' => 'Create order failed',
-                        'errors' => 'Ngày hết hạn không hợp lệ'
-                    ]);
-                }
-
-                if (strtotime($validatedData['expired_date']) > strtotime('+4 days')) {
-                    return response()->json([
-                        'status' => false,
-                        'message' => 'Create order failed',
-                        'errors' => 'Ngày hết hạn không được quá 4 ngày'
-                    ]);
-                }
-            }
-
-            if ($validatedData['payment_method'] === 'wallet') {
-                $wallet = auth()->user()->wallet;
-
-                if ($wallet) {
-                    if ($wallet->status !== 'active') {
-                        return response()->json([
-                            'status' => false,
-                            'message' => 'Create order failed',
-                            'errors' => 'Ví của bạn đã bị khóa'
-                        ]);
-                    }
-
-                    if ($wallet->balance < $validatedData['total_all_fee']) {
-                        return response()->json([
-                            'status' => false,
-                            'message' => 'Create order failed',
-                            'errors' => 'Số dư trong ví không đủ'
-                        ]);
-                    }
-                } else {
-                    return response()->json([
-                        'status' => false,
-                        'message' => 'Create order failed',
-                        'errors' => 'Bạn chưa kích hoạt ví'
-                    ]);
+                        "staus" => false,
+                        "message" => "Validation error",
+                        "errors" => $validator3->errors()
+                    ], 400);
                 }
 
                 $transaction_code = intval(substr(strtotime(now()) . rand(1000, 9999), -9));
 
-                $order = LoanOrders::create(array_merge($validatedData, [
+                $order = LoanOrders::create(array_merge($request->all(), [
                     'user_id' => auth()->user()->id,
-                    // 'expired_date' => $request->has('expired_date') ? date('Y-m-d', strtotime($validatedData['expired_date'])) : date('Y-m-d', strtotime('+4 days')),
                 ]));
 
-                $orderDetails = $validatedData['order_details'];
-                foreach ($orderDetails as $key => $detail) {
-                    // $orderDetails[$key]['expired_date'] = $request->has('expired_date') ? date('Y-m-d', strtotime($validatedData['expired_date'])) : date('Y-m-d', strtotime('+4 days'));
-                }
+                $orderDetails = $request->order_details;
 
                 $order->loanOrderDetails()->createMany($orderDetails);
 
-                $wallet->history()->create([
-                    'previous_balance' => $wallet->balance,
-                    'new_balance' => $wallet->balance - $validatedData['total_all_fee'],
-                    'previous_status' => $wallet->status,
-                    'new_status' => $wallet->status,
-                    'action' => 'update_balance',
-                    'reason' => 'payment',
-                ]);
-
-                $wallet->update([
-                    'balance' => $wallet->balance - $validatedData['total_all_fee']
-                ]);
-
-                $transaction = WalletTransaction::create([
-                    'wallet_id' => $wallet->id,
-                    'reference_id' => $transaction_code,
+                $transaction = Transaction::create([
                     'transaction_code' => $transaction_code,
                     'transaction_type' => 'payment',
-                    'transaction_method' => 'wallet',
-                    'amount' => $validatedData['total_all_fee'],
-                    'status' => 'holding',
+                    'loan_order_id' => $order->id,
+                    'portal' => $request->payment_portal,
+                    'transaction_method' => 'online',
+                    'amount' => $request->total_all_fee,
                     'description' => 'Thanh toán đơn thuê ' . $order->order_code,
-                ]);
-
-                $order->update([
-                    'transaction_id' => $transaction->id
                 ]);
             } else {
-                $order = LoanOrders::create(array_merge($validatedData, [
+                $order = LoanOrders::create(array_merge($request->all(), [
                     'user_id' => auth()->user()->id,
-                    'expired_date' => $request->has('expired_date') ? date('Y-m-d', strtotime($validatedData['expired_date'])) : date('Y-m-d', strtotime('+4 days')),
+                    'expired_date' => $request->has('expired_date') ? date('Y-m-d', strtotime($request->expired_date)) : date('Y-m-d', strtotime('+4 days')),
                 ]));
 
-                $orderDetails = $validatedData['order_details'];
+                $orderDetails = $request->order_details;
                 foreach ($orderDetails as $key => $detail) {
-                    $orderDetails[$key]['expired_date'] = $request->has('expired_date') ? date('Y-m-d', strtotime($validatedData['expired_date'])) : date('Y-m-d', strtotime('+4 days'));
+                    $orderDetails[$key]['expired_date'] = $request->has('expired_date') ? date('Y-m-d', strtotime($request->expired_date)) : date('Y-m-d', strtotime('+4 days'));
                 }
 
                 $order->loanOrderDetails()->createMany($orderDetails);
 
-                $wallet = Wallet::where('user_id', auth()->user()->id)->first();
-
-                if (!$wallet) {
-                    $wallet = Wallet::create([
-                        'user_id' => auth()->user()->id,
-                        'balance' => 0,
-                        'status' => 'none_verify'
-                    ]);
-                }
-
                 $transaction_code = intval(substr(strtotime(now()) . rand(1000, 9999), -9));
 
-                $transaction = WalletTransaction::create([
-                    'wallet_id' => $wallet->id,
-                    'reference_id' => $transaction_code,
+                $transaction = Transaction::create([
                     'transaction_code' => $transaction_code,
+                    'portal' => $request->payment_portal,
+                    'loan_order_id' => $order->id,
                     'transaction_type' => 'payment',
                     'transaction_method' => 'offline',
-                    'amount' => $validatedData['total_all_fee'],
-                    'status' => 'holding',
-                    'description' => 'Thanh toán đơn thuê ' . $order->order_code,
-                ]);
-
-                $order->update([
-                    'transaction_id' => $transaction->id
+                    'amount' => $request->total_all_fee,
+                    'description' => 'Thanh toán tiền mặt đơn thuê ' . $order->order_code,
                 ]);
             }
 
@@ -603,7 +535,7 @@ class OrderController extends Controller
             'loanOrderDetails.bookDetails.book.category',
             'loanOrderDetails.bookDetails.book.shelve',
             'loanOrderDetails.bookDetails.book.shelve.bookcase',
-            'transaction',
+            'transactions',
             'extensions',
             'extensions.extensionDetails',
         )->find($id);
@@ -657,39 +589,11 @@ class OrderController extends Controller
                 'status' => 'canceled'
             ]);
 
-            $transaction = WalletTransaction::find($order->transaction_id);
+            $transaction = Transaction::find($order->transaction_id);
 
             if ($transaction) {
                 $transaction->update([
                     'status' => 'canceled'
-                ]);
-
-                $wallet = Wallet::find($transaction->wallet_id);
-
-                $transaction_code = intval(substr(strtotime(now()) . rand(1000, 9999), -9));
-                $transaction = WalletTransaction::create([
-                    'wallet_id' => $wallet->id,
-                    'reference_id' => $transaction_code,
-                    'transaction_code' => $transaction_code,
-                    'transaction_type' => 'refund',
-                    'transaction_method' => 'wallet',
-                    'amount' => $transaction->amount,
-                    'status' => 'completed',
-                    'completed_at' => now(),
-                    'description' => 'Hoàn tiền đơn thuê ' . $order->order_code,
-                ]);
-
-                $wallet->history()->create([
-                    'previous_balance' => $wallet->balance,
-                    'new_balance' => $wallet->balance + $transaction->amount,
-                    'previous_status' => $wallet->status,
-                    'new_status' => $wallet->status,
-                    'action' => 'update_balance',
-                    'reason' => 'refund',
-                ]);
-
-                $wallet->update([
-                    'balance' => $wallet->balance + $transaction->amount
                 ]);
             }
 
@@ -743,19 +647,10 @@ class OrderController extends Controller
                 ]);
             }
 
-            $wallet = Wallet::where('user_id', auth()->id())->first();
             if ($order->discount != 0) {
                 $extension_fee = $order->discount / 100 * (count($order->loanOrderDetails) * 10000);
             } else {
                 $extension_fee = count($order->loanOrderDetails) * 10000;
-            }
-
-            if ($wallet->balance < $extension_fee) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Extension order failed',
-                    'errors' => 'Số dư trong ví không đủ'
-                ]);
             }
 
             $extension = Extensions::create([
@@ -778,9 +673,7 @@ class OrderController extends Controller
             $extension->extensionDetails()->createMany($extensionDetails);
 
             $transaction_code = intval(substr(strtotime(now()) . rand(1000, 9999), -9));
-            $transaction = WalletTransaction::create([
-                'wallet_id' => $wallet->id,
-                'reference_id' => $transaction_code,
+            $transaction = Transaction::create([
                 'transaction_code' => $transaction_code,
                 'transaction_type' => 'payment',
                 'transaction_method' => 'wallet',
@@ -788,19 +681,6 @@ class OrderController extends Controller
                 'status' => 'completed',
                 'completed_at' => now(),
                 'description' => 'Thanh toán gia hạn đơn thuê ' . $order->order_code,
-            ]);
-
-            $wallet->history()->create([
-                'previous_balance' => $wallet->balance,
-                'new_balance' => $wallet->balance - $extension_fee,
-                'previous_status' => $wallet->status,
-                'new_status' => $wallet->status,
-                'action' => 'update_balance',
-                'reason' => 'payment',
-            ]);
-
-            $wallet->update([
-                'balance' => $wallet->balance - $extension_fee
             ]);
 
             $extension->update([

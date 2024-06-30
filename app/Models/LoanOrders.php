@@ -15,7 +15,6 @@ class LoanOrders extends Model
         'order_code',
         'user_id',
         'payment_method',
-        'transaction_id',
         'user_note',
         'reason_cancel',
         'max_extensions',
@@ -82,14 +81,14 @@ class LoanOrders extends Model
         return $this->hasMany(Extensions::class, 'loan_order_id', 'id');
     }
 
-    public function transaction()
-    {
-        return $this->belongsTo(WalletTransaction::class, 'transaction_id', 'id');
-    }
-
     public function extensionDetails()
     {
         return $this->hasManyThrough(ExtensionDetails::class, Extensions::class, 'loan_order_id', 'extension_id', 'id', 'id');
+    }
+
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class, 'loan_order_id', 'id');
     }
 
 }

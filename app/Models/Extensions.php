@@ -43,6 +43,6 @@ class Extensions extends Model
 
     public function feeTransaction()
     {
-        return $this->belongsTo(WalletTransaction::class, 'fee_transaction_id', 'id');
+        return $this->belongsTo(Transaction::class, 'fee_transaction_id', 'id');
     }
 }

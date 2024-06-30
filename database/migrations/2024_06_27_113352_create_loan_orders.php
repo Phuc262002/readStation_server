@@ -16,8 +16,7 @@ return new class extends Migration
             $table->string('order_code');
 
             $table->foreignUuid('user_id');
-            $table->enum('payment_method', ['wallet', 'cash']);
-            $table->foreignUuid('transaction_id')->nullable();
+            $table->enum('payment_method', ['online', 'cash']);
             $table->string('user_note')->nullable();
             $table->string('reason_cancel')->nullable();
 
@@ -43,12 +42,11 @@ return new class extends Migration
             $table->dateTime('pickup_date')->nullable();
             $table->dateTime('delivered_date')->nullable();
 
-            $table->enum('status', ['pending', 'approved', 'ready_for_pickup', 'preparing_shipment', 'in_transit', 'active', 'extended', 'returning', 'completed', 'canceled', 'overdue'])->default('pending');
+            $table->enum('status', ['wating_payment', 'pending', 'approved', 'ready_for_pickup', 'preparing_shipment', 'in_transit', 'active', 'extended', 'returning', 'completed', 'canceled', 'overdue'])->default('pending');
             $table->timestamps();
 
             $table->foreign('shipping_method_id')->references('id')->on('shipping_methods')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('transaction_id')->references('id')->on('wallet_transactions')->onDelete('set null');
         });
     }
 
