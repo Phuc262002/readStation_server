@@ -444,12 +444,8 @@ class OrderController extends Controller
                     'status' => 'canceled'
                 ]);
 
-                $wallet = Wallet::find($transaction->wallet_id);
-
                 $transaction_code = intval(substr(strtotime(now()) . rand(1000, 9999), -9));
                 $transaction = Transaction::create([
-                    'wallet_id' => $wallet->id,
-                    'reference_id' => $transaction_code,
                     'transaction_code' => $transaction_code,
                     'transaction_type' => 'refund',
                     'transaction_method' => 'wallet',
@@ -457,19 +453,6 @@ class OrderController extends Controller
                     'status' => 'completed',
                     'completed_at' => now(),
                     'description' => 'Hoàn tiền đơn thuê ' . $order->order_code,
-                ]);
-
-                $wallet->history()->create([
-                    'previous_balance' => $wallet->balance,
-                    'new_balance' => $wallet->balance + $transaction->amount,
-                    'previous_status' => $wallet->status,
-                    'new_status' => $wallet->status,
-                    'action' => 'update_balance',
-                    'reason' => 'refund',
-                ]);
-
-                $wallet->update([
-                    'balance' => $wallet->balance + $transaction->amount
                 ]);
             }
 

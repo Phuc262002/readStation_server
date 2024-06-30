@@ -459,6 +459,10 @@ class OrderController extends Controller
                     'amount' => $request->total_all_fee,
                     'description' => 'Thanh toán đơn thuê ' . $order->order_code,
                 ]);
+
+                if (!$transaction) {
+                    $order->delete();
+                }
             } else {
                 $order = LoanOrders::create(array_merge($request->all(), [
                     'user_id' => auth()->user()->id,
@@ -483,6 +487,10 @@ class OrderController extends Controller
                     'amount' => $request->total_all_fee,
                     'description' => 'Thanh toán tiền mặt đơn thuê ' . $order->order_code,
                 ]);
+
+                if (!$transaction) {
+                    $order->delete();
+                }
             }
 
             foreach ($bookDetailsIds as $bookDetailsId) {
