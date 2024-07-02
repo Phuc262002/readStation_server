@@ -617,31 +617,58 @@ class OrderController extends Controller
 
     public function completedOrder($id)
     {
-        // try {
-        //     $order = LoanOrders::find($id);
+        try {
+            $order = LoanOrders::find($id);
 
-        //     if ($order->status != 'active') {
-        //         return response()->json([
-        //             'status' => false,
-        //             'message' => 'Đơn hàng không ở trạng thái đang mượn',
-        //         ], 400);
-        //     }
+            if ($order->status != 'active') {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Đơn hàng đã hoàn thành',
+                ], 400);
+            }
 
-        //     $order->update([
-        //         'status' => 'completed'
-        //     ]);
+            return response()->json($order->loanOrderDetails);
 
-        //     return response()->json([
-        //         'status' => true,
-        //         'message' => 'Hoàn thành đơn hàng',
-        //     ]);
-        // } catch (\Throwable $th) {
-        //     return response()->json([
-        //         'status' => false,
-        //         'message' => 'Hoàn thành đơn hàng thất bại',
-        //         'errors' => $th->getMessage()
-        //     ], 500);
-        // }
+            foreach ($order->loanOrderDetails as $orderDetail) {
+                $orderDetail->update([
+                    'status' => 'completed',
+                    'return_date' => now(),
+                    'actual_return_condition' => 'good'
+                ]);
+
+                $orderDetail->bookDetails->update([
+                    'stock' => $orderDetail->bookDetails->stock + 1
+                ]);
+
+                $orderDetail->returnHistories()->create([
+                    'return_date' => now(),
+                    'condition' => 'good',
+                    'processed_by' => auth()->id(),
+                    'return_method' => 'pickup',
+                    'pickup_info' => [
+                        'pickup_date' => now(),
+                        'received_at_library_date' => now(),
+                    ],
+                    'status' => 'completed',
+                ]);
+            }
+
+            $order->update([
+                'status' => 'completed',
+                'completed_date' => now()
+            ]);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Hoàn thành đơn hàng',
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Hoàn thành đơn hàng thất bại',
+                'errors' => $th->getMessage()
+            ], 500);
+        }
 
         return response()->json([
             'status' => false,

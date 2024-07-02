@@ -24,7 +24,7 @@ return new class extends Migration
 
             $table->foreign('loan_order_id')->references('id')->on('loan_orders')->onDelete('cascade');
             $table->foreign('approved_by')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('fee_transaction_id')->references('id')->on('wallet_transactions')->onDelete('set null');
+            $table->foreign('fee_transaction_id')->references('id')->on('transactions')->onDelete('set null');
         });
     }
 
