@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\Admin\InvoiceEnterController;
 use App\Http\Controllers\Api\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Api\Admin\PostController as AdminPostController;
 use App\Http\Controllers\Api\Admin\PublishingCompanyController as AdminPublishingCompanyController;
+use App\Http\Controllers\Api\Admin\RoleController;
 use App\Http\Controllers\Api\Admin\ShelveController;
 use App\Http\Controllers\Api\Admin\ShippingMethodController;
 use App\Http\Controllers\Api\Admin\SupplierController;
@@ -59,7 +60,6 @@ Route::group([
         Route::post('/verify-email', [VerifyEmailController::class, 'verifyEmail']);
         Route::post('/resend-otp', [VerifyEmailController::class, 'reRegister']);
 
-
         Route::group(["middleware" => ["auth:api"]], function () {
             Route::post('/logout', [AuthController::class, 'logout']);
             Route::post('/change-password', [PasswordController::class, 'changePassWord']);
@@ -107,6 +107,12 @@ Route::group([
         "prefix" => "admin",
         "middleware" => ["auth:api"]
     ], function () {
+        Route::group([
+            "prefix" => "roles"
+        ], function () {
+            Route::get('/', [RoleController::class, 'index']);
+        });
+
         Route::group([
             "prefix" => "users",
         ], function () {
@@ -222,6 +228,7 @@ Route::group([
             "prefix" => "posts"
         ], function () {
             Route::get('/', [AdminPostController::class, 'index']);
+            Route::get('/update/{id}', [AdminPostController::class, 'update']);
         });
 
         Route::group([

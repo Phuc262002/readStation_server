@@ -73,6 +73,47 @@ use OpenApi\Attributes as OA;
     ],
 )]
 
+#[OA\Put(
+    path: '/api/v1/admin/posts/update/{id}',
+    operationId: 'adminPostUpdate',
+    tags: ['Admin / Post'],
+    summary: 'Update a post',
+    description: 'Update a post',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    parameters: [
+        new OA\Parameter(
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'ID của bài viết',
+            schema: new OA\Schema(type: 'integer')
+        ),
+    ],
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            required: ['status', 'reason_cancel'],
+            properties: [
+                new OA\Property(property: 'status', type: 'string', enum: ['published', 'approve_canceled']),
+                new OA\Property(property: 'reason_cancel', type: 'string', nullable: true, default: null),
+            ]
+        )
+    ),
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Update post successfully!',
+        ),
+        new OA\Response(
+            response: 500,
+            description: 'Update post request failed',
+        ),
+    ]
+)]
+
+
 class PostController extends Controller
 {
     public function index(Request $request)
@@ -138,5 +179,66 @@ class PostController extends Controller
                 "total" => $totalItems
             ],
         ], 200);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $validator = Validator::make(array_merge(['id' => $id], $request->all()), [
+            'id' => 'required|exists:posts,id',
+            'status' => 'required|in:published,approve_canceled',
+            'reason_cancel' => 'required_if:status,approve_canceled',
+        ], [
+            'id.required' => 'Vui lòng nhập ID',
+            'id.exists' => 'ID không tồn tại',
+            'status.required' => 'Vui lòng nhập trạng thái',
+            'status.in' => 'Trạng thái phải là published hoặc approve_canceled',
+            'reason_cancel.required_if' => 'Vui lòng nhập lý do từ chối',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                "status" => false,
+                "message" => "Validation error",
+                "errors" => $validator->errors()
+            ], 400);
+        }
+
+        try {
+            $post = Post::find($id);
+
+            if (!$post) {
+                return response()->json([
+                    "status" => false,
+                    "message" => "Post not found!",
+                ], 404);
+            }
+
+            if ($post->status == 'approve_canceled') {
+                $post->update([
+                    'status' => $request->status,
+                    'reason_cancel' => $request->reason_cancel,
+                ]);
+            }
+
+            if ($post->status == 'published') {
+                $post->update([
+                    'status' => $request->status,
+                ]);
+            }
+
+            return response()->json([
+                "status" => true,
+                "message" => "Approved post successfully!",
+                "data" => [
+                    "post" => $post,
+                ],
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => false,
+                "message" => "Approved post failed!",
+                "errors" => $th->getMessage(),
+            ], 500);
+        }
     }
 }

@@ -307,37 +307,6 @@ class VerificationRequestController extends Controller
                             'place_of_issue' => $verification_request->verification_card_info['place_of_issue']
                         ],
                     ]);
-
-                    $wallet = Wallet::where('user_id', $user->id)->first();
-                    if ($user->wallet()->count() === 0) {
-                        $user->wallet()->create([
-                            'balance' => 0
-                        ]);
-
-                        $wallet->history()->create([
-                            'previous_balance' => $wallet->balance,
-                            'new_balance' => $wallet->balance,
-                            'previous_status' => 'active',
-                            'new_status' => 'active',
-                            'action' => 'update_status',
-                            'reason' => 'Xác minh ví',
-                        ]);
-                    } else {
-                        if ($user->wallet()->first()->status === 'none_verify') {
-                            $wallet->history()->create([
-                                'previous_balance' => $wallet->balance,
-                                'new_balance' => $wallet->balance,
-                                'previous_status' => 'none_verify',
-                                'new_status' => 'active',
-                                'action' => 'update_status',
-                                'reason' => 'Xác minh ví',
-                            ]);
-
-                            $user->wallet()->first()->update([
-                                'status' => 'active'
-                            ]);
-                        }
-                    }
                 } else {
                     $verification_request->update([
                         'status' => $request->status,

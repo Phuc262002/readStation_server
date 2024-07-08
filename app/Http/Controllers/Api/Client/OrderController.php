@@ -400,6 +400,18 @@ class OrderController extends Controller
 
         try {
 
+            $allOrder = LoanOrders::where('user_id', auth()->id())->get();
+
+            foreach ($allOrder as $order) {
+                if (in_array($order->status, ['pending', 'approved', 'ready_for_pickup', 'preparing_shipment', 'in_transit', 'active', 'extended'])) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Create order failed',
+                        'errors' => 'Bạn hiện đang có đơn hàng đang chờ xử lý, vui lòng chờ đơn hàng hiện tại được xử lý xong'
+                    ]);
+                }
+            }
+
             if ($request->delivery_method === 'shipper') {
                 $validator2 = Validator::make($request->all(), [
                     'delivery_info' => 'required|array',

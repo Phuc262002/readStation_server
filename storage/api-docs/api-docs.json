@@ -2378,6 +2378,68 @@
                 ]
             }
         },
+        "/api/v1/admin/posts/update/{id}": {
+            "put": {
+                "tags": [
+                    "Admin / Post"
+                ],
+                "summary": "Update a post",
+                "description": "Update a post",
+                "operationId": "adminPostUpdate",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID của bài viết",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "status",
+                                    "reason_cancel"
+                                ],
+                                "properties": {
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "published",
+                                            "approve_canceled"
+                                        ]
+                                    },
+                                    "reason_cancel": {
+                                        "type": "string",
+                                        "default": null,
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Update post successfully!"
+                    },
+                    "500": {
+                        "description": "Update post request failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/admin/publishing-companies": {
             "get": {
                 "tags": [
@@ -2641,6 +2703,29 @@
                     },
                     "500": {
                         "description": "Delete publishing company failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/roles": {
+            "get": {
+                "tags": [
+                    "Admin / Role"
+                ],
+                "summary": "Get all roles",
+                "description": "Get all roles",
+                "operationId": "adminRoleIndex",
+                "responses": {
+                    "200": {
+                        "description": "Get all roles"
+                    },
+                    "400": {
+                        "description": "Validation error"
                     }
                 },
                 "security": [
@@ -3522,6 +3607,15 @@
                                 "inactive",
                                 "deleted"
                             ]
+                        }
+                    },
+                    {
+                        "name": "role_id",
+                        "in": "query",
+                        "description": "Id của role",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
                         }
                     }
                 ],

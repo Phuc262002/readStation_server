@@ -49,6 +49,13 @@ use OpenApi\Attributes as OA;
             description: 'Trạng thái của tác giả',
             schema: new OA\Schema(type: 'string', enum: ['active', 'inactive', 'deleted'])
         ),
+        new OA\Parameter(
+            name: 'role_id',
+            in: 'query',
+            required: false,
+            description: 'Id của role',
+            schema: new OA\Schema(type: 'integer')
+        ),
     ],
     responses: [
         new OA\Response(
@@ -246,12 +253,15 @@ class UserController extends Controller
             'pageSize' => 'integer|min:1',
             'search' => 'string',
             'status' => 'string|in:active,inactive,deleted,needUpdateDetail',
+            'role_id' => 'integer|exists:roles,id',
         ], [
             'page.integer' => 'Trang phải là số nguyên.',
             'page.min' => 'Trang phải lớn hơn hoặc bằng 1.',
             'pageSize.integer' => 'Kích thước trang phải là số nguyên.',
             'pageSize.min' => 'Kích thước trang phải lớn hơn hoặc bằng 1.',
             'status.in' => 'Status phải là active, inactive, needUpdateDetail hoặc deleted.',
+            'role_id.integer' => 'Role id phải là số nguyên.',
+            'role_id.exists' => 'Role id không tồn tại.',
         ]);
 
         if ($validator->fails()) {
@@ -267,13 +277,14 @@ class UserController extends Controller
         $pageSize = $request->input('pageSize', 10);
         $search = $request->input('search');
         $status = $request->input('status');
+        $role_id = $request->input('role_id');
 
         // Tạo query ban đầu
         $query = User::query()
             ->with(['role', 'province', 'district', 'ward']);
 
         $totalItems = $query->count();
-        $query = $query->filter($status);
+        $query = $query->filter($status, $role_id);
 
         // Áp dụng bộ lọc tìm kiếm nếu có tham số tìm kiếm
         $query = $query->search($search);
@@ -434,7 +445,7 @@ class UserController extends Controller
                 'password' => $password,
                 'user_verified_at' => $request->has('citizen_identity_card') ? now() : null,
                 'has_wallet' => $request->has('citizen_identity_card') ? true : false,
-                'email_verified_at' => $request->has('citizen_identity_card') || $request->has('student_id_card') ? now() : null,
+                'email_verified_at' => now(),
             ]));
 
             if ($request->has('citizen_identity_card')) {

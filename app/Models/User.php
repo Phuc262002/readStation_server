@@ -124,12 +124,16 @@ class User extends Authenticatable implements JWTSubject
         return $query->where('fullname', 'like', '%' . $search . '%')->orWhere('email', 'like', '%' . $search . '%');
     } 
 
-    public function scopeFilter($query, $status)
+    public function scopeFilter($query, $status, $role)
     {
         if ($status) {
             $query->where('status', $status);
         } else {
             $query->where('status', '!=', 'delete');
+        }
+
+        if ($role) {
+            $query->where('role_id', $role);
         }
     }
 
@@ -155,11 +159,6 @@ class User extends Authenticatable implements JWTSubject
     public function sendPasswordResetNotification($token): void
     {
         $this->notify(new ResetPasswordNotification($token));
-    }
-
-    public function wallet()
-    {
-        return $this->hasOne(Wallet::class);
     }
 
     public function createWallet()
