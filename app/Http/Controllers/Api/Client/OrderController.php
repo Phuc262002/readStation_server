@@ -400,10 +400,10 @@ class OrderController extends Controller
 
         try {
 
-            $allOrder = LoanOrders::where('user_id', auth()->id())->get();
+            $allOrder = LoanOrders::where('user_id', $request->user_id)->get();
 
             foreach ($allOrder as $order) {
-                if (in_array($order->status, ['pending', 'approved', 'ready_for_pickup', 'preparing_shipment', 'in_transit', 'active', 'extended'])) {
+                if (in_array($order->status, ['wating_payment', 'pending', 'approved', 'ready_for_pickup', 'preparing_shipment', 'in_transit', 'active', 'extended', 'returning', 'canceled', 'overdue'])) {
                     return response()->json([
                         'status' => false,
                         'message' => 'Create order failed',
