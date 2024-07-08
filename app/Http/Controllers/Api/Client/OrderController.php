@@ -41,7 +41,7 @@ use PayOS\PayOS;
             in: 'query',
             required: false,
             description: 'Trạng thái của order',
-            schema: new OA\Schema(type: 'string', enum: ['pending', 'approved', 'ready_for_pickup', 'preparing_shipment', 'in_transit', 'extended', 'active', 'returning', 'completed', 'canceled', 'overdue'])
+            schema: new OA\Schema(type: 'string', enum: ['wating_payment', 'pending', 'approved', 'ready_for_pickup', 'preparing_shipment', 'in_transit', 'active', 'extended', 'returning', 'canceled', 'overdue'])
         ),
         new OA\Parameter(
             name: 'search',
@@ -318,7 +318,7 @@ class OrderController extends Controller
         if ($status) {
             $query->where('status', $status);
         } else {
-            $query->whereIn('status', ['pending', 'approved', 'ready_for_pickup', 'preparing_shipment', 'in_transit', 'active', 'extended', 'returning', 'completed', 'canceled', 'overdue']);
+            $query->whereIn('status', ['wating_payment', 'pending', 'approved', 'ready_for_pickup', 'preparing_shipment', 'in_transit', 'active', 'extended', 'returning', 'canceled', 'overdue']);
         }
 
         if ($search) {
@@ -400,7 +400,7 @@ class OrderController extends Controller
 
         try {
 
-            $allOrder = LoanOrders::where('user_id', $request->user_id)->get();
+            $allOrder = LoanOrders::where('user_id', auth()->user()->id)->get();
 
             foreach ($allOrder as $order) {
                 if (in_array($order->status, ['wating_payment', 'pending', 'approved', 'ready_for_pickup', 'preparing_shipment', 'in_transit', 'active', 'extended', 'returning', 'canceled', 'overdue'])) {
