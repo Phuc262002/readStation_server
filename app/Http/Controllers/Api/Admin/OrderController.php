@@ -153,7 +153,7 @@ use OpenApi\Attributes as OA;
             description: 'Trạng thái đơn hàng',
             schema: new OA\Schema(
                 type: 'string',
-                enum: ['pending', 'approved', 'ready_for_pickup', 'preparing_shipment', 'in_transit', 'extended', 'active', 'returning', 'completed', 'canceled']
+                enum: ['pending', 'approved', 'ready_for_pickup', 'preparing_shipment', 'in_transit', 'extended', 'active', 'returning', 'completed', 'canceled', 'overdue']
             )
         ),
         new OA\Parameter(
@@ -283,13 +283,13 @@ class OrderController extends Controller
         $validator = Validator::make($request->all(), [
             'page' => 'integer',
             'pageSize' => 'integer',
-            'status' => 'in:pending,approved,ready_for_pickup,preparing_shipment,in_transit,extended,active,returning,completed,canceled,overdue',
+            'status' => 'in:wating_payment,pending,approved,ready_for_pickup,preparing_shipment,in_transit,extended,active,returning,completed,canceled,overdue',
             'search' => 'string',
             'sort' => 'in:asc,desc',
         ], [
             'page.integer' => 'Số trang phải là số nguyên',
             'pageSize.integer' => 'Số lượng phải là số nguyên',
-            'status.in' => 'Trạng thái phải là pending,approved,ready_for_pickup,preparing_shipment,in_transit,extended,active,returning,completed,canceled,overdue',
+            'status.in' => 'Trạng thái phải là wating_payment,pending,approved,ready_for_pickup,preparing_shipment,in_transit,extended,active,returning,completed,canceled,overdue',
             'search.string' => 'Tìm kiếm phải là chuỗi',
             'sort.in' => 'Sắp xếp phải là asc hoặc desc',
         ]);
