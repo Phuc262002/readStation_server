@@ -2253,7 +2253,8 @@
                                 "active",
                                 "returning",
                                 "completed",
-                                "canceled"
+                                "canceled",
+                                "overdue"
                             ]
                         }
                     },
@@ -5150,13 +5151,14 @@
                         "schema": {
                             "type": "string",
                             "enum": [
+                                "wating_payment",
                                 "pending",
                                 "approved",
                                 "ready_for_pickup",
                                 "preparing_shipment",
                                 "in_transit",
-                                "extended",
                                 "active",
+                                "extended",
                                 "returning",
                                 "completed",
                                 "canceled",

@@ -41,7 +41,7 @@ use PayOS\PayOS;
             in: 'query',
             required: false,
             description: 'Trạng thái của order',
-            schema: new OA\Schema(type: 'string', enum: ['wating_payment', 'pending', 'approved', 'ready_for_pickup', 'preparing_shipment', 'in_transit', 'active', 'extended', 'returning', 'canceled', 'overdue'])
+            schema: new OA\Schema(type: 'string', enum: ['wating_payment', 'pending', 'approved', 'ready_for_pickup', 'preparing_shipment', 'in_transit', 'active', 'extended', 'returning', 'completed', 'canceled', 'overdue'])
         ),
         new OA\Parameter(
             name: 'search',
@@ -318,7 +318,7 @@ class OrderController extends Controller
         if ($status) {
             $query->where('status', $status);
         } else {
-            $query->whereIn('status', ['wating_payment', 'pending', 'approved', 'ready_for_pickup', 'preparing_shipment', 'in_transit', 'active', 'extended', 'returning', 'canceled', 'overdue']);
+            $query->whereIn('status', ['wating_payment', 'pending', 'approved', 'ready_for_pickup', 'preparing_shipment', 'in_transit', 'active', 'extended', 'returning', 'completed', 'canceled', 'overdue']);
         }
 
         if ($search) {
