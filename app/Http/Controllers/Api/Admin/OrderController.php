@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\BookDetail;
 use App\Models\LoanOrders;
 use App\Models\Wallet;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use PayOS\PayOS;
 use OpenApi\Attributes as OA;
 
 #[OA\Get(
@@ -178,8 +180,74 @@ use OpenApi\Attributes as OA;
     ]
 )]
 
+#[OA\Post(
+    path: '/api/v1/admin/orders//store-has-user',
+    operationId: 'adminOrderStoreHasUser',
+    tags: ['Admin / Orders'],
+    summary: 'Create order',
+    description: 'Create order',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            required: ['user_id', 'payment_method', 'discount', 'total_service_fee', 'total_deposit_fee', 'total_all_fee', 'order_details'],
+            properties: [
+                new OA\Property(property: 'user_id', type: 'string', description: 'Id người dùng'),
+                new OA\Property(property: 'payment_method', type: 'string', description: 'Phương thức thanh toán', enum: ['online', 'cash']),
+                new OA\Property(property: 'discount', type: 'number', description: 'Giảm giá'),
+                new OA\Property(property: 'total_service_fee', type: 'integer', description: 'Tổng phí dịch vụ'),
+                new OA\Property(property: 'total_deposit_fee', type: 'number', description: 'Tiền đặt cọc'),
+                new OA\Property(property: 'total_all_fee', type: 'number', description: 'Tổng tiền'),
+                new OA\Property(
+                    property: 'order_details',
+                    type: 'array',
+                    description: 'Chi tiết đơn hàng',
+                    items: new OA\Items(
+                        type: 'object',
+                        required: ['book_details_id', 'service_fee', 'deposit'],
+                        properties: [
+                            new OA\Property(property: 'book_details_id', type: 'integer', description: 'Id chi tiết sách'),
+                            new OA\Property(property: 'service_fee', type: 'integer', description: 'Phí dịch vụ'),
+                            new OA\Property(property: 'deposit_fee', type: 'number', description: 'Tiền đặt cọc')
+                        ]
+                    )
+                ),
+            ]
+        )
+    ),
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Create order successfully'
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error',
+        ),
+        new OA\Response(
+            response: 500,
+            description: 'Create order failed',
+        ),
+    ]
+)]
+
 class OrderController extends Controller
 {
+    private string $payOSClientId;
+    private string $payOSApiKey;
+    private string $payOSChecksumKey;
+
+
+
+    public function __construct()
+    {
+        $this->payOSClientId = env("PAYOS_CLIENT_ID");
+        $this->payOSApiKey = env("PAYOS_API_KEY");
+        $this->payOSChecksumKey = env("PAYOS_CHECKSUM_KEY");
+    }
+
     public function statisticOrder()
     {
         $orders = LoanOrders::count();
@@ -270,6 +338,203 @@ class OrderController extends Controller
                 'total' =>  $total
             ]
         ]);
+    }
+
+    public function store(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'required|exists:users,id',
+            'payment_method' => 'required|string|in:online,cash',
+            'user_note' => 'nullable|string',
+            'discount' => 'nullable|numeric|min:0',
+            'total_deposit_fee' => 'required|numeric|min:0',
+            'total_service_fee' => 'required|integer|min:1',
+            'total_all_fee' => 'required|numeric|min:0',
+
+            'order_details' => 'required|array',
+            'order_details.*.book_details_id' => 'required|integer',
+            'order_details.*.service_fee' => 'required|integer|min:1',
+            'order_details.*.deposit_fee' => 'required|numeric|min:0',
+        ], [
+            'user_id.required' => 'Trường id người dùng là bắt buộc',
+            'user_id.exists' => 'Id người dùng không tồn tại',
+            'payment_method.required' => 'Trường phương thức thanh toán là bắt buộc',
+            'payment_method.string' => 'Trường phương thức thanh toán phải là kiểu chuỗi',
+            'payment_method.in' => 'Trường phương thức thanh toán phải là online hoặc cash',
+            'user_note.string' => 'Trường ghi chú phải là kiểu chuỗi',
+            'total_deposit_fee.required' => 'Trường tiền đặt cọc là bắt buộc',
+            'total_deposit_fee.numeric' => 'Trường tiền đặt cọc phải là kiểu số',
+            'total_deposit_fee.min' => 'Trường tiền đặt cọc không được nhỏ hơn 0',
+
+            'total_service_fee.required' => 'Trường tổng phí dịch vụ là bắt buộc',
+            'total_service_fee.integer' => 'Trường tổng phí dịch vụ phải là kiểu số',
+            'total_service_fee.min' => 'Trường tổng phí dịch vụ không được nhỏ hơn 0',
+            'total_all_fee.required' => 'Trường tổng tiền là bắt buộc',
+            'total_all_fee.numeric' => 'Trường tổng tiền phải là kiểu số',
+            'total_all_fee.min' => 'Trường tổng tiền không được nhỏ hơn 0',
+
+            'order_details.required' => 'Trường chi tiết đơn hàng là bắt buộc',
+            'order_details.array' => 'Trường chi tiết đơn hàng phải là kiểu mảng',
+            'order_details.*.book_details_id.required' => 'Trường id chi tiết sách là bắt buộc',
+            'order_details.*.book_details_id.integer' => 'Trường id chi tiết sách phải là kiểu số',
+            'order_details.*.service_fee.required' => 'Trường phí dịch vụ là bắt buộc',
+            'order_details.*.service_fee.integer' => 'Trường phí dịch vụ phải là kiểu số',
+            'order_details.*.service_fee.min' => 'Trường phí dịch vụ không được nhỏ hơn 1',
+            'order_details.*.deposit.required' => 'Trường tiền đặt cọc là bắt buộc',
+            'order_details.*.deposit.numeric' => 'Trường tiền đặt cọc phải là kiểu số',
+            'order_details.*.deposit.min' => 'Trường tiền đặt cọc không được nhỏ hơn 0',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                "staus" => false,
+                "message" => "Validation error",
+                "errors" => $validator->errors()
+            ], 400);
+        }
+
+        try {
+
+            $allOrder = LoanOrders::where('user_id', $request->user_id)->get();
+
+            foreach ($allOrder as $order) {
+                if (in_array($order->status, ['wating_payment', 'pending', 'approved', 'ready_for_pickup', 'preparing_shipment', 'in_transit', 'active', 'extended', 'returning', 'canceled', 'overdue'])) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Create order failed',
+                        'errors' => 'Bạn hiện đang có đơn hàng đang chờ xử lý, vui lòng chờ đơn hàng hiện tại được xử lý xong'
+                    ]);
+                }
+            }
+
+            $bookDetailsIds = collect($request->order_details)->pluck('book_details_id')->toArray();
+
+            foreach ($bookDetailsIds as $bookDetailsId) {
+                $bookDetail = BookDetail::find($bookDetailsId);
+
+                if (!$bookDetail) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Create order failed',
+                        'errors' => 'Id chi tiết sách không tồn tại'
+                    ]);
+                }
+
+                if ($bookDetail->status !== 'active') {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Create order failed',
+                        'errors' => 'Sách không còn trạng thái cho thuê'
+                    ]);
+                }
+
+                if ($bookDetail->stock < 1) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Create order failed',
+                        'errors' => 'Sách đã hết hàng'
+                    ]);
+                }
+            }
+
+            if ($request->payment_method === 'online') {
+                $transaction_code = intval(substr(strtotime(now()) . rand(1000, 9999), -9));
+
+                $order = LoanOrders::create(array_merge($request->all(), [
+                    'user_id' => $request->user_id,
+                    'status' => 'wating_payment',
+                    'delivery_method' => 'pickup',
+                ]));
+
+                $orderDetails = $request->order_details;
+
+                $order->loanOrderDetails()->createMany($orderDetails);
+
+                $transaction = Transaction::create([
+                    'transaction_code' => $transaction_code,
+                    'transaction_type' => 'payment',
+                    'loan_order_id' => $order->id,
+                    'portal' => 'payos',
+                    'transaction_method' => 'online',
+                    'amount' => $request->total_all_fee,
+                    'description' => 'Thanh toán đơn thuê ' . $order->order_code,
+                ]);
+
+                if (!$transaction) {
+                    $order->delete();
+                }
+
+                $body = $request->input();
+                $body["amount"] = intval($transaction->amount);
+                $body["orderCode"] = intval($transaction->transaction_code);
+                $body["description"] =  $order->order_code;
+                $body["expiredAt"] = now()->addMinutes(30)->getTimestamp();
+                $body["returnUrl"] = "http://localhost:3000/account/wallet/transaction-success";
+                $body["cancelUrl"] = "http://localhost:3000/account/wallet/transaction-error";
+                $payOS = new PayOS($this->payOSClientId, $this->payOSApiKey, $this->payOSChecksumKey);
+
+                $response = $payOS->createPaymentLink($body);
+
+                $transaction->update([
+                    'status' => 'pending',
+                    'expired_at' => now()->addMinutes(30),
+                    'extra_info' => $response
+                ]);
+            } else {
+                $order = LoanOrders::create(array_merge($request->all(), [
+                    'user_id' => $request->user_id,
+                    'delivery_method' => 'pickup',
+                    'loan_date' => now(),
+                    'original_due_date' => date('Y-m-d', strtotime('+5 days')),
+                    'current_due_date' => date('Y-m-d', strtotime('+5 days')),
+                ]));
+
+                $orderDetails = $request->order_details;
+                foreach ($orderDetails as $key => $detail) {
+                    $orderDetails[$key]['original_due_date'] = date('Y-m-d', strtotime('+5 days'));
+                    $orderDetails[$key]['current_due_date'] = date('Y-m-d', strtotime('+5 days'));
+                }
+
+                $order->loanOrderDetails()->createMany($orderDetails);
+
+                $transaction_code = intval(substr(strtotime(now()) . rand(1000, 9999), -9));
+
+                $transaction = Transaction::create([
+                    'transaction_code' => $transaction_code,
+                    'portal' => 'payos',
+                    'loan_order_id' => $order->id,
+                    'transaction_type' => 'payment',
+                    'transaction_method' => 'offline',
+                    'amount' => $request->total_all_fee,
+                    'description' => 'Thanh toán tiền mặt đơn thuê ' . $order->order_code,
+                ]);
+
+                if (!$transaction) {
+                    $order->delete();
+                }
+            }
+
+            foreach ($bookDetailsIds as $bookDetailsId) {
+                $bookDetail = BookDetail::find($bookDetailsId);
+                $bookDetail->update([
+                    'stock' => $bookDetail->stock - 1
+                ]);
+            }
+
+            $order = LoanOrders::with(['transactions'])->find($order->id);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Create order successfully',
+                'data' => $order
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Create order failed',
+                'errors' => $th->getMessage()
+            ]);
+        }
     }
 
     public function show(Request $request, $id)

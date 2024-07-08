@@ -130,6 +130,7 @@ Route::group([
             Route::get('/', [AdminOrderController::class, 'index']);
             Route::get('/{id}', [AdminOrderController::class, 'show']);
             Route::put('/update/{id}', [AdminOrderController::class, 'update']);
+            Route::post('/store-has-user', [AdminOrderController::class, 'store']);
         });
 
         Route::group([

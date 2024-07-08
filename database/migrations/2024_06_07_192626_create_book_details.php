@@ -21,6 +21,7 @@ return new class extends Migration
             $table->unsignedBigInteger('price')->default(0);
             $table->unsignedBigInteger('hire_percent')->default(0);
             $table->unsignedInteger('stock')->default(0);
+            $table->unsignedInteger('stock_broken')->default(0);
             $table->date('publish_date')->nullable();
             $table->unsignedBigInteger('publishing_company_id')->nullable();
             $table->string('issuing_company')->nullable();

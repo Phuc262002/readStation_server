@@ -2285,6 +2285,107 @@
                 ]
             }
         },
+        "/api/v1/admin/orders//store-has-user": {
+            "post": {
+                "tags": [
+                    "Admin / Orders"
+                ],
+                "summary": "Create order",
+                "description": "Create order",
+                "operationId": "adminOrderStoreHasUser",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "user_id",
+                                    "payment_method",
+                                    "discount",
+                                    "total_service_fee",
+                                    "total_deposit_fee",
+                                    "total_all_fee",
+                                    "order_details"
+                                ],
+                                "properties": {
+                                    "user_id": {
+                                        "description": "Id người dùng",
+                                        "type": "string"
+                                    },
+                                    "payment_method": {
+                                        "description": "Phương thức thanh toán",
+                                        "type": "string",
+                                        "enum": [
+                                            "online",
+                                            "cash"
+                                        ]
+                                    },
+                                    "discount": {
+                                        "description": "Giảm giá",
+                                        "type": "number"
+                                    },
+                                    "total_service_fee": {
+                                        "description": "Tổng phí dịch vụ",
+                                        "type": "integer"
+                                    },
+                                    "total_deposit_fee": {
+                                        "description": "Tiền đặt cọc",
+                                        "type": "number"
+                                    },
+                                    "total_all_fee": {
+                                        "description": "Tổng tiền",
+                                        "type": "number"
+                                    },
+                                    "order_details": {
+                                        "description": "Chi tiết đơn hàng",
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "book_details_id",
+                                                "service_fee",
+                                                "deposit"
+                                            ],
+                                            "properties": {
+                                                "book_details_id": {
+                                                    "description": "Id chi tiết sách",
+                                                    "type": "integer"
+                                                },
+                                                "service_fee": {
+                                                    "description": "Phí dịch vụ",
+                                                    "type": "integer"
+                                                },
+                                                "deposit_fee": {
+                                                    "description": "Tiền đặt cọc",
+                                                    "type": "number"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Create order successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Create order failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/admin/posts": {
             "get": {
                 "tags": [

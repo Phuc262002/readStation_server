@@ -21,6 +21,7 @@ class BookDetail extends Model
         'price',
         'hire_percent',
         'stock',
+        'stock_broken',
         'publish_date',
         'publishing_company_id',
         'issuing_company',
