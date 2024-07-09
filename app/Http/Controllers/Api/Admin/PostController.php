@@ -186,7 +186,7 @@ class PostController extends Controller
         $validator = Validator::make(array_merge(['id' => $id], $request->all()), [
             'id' => 'required|exists:posts,id',
             'status' => 'required|in:published,approve_canceled',
-            'reason_cancel' => 'required_if:status,approve_canceled',
+            'reason_cancel' => 'required_if:status,approve_cancelfed',
         ], [
             'id.required' => 'Vui lòng nhập ID',
             'id.exists' => 'ID không tồn tại',
@@ -214,25 +214,29 @@ class PostController extends Controller
             }
 
             if ($post->status == 'approve_canceled') {
-                $post->update([
-                    'status' => $request->status,
-                    'reason_cancel' => $request->reason_cancel,
-                ]);
+                return response()->json([
+                    "status" => false,
+                    "message" => "Post has been canceled!",
+                ], 400);
             }
 
             if ($post->status == 'published') {
                 $post->update([
                     'status' => $request->status,
                 ]);
+            } else {
+                $post->update([
+                    'status' => $request->status,
+                    'reason_cancel' => $request->reason_cancel,
+                ]);
             }
 
             return response()->json([
                 "status" => true,
-                "message" => "Approved post successfully!",
-                "data" => [
-                    "post" => $post,
-                ],
+                "message" => "Update post successfully!",
+                "data" => $post,
             ], 200);
+
         } catch (\Throwable $th) {
             return response()->json([
                 "status" => false,
