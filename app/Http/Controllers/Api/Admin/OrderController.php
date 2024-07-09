@@ -181,7 +181,7 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Post(
-    path: '/api/v1/admin/orders//store-has-user',
+    path: '/api/v1/admin/orders/store-has-user',
     operationId: 'adminOrderStoreHasUser',
     tags: ['Admin / Orders'],
     summary: 'Create order',
@@ -348,8 +348,8 @@ class OrderController extends Controller
             'user_note' => 'nullable|string',
             'discount' => 'nullable|numeric|min:0',
             'total_deposit_fee' => 'required|numeric|min:0',
-            'total_service_fee' => 'required|integer|min:1',
-            'total_all_fee' => 'required|numeric|min:0',
+            'total_service_fee' => 'required|integer|min:0',
+            'total_all_fee' => 'required|numeric|min:10000',
 
             'order_details' => 'required|array',
             'order_details.*.book_details_id' => 'required|integer',
@@ -371,7 +371,7 @@ class OrderController extends Controller
             'total_service_fee.min' => 'Trường tổng phí dịch vụ không được nhỏ hơn 0',
             'total_all_fee.required' => 'Trường tổng tiền là bắt buộc',
             'total_all_fee.numeric' => 'Trường tổng tiền phải là kiểu số',
-            'total_all_fee.min' => 'Trường tổng tiền không được nhỏ hơn 0',
+            'total_all_fee.min' => 'Trường tổng tiền không được nhỏ hơn 10,000',
 
             'order_details.required' => 'Trường chi tiết đơn hàng là bắt buộc',
             'order_details.array' => 'Trường chi tiết đơn hàng phải là kiểu mảng',
@@ -451,6 +451,7 @@ class OrderController extends Controller
                 $order->loanOrderDetails()->createMany($orderDetails);
 
                 $transaction = Transaction::create([
+                    'user_id' => $request->user_id,
                     'transaction_code' => $transaction_code,
                     'transaction_type' => 'payment',
                     'loan_order_id' => $order->id,
@@ -500,6 +501,7 @@ class OrderController extends Controller
                 $transaction_code = intval(substr(strtotime(now()) . rand(1000, 9999), -9));
 
                 $transaction = Transaction::create([
+                    'user_id' => $request->user_id,
                     'transaction_code' => $transaction_code,
                     'portal' => 'payos',
                     'loan_order_id' => $order->id,

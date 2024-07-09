@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Client;
 
+use App\Http\Controllers\Api\VNPay\VnpayCreatePayment;
 use App\Http\Controllers\Controller;
 use App\Models\BookDetail;
 use App\Models\Extensions;
@@ -503,6 +504,7 @@ class OrderController extends Controller
                 $order->loanOrderDetails()->createMany($orderDetails);
 
                 $transaction = Transaction::create([
+                    'user_id' => auth()->user()->id,
                     'transaction_code' => $transaction_code,
                     'transaction_type' => 'payment',
                     'loan_order_id' => $order->id,
@@ -531,6 +533,7 @@ class OrderController extends Controller
                 $transaction_code = intval(substr(strtotime(now()) . rand(1000, 9999), -9));
 
                 $transaction = Transaction::create([
+                    'user_id' => auth()->user()->id,
                     'transaction_code' => $transaction_code,
                     'portal' => $request->payment_portal,
                     'loan_order_id' => $order->id,
@@ -688,17 +691,31 @@ class OrderController extends Controller
                     'data' => $response
                 ]);
             } else {
+                $vnpay = new VnpayCreatePayment();
+
+                $response = $vnpay->createPaymentLink($transaction->amount, $transaction->transaction_code, "Thanh toán đơn hàng " . $loanOrder->order_code);
+
+                $transaction->update([
+                    'status' => 'pending',
+                    'portal' => 'vnpay',
+                    'expired_at' => now()->addMinutes(30),
+                    'extra_info' => [
+                        'checkoutUrl' => $response
+                    ]
+                ]);
+
                 return response()->json([
-                    'status' => false,
-                    'message' => 'Payment order failed',
-                    'errors' => 'Cổng thanh toán không hỗ trợ'
+                    'status' => true,
+                    'message' => 'Payment order successfully',
+                    'data' => [
+                        'checkoutUrl' => $response
+                    ]
                 ]);
             }
         } catch (\Throwable $th) {
             return response()->json([
                 "status" => $th->getCode(),
                 "message" => $th->getMessage(),
-                "data" => null
             ]);
         }
     }

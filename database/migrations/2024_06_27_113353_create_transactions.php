@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->uuid('id')->primary(); 
+            $table->foreignUuid('user_id')->nullable();
             $table->string('transaction_code')->unique();
             $table->foreignId('loan_order_id');
             $table->enum('portal', ['payos', 'vnpay'])->nullable();
@@ -28,6 +29,7 @@ return new class extends Migration
 
             $table->unique('id');
             $table->foreign('loan_order_id')->references('id')->on('loan_orders')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
         });
     }
 

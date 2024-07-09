@@ -268,7 +268,6 @@ class VerificationRequestController extends Controller
                 'verification_card_info.student_card_expired.required' => 'Ngày hết hạn không được để trống.',
                 'verification_card_info.student_card_expired.date' => 'Ngày hết hạn phải là ngày.',
                 'verification_card_info.place_of_study.required' => 'Tên trường không được để trống.',
-                'verification_card_info.school_name.string' => 'Tên trường phải là chuỗi.',
             ]);
 
             if ($validator2->fails()) {

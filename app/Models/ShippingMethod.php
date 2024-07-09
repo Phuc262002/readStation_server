@@ -33,6 +33,8 @@ class ShippingMethod extends Model
     {
         if ($status) {
             $query->where('status', $status);
+        } else {
+            $query->where('status', '!=', 'deleted');
         }
 
         return $query;

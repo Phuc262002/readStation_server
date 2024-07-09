@@ -13,7 +13,7 @@ class Transaction extends Model
     protected $table = 'transactions';
 
     protected $fillable = [
-        'reference_id',
+        'user_id',
         'transaction_code',
         'loan_order_id',
         'portal', // payos, vnpay, cash

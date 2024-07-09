@@ -26,6 +26,7 @@ use App\Http\Controllers\Api\Client\AccountController;
 use App\Http\Controllers\Api\Client\CommentController;
 use App\Http\Controllers\Api\Client\OrderController;
 use App\Http\Controllers\Api\Client\PostController;
+use App\Http\Controllers\Api\Client\TransactionController;
 use App\Http\Controllers\Api\Client\VerificationRequestController as ClientVerificationRequestController;
 use App\Http\Controllers\Api\PayOS\CheckCCCDController;
 use App\Http\Controllers\Api\Public\AuthorController;
@@ -37,6 +38,7 @@ use App\Http\Controllers\Api\Public\PublishingCompanyController;
 use App\Http\Controllers\Api\Public\ShippingMethodController as PublicShippingMethodController;
 use App\Http\Controllers\Api\Shiip\ShiipController;
 use App\Http\Controllers\Api\Upload\CloudinaryController;
+use App\Http\Controllers\Api\VNPay\VnpayCreatePayment;
 use Illuminate\Support\Facades\Route;
 
 Route::group([
@@ -117,6 +119,7 @@ Route::group([
             "prefix" => "users",
         ], function () {
             Route::get('/', [UserController::class, 'index']);
+            Route::get('/static', [UserController::class, 'staticUser']);
             Route::get('/get-one/{id}', [UserController::class, 'show']);
             Route::post('/create', [UserController::class, 'store']);
             Route::put('/update/{id}', [UserController::class, 'update']);
@@ -372,4 +375,6 @@ Route::group([
         Route::post('/create-district', [ShiipController::class, 'createDistrict']);
         Route::post('/create-ward', [ShiipController::class, 'createWard']);
     });
+
+    Route::get('/test', [TransactionController::class, 'index']);
 });

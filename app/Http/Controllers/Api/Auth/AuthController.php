@@ -198,7 +198,7 @@ class AuthController extends Controller
                 'status' => false,
                 'message' => 'Unauthorized',
                 'errors' => [
-                    'email' => ['Tài khoản đã bị khóa']
+                    'email' => ['Tài khoản đã bị vô hiệu hóa']
                 ]
             ], 401);
         }
@@ -265,7 +265,7 @@ class AuthController extends Controller
                     'status' => false,
                     'message' => 'Unauthorized',
                     'errors' => [
-                        'email' => ['Tài khoản đã bị khóa']
+                        'email' => ['Tài khoản đã bị vô hiệu hóa']
                     ]
                 ], 401);
             }
@@ -417,6 +417,7 @@ class AuthController extends Controller
     protected function createNewToken($token, $refreshToken)
     {
         $user = User::with(['role', 'province', 'district', 'ward'])->find(auth()->user()->id);
+        setcookie('token', $token, time() + 60 * 60 * 24 * 30, '/', '', false, true);
         return response()->json([
             "status" => true,
             "message" => "Login successful",

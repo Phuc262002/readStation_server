@@ -39,7 +39,8 @@ return new class extends Migration
             $table->string('refresh_token')->nullable();
             $table->string('remember_token')->nullable();
             $table->unsignedBigInteger('discount')->default(0);
-            $table->enum('status', ['active', 'locked', 'banned'])->default('active');
+            $table->string('banned_reason')->nullable();
+            $table->enum('status', ['active', 'banned'])->default('active');
             $table->timestamps();
 
             $table->foreign('province_id')->references('id')->on('provinces')->onDelete('cascade');

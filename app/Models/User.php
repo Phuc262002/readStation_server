@@ -45,6 +45,7 @@ class User extends Authenticatable implements JWTSubject
         'remember_token',
         'refresh_token',
         'status',
+        'banned_reason',
         'discount'
     ];
 
@@ -151,6 +152,11 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(LoanOrders::class);
     }
 
+    public function transaction()
+    {
+        return $this->hasOne(Transaction::class);
+    }
+
     public function comment()
     {
         return $this->hasMany(Comment::class);
@@ -159,11 +165,6 @@ class User extends Authenticatable implements JWTSubject
     public function sendPasswordResetNotification($token): void
     {
         $this->notify(new ResetPasswordNotification($token));
-    }
-
-    public function createWallet()
-    {
-        $this->wallet()->create();
     }
 
     public function province()

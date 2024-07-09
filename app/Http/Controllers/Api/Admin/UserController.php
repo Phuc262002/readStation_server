@@ -5,11 +5,30 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Api\PayOS\CheckCCCDController;
 use App\Http\Controllers\Controller;
 use App\Mail\InfomationAccount;
+use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use OpenApi\Attributes as OA;
+
+#[OA\Get(
+    path: '/api/v1/admin/users/static',
+    tags: ['Admin / User'],
+    operationId: 'staticUser',
+    summary: 'Get static user',
+    description: 'Get static user',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Get all authors successfully',
+        ),
+    ],
+)]
+
 
 #[OA\Get(
     path: '/api/v1/admin/users',
@@ -47,7 +66,7 @@ use OpenApi\Attributes as OA;
             in: 'query',
             required: false,
             description: 'Trạng thái của tác giả',
-            schema: new OA\Schema(type: 'string', enum: ['active', 'inactive', 'deleted'])
+            schema: new OA\Schema(type: 'string', enum: ['active', 'banned'])
         ),
         new OA\Parameter(
             name: 'role_id',
@@ -223,7 +242,8 @@ use OpenApi\Attributes as OA;
                 new OA\Property(property: 'ward_id', type: 'string', description: 'Ward'),
                 new OA\Property(property: 'address_detail', type: 'string', description: 'Address detail'),
                 new OA\Property(property: 'phone', type: 'string', description: 'Phone'),
-                new OA\Property(property: 'status', type: 'string', enum: ['active', 'inactive', 'banned', 'deleted']),
+                new OA\Property(property: 'status', type: 'string', enum: ['active', 'banned']),
+                new OA\Property(property: 'banned_reason', type: 'string', description: 'Lý do banned', default: 'Lý do banned'),
             ]
         )
     ),
@@ -246,6 +266,29 @@ use OpenApi\Attributes as OA;
 
 class UserController extends Controller
 {
+    public function staticUser()
+    {
+        $totalUser = User::count();
+        $totalManager = User::where('role_id', '3')->count();
+        $totalAdmin = User::where('role_id', '4')->count();
+        $totalStudent = User::where('role_id', '2')->count();
+        $totalUserVerified = User::whereNotNull('user_verified_at')->where('role_id', '!=','3')->where('role_id', '!=','4')->count();
+        $totalUserUnverified = User::whereNull('user_verified_at')->where('role_id', '!=','3')->where('role_id', '!=','4')->count();
+
+        return response()->json([
+            "status" => true,
+            "message" => "Get static user successfully!",
+            "data" => [
+                "totalUser" => $totalUser,
+                "totalManager" => $totalManager,
+                "totalAdmin" => $totalAdmin,
+                "totalStudent" => $totalStudent,
+                "totalUserVerified" => $totalUserVerified,
+                "totalUserUnverified" => $totalUserUnverified,
+            ],
+        ], 200);
+    }
+
     public function index(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -259,7 +302,7 @@ class UserController extends Controller
             'page.min' => 'Trang phải lớn hơn hoặc bằng 1.',
             'pageSize.integer' => 'Kích thước trang phải là số nguyên.',
             'pageSize.min' => 'Kích thước trang phải lớn hơn hoặc bằng 1.',
-            'status.in' => 'Status phải là active, inactive, needUpdateDetail hoặc deleted.',
+            'status.in' => 'Status phải là active, banned.',
             'role_id.integer' => 'Role id phải là số nguyên.',
             'role_id.exists' => 'Role id không tồn tại.',
         ]);
@@ -295,6 +338,7 @@ class UserController extends Controller
         $users->getCollection()->transform(function ($user) {
             return array_merge($user->toArray(), [
                 'id' => $user->id,
+                'balance_holding' => Transaction::where('user_id', $user->id)->where('status', 'holding')->sum('amount'),
             ]);
         });
 
@@ -513,7 +557,7 @@ class UserController extends Controller
             'id' => 'required|string|exists:users,id',
             'role_id' => 'nullable|integer|exists:roles,id',
             'avatar' => 'nullable|string',
-            'fullname' => 'required|string',
+            'fullname' => 'nullable|string',
             'job' => 'nullable|string',
             'story' => 'nullable|string',
             'gender' => 'nullable|string|in:male,female,other',
@@ -525,8 +569,9 @@ class UserController extends Controller
             'district_id' => 'nullable',
             'ward_id' => 'nullable',
             'address_detail' => 'nullable|string',
-            'phone' => 'required|regex:/^(0[35789])[0-9]{8}$/',
-            'status' => 'nullable|string|in:active,inactive,banned,deleted',
+            'phone' => 'nullable|regex:/^(0[35789])[0-9]{8}$/',
+            'status' => 'nullable|string|in:active,banned',
+            'banned_reason' => 'required_if:status,banned|string',
         ], [
             'id.required' => 'Id không được để trống.',
             'id.exists' => 'Id không tồn tại.',
@@ -535,9 +580,10 @@ class UserController extends Controller
             'role_id.exists' => 'Role id không tồn tại.',
             'fullname.required' => 'Fullname không được để trống.',
             'fullname.string' => 'Fullname phải là chuỗi.',
-            'status.in' => 'Status phải là active, inactive, banned hoặc deleted.',
+            'status.in' => 'Status phải là active, hoặc banned.',
             'phone.required' => 'Số điện thoại không được để trống.',
             'phone.regex' => 'Số điện thoại không đúng định dạng.',
+            'banned_reason.required_if' => 'Lý do banned không được để trống.',
         ]);
 
         if ($validator->fails()) {
@@ -550,6 +596,26 @@ class UserController extends Controller
 
         try {
             $user = User::find($id);
+
+            if ($user->status == 'banned') {
+                if ($request->status == 'active') {
+                    $user->update(['status' => 'active', 'banned_reason' => null]);
+                } else {
+                    return response()->json([
+                        "status" => false,
+                        "message" => "Tài khoản đã bị banned, không thể cập nhật thông tin."
+                    ], 400);
+                }
+            }
+
+            if (($user->role_id == 4 || $user->role_id == 3)) {
+                if (auth()->user()->role_id != 4) {
+                    return response()->json([
+                        "status" => false,
+                        "message" => "Bạn không có quyền cập nhật thông tin tài khoản này."
+                    ], 400);
+                }
+            }
 
             if ($request->role_id == 2) {
                 $validator2 = Validator::make($request->all(), [
@@ -645,10 +711,5 @@ class UserController extends Controller
                 "errors" => $th->getMessage()
             ], 500);
         }
-    }
-
-    public function destroy(User $user)
-    {
-        //
     }
 }

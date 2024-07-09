@@ -2286,7 +2286,7 @@
                 ]
             }
         },
-        "/api/v1/admin/orders//store-has-user": {
+        "/api/v1/admin/orders/store-has-user": {
             "post": {
                 "tags": [
                     "Admin / Orders"
@@ -3659,6 +3659,26 @@
                 ]
             }
         },
+        "/api/v1/admin/users/static": {
+            "get": {
+                "tags": [
+                    "Admin / User"
+                ],
+                "summary": "Get static user",
+                "description": "Get static user",
+                "operationId": "staticUser",
+                "responses": {
+                    "200": {
+                        "description": "Get all authors successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/admin/users": {
             "get": {
                 "tags": [
@@ -3706,8 +3726,7 @@
                             "type": "string",
                             "enum": [
                                 "active",
-                                "inactive",
-                                "deleted"
+                                "banned"
                             ]
                         }
                     },
@@ -5808,6 +5827,51 @@
                     },
                     "500": {
                         "description": "Delete post failed!"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/account/transactions": {
+            "get": {
+                "tags": [
+                    "Account / Transaction"
+                ],
+                "summary": "Get all order",
+                "description": "Get all order",
+                "operationId": "transactionIndex",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Số trang hiện tại",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "pageSize",
+                        "in": "query",
+                        "description": "Số lượng mục trên mỗi trang",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get all order successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
                     }
                 },
                 "security": [

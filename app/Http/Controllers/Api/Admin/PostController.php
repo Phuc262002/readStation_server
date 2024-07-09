@@ -186,7 +186,7 @@ class PostController extends Controller
         $validator = Validator::make(array_merge(['id' => $id], $request->all()), [
             'id' => 'required|exists:posts,id',
             'status' => 'required|in:published,approve_canceled',
-            'reason_cancel' => 'required_if:status,approve_cancelfed',
+            'reason_cancel' => 'required_if:status,approve_canceled',
         ], [
             'id.required' => 'Vui lòng nhập ID',
             'id.exists' => 'ID không tồn tại',
