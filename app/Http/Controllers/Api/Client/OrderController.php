@@ -723,7 +723,7 @@ class OrderController extends Controller
         try {
             $order = LoanOrders::with('loanOrderDetails')->find($id);
 
-            if ($order->status !== 'pending') {
+            if ($order->status !== 'pending' && $order->status !== 'wating_payment') {
                 return response()->json([
                     'status' => false,
                     'message' => 'Cancel order failed',
