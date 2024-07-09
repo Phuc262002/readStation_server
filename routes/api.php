@@ -229,7 +229,7 @@ Route::group([
             "prefix" => "posts"
         ], function () {
             Route::get('/', [AdminPostController::class, 'index']);
-            Route::get('/update/{id}', [AdminPostController::class, 'update']);
+            Route::put('/update/{id}', [AdminPostController::class, 'update']);
         });
 
         Route::group([
