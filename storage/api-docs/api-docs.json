@@ -2387,6 +2387,72 @@
                 ]
             }
         },
+        "/api/v1/admin/orders/return-each-book/{id}": {
+            "put": {
+                "tags": [
+                    "Admin / Orders"
+                ],
+                "summary": "Trả từng sách",
+                "description": "Trả từng sách",
+                "operationId": "adminOrderReturnEachBook",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id chi tiết đơn hàng",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "condition",
+                                    "actual_return_condition",
+                                    "fine_amount"
+                                ],
+                                "properties": {
+                                    "condition": {
+                                        "description": "Tình trạng sách",
+                                        "type": "string"
+                                    },
+                                    "actual_return_condition": {
+                                        "description": "Tình trạng thực tế khi trả sách",
+                                        "type": "string"
+                                    },
+                                    "fine_amount": {
+                                        "description": "Số tiền phạt",
+                                        "type": "number"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Trả từng sách"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Lỗi không xác định"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/admin/posts": {
             "get": {
                 "tags": [
@@ -4083,10 +4149,13 @@
                                         "type": "string",
                                         "enum": [
                                             "active",
-                                            "inactive",
-                                            "banned",
-                                            "deleted"
+                                            "banned"
                                         ]
+                                    },
+                                    "banned_reason": {
+                                        "description": "Lý do banned",
+                                        "type": "string",
+                                        "default": "Lý do banned"
                                     }
                                 },
                                 "type": "object"
@@ -5511,6 +5580,90 @@
                     },
                     "500": {
                         "description": "Extension all order failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/account/orders/return-each-book/{id}": {
+            "put": {
+                "tags": [
+                    "Account / Orders"
+                ],
+                "summary": "Trả từng sách",
+                "description": "Trả từng sách",
+                "operationId": "returnEachBook",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id chi tiết đơn hàng",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "loan_order_details_id",
+                                    "return_method",
+                                    "pickup_info"
+                                ],
+                                "properties": {
+                                    "loan_order_details_id": {
+                                        "description": "Id chi tiết đơn hàng",
+                                        "type": "integer"
+                                    },
+                                    "return_method": {
+                                        "description": "Phương thức trả sách",
+                                        "type": "string",
+                                        "enum": [
+                                            "pickup",
+                                            "library"
+                                        ]
+                                    },
+                                    "pickup_info": {
+                                        "description": "Thông tin lấy sách",
+                                        "properties": {
+                                            "fullname": {
+                                                "description": "Họ tên",
+                                                "type": "string"
+                                            },
+                                            "phone": {
+                                                "description": "Số điện thoại",
+                                                "type": "string"
+                                            },
+                                            "address": {
+                                                "description": "Địa chỉ",
+                                                "type": "string"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Trả từng sách"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Lỗi không xác định"
                     }
                 },
                 "security": [

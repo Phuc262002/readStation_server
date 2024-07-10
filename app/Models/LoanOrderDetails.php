@@ -54,4 +54,9 @@ class LoanOrderDetails extends Model
     {
         return $this->hasMany(BookReviews::class);
     }
+
+    public function createReturnHistory($data)
+    {
+        return $this->returnHistories()->create($data);
+    }
 }

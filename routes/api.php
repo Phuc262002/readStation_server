@@ -94,6 +94,7 @@ Route::group([
             Route::put('/cancel/{id}', [OrderController::class, 'cancelOrder']);
             Route::post('/payment/{id}', [OrderController::class, 'paymentOrder']);
             Route::post('/extension/{id}', [OrderController::class, 'extensionAllOrder']);
+            Route::put('/return-each-book/{id}', [AdminOrderController::class, 'returnEachBook']);
         });
 
         Route::group([
@@ -101,6 +102,13 @@ Route::group([
         ], function () {
             Route::get('/', [ClientVerificationRequestController::class, 'index']);
             Route::post('/create', [ClientVerificationRequestController::class, 'store']);
+        });
+
+        Route::group([
+            "prefix" => "transactions"
+        ], function () {
+            Route::get('/', [TransactionController::class, 'index']);
+
         });
     });
 
@@ -133,6 +141,7 @@ Route::group([
             Route::get('/', [AdminOrderController::class, 'index']);
             Route::get('/{id}', [AdminOrderController::class, 'show']);
             Route::put('/update/{id}', [AdminOrderController::class, 'update']);
+            Route::put('/return-each-book/{id}', [AdminOrderController::class, 'returnEachBook']);
             Route::post('/store-has-user', [AdminOrderController::class, 'store']);
         });
 

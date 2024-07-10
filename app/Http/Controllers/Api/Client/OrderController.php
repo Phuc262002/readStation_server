@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\VNPay\VnpayCreatePayment;
 use App\Http\Controllers\Controller;
 use App\Models\BookDetail;
 use App\Models\Extensions;
+use App\Models\LoanOrderDetails;
 use App\Models\LoanOrders;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
@@ -267,6 +268,61 @@ use PayOS\PayOS;
         ),
     ]
 )]
+
+#[OA\Put(
+    path: '/api/v1/account/orders/return-each-book/{id}',
+    operationId: 'returnEachBook',
+    tags: ['Account / Orders'],
+    summary: 'Trả từng sách',
+    description: 'Trả từng sách',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    parameters: [
+        new OA\Parameter(
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Id chi tiết đơn hàng',
+            schema: new OA\Schema(type: 'integer')
+        ),
+    ],
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            required: ['loan_order_details_id', 'return_method', 'pickup_info'],
+            properties: [
+                new OA\Property(property: 'loan_order_details_id', type: 'integer', description: 'Id chi tiết đơn hàng'),
+                new OA\Property(property: 'return_method', type: 'string', description: 'Phương thức trả sách', enum: ['pickup', 'library']),
+                new OA\Property(
+                    property: 'pickup_info',
+                    type: 'object',
+                    description: 'Thông tin lấy sách',
+                    properties: [
+                        new OA\Property(property: 'fullname', type: 'string', description: 'Họ tên'),
+                        new OA\Property(property: 'phone', type: 'string', description: 'Số điện thoại'),
+                        new OA\Property(property: 'address', type: 'string', description: 'Địa chỉ'),
+                    ]
+                ),
+            ]
+        )
+    ),
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Trả từng sách',
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error'
+        ),
+        new OA\Response(
+            response: 500,
+            description: 'Lỗi không xác định'
+        ),
+    ]
+)]
+
 
 class OrderController extends Controller
 {
@@ -883,6 +939,94 @@ class OrderController extends Controller
                 'message' => 'Extension order failed',
                 'errors' => $th->getMessage()
             ]);
+        }
+    }
+
+    public function returnEachBook(Request $request, $id)
+    {
+        $validator = Validator::make(array_merge(
+            $request->all(),
+            ['loan_order_details_id' => $id]
+        ), [
+            'loan_order_details_id' => 'required|integer|exists:loan_order_details,id',
+            'return_method' => 'required|string|in:library,pickup',
+        ], [
+            'loan_order_details_id.required' => 'Trường id chi tiết đơn hàng là bắt buộc',
+            'loan_order_details_id.integer' => 'Trường id chi tiết đơn hàng phải là kiểu số',
+            'loan_order_details_id.exists' => 'Id chi tiết đơn hàng không tồn tại',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                "status" => false,
+                "message" => "Validation error",
+                "errors" => $validator->errors()
+            ], 400);
+        }
+
+        $orderDetail = LoanOrderDetails::find($id);
+
+        if ($orderDetail->status != 'active' && $orderDetail->status != 'extended') {
+            return response()->json([
+                'status' => false,
+                'message' => 'Chi tiết đơn hàng không ở trạng thái đang mượn',
+            ], 400);
+        }
+
+        if ($request->return_method == 'pickup') {
+            $validator2 = Validator::make($request->all(), [
+                'shipping_method_id' => 'required|integer|exists:shipping_methods,id',
+                'pickup_info' => 'required|array',
+                'pickup_info.fullname' => 'required|string',
+                'pickup_info.phone' => 'required|regex:/^(0[35789])[0-9]{8}$/',
+                'pickup_info.address' => 'required|string',
+            ], [
+                'shipping_method_id.required' => 'Trường phương thức vận chuyển là bắt buộc',
+                'shipping_method_id.integer' => 'Trường phương thức vận chuyển phải là kiểu số',
+                'shipping_method_id.exists' => 'Id phương thức vận chuyển không tồn tại',
+                'pickup_info.required' => 'Trường thông tin nhận sách là bắt buộc',
+                'pickup_info.array' => 'Trường thông tin nhận sách phải là kiểu mảng',
+                'pickup_info.fullname.required' => 'Trường họ tên là bắt buộc',
+                'pickup_info.phone.required' => 'Trường số điện thoại là bắt buộc',
+                'pickup_info.address.required' => 'Trường địa chỉ là bắt buộc',
+                'pickup_info.fullname.string' => 'Trường họ tên phải là kiểu chuỗi',
+                'pickup_info.phone.regex' => 'Trường số điện thoại không hợp lệ',
+                'pickup_info.address.string' => 'Trường địa chỉ phải là kiểu chuỗi',
+            ]);
+
+            if ($validator2->fails()) {
+                return response()->json([
+                    "status" => false,
+                    "message" => "Validation error",
+                    "errors" => $validator2->errors()
+                ], 400);
+            }
+        }
+
+        try {
+
+            $orderDetail->createReturnHistory(array_merge(
+                $request->all(),
+                [
+                    'return_date' => now(),
+                    'status' => 'pending'
+                ]
+            ));
+
+            $orderDetail->update([
+                'status' => 'returning',
+            ]);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Trả sách thành công',
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Hoàn thành đơn hàng thất bại',
+                'errors' => $th->getMessage()
+            ], 500);
         }
     }
 }

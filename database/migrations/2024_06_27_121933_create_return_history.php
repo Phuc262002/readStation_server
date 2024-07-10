@@ -24,6 +24,7 @@ return new class extends Migration
             $table->unsignedBigInteger('return_shipping_fee')->default(0);
             $table->datetime('pickup_date')->nullable();
             $table->datetime('received_at_library_date')->nullable();
+            $table->enum('actual_return_condition', ['excellent', 'good', 'fair', 'poor', 'damaged', 'lost'])->nullable();
             $table->enum('status', ['pending', 'approved', 'preparing_shipment', 'in_transit', 'completed', 'lost'])->default('pending');
             $table->timestamps();
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\BookDetail;
+use App\Models\LoanOrderDetails;
 use App\Models\LoanOrders;
 use App\Models\Wallet;
 use App\Models\Transaction;
@@ -229,6 +230,51 @@ use OpenApi\Attributes as OA;
         new OA\Response(
             response: 500,
             description: 'Create order failed',
+        ),
+    ]
+)]
+
+#[OA\Put(
+    path: '/api/v1/admin/orders/return-each-book/{id}',
+    operationId: 'adminOrderReturnEachBook',
+    tags: ['Admin / Orders'],
+    summary: 'Trả từng sách',
+    description: 'Trả từng sách',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    parameters: [
+        new OA\Parameter(
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Id chi tiết đơn hàng',
+            schema: new OA\Schema(type: 'integer')
+        ),
+    ],
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            required: ['condition', 'actual_return_condition', 'fine_amount'],
+            properties: [
+                new OA\Property(property: 'condition', type: 'string', description: 'Tình trạng sách'),
+                new OA\Property(property: 'actual_return_condition', type: 'string', description: 'Tình trạng thực tế khi trả sách'),
+                new OA\Property(property: 'fine_amount', type: 'number', description: 'Số tiền phạt')
+            ]
+        )
+    ),
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Trả từng sách',
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error'
+        ),
+        new OA\Response(
+            response: 500,
+            description: 'Lỗi không xác định'
         ),
     ]
 )]
@@ -941,5 +987,73 @@ class OrderController extends Controller
             'status' => false,
             'message' => 'Chức năng này chưa được hỗ trợ',
         ], 400);
+    }
+
+    public function returnEachBook(Request $request, $id)
+    {
+        $validator = Validator::make(array_merge(
+            $request->all(),
+            ['loan_order_details_id' => $id]
+        ), [
+            'loan_order_details_id' => 'required|integer|exists:loan_order_details,id',
+            'condition' => 'nullable|string',
+            'actual_return_condition' => 'required|string|in:excellent,good,fair,poor,damaged,lost',
+            'fine_amount' => 'required_if:actual_return_condition,poor,damaged,lost|numeric|min:0',
+        ], [
+            'loan_order_details_id.required' => 'Trường id chi tiết đơn hàng là bắt buộc',
+            'loan_order_details_id.integer' => 'Trường id chi tiết đơn hàng phải là kiểu số',
+            'loan_order_details_id.exists' => 'Id chi tiết đơn hàng không tồn tại',
+            'condition.string' => 'Trường condition phải là kiểu chuỗi',
+            'actual_return_condition.required' => 'Trường tình trạng trả sách là bắt buộc',
+            'actual_return_condition.string' => 'Trường tình trạng trả sách phải là kiểu chuỗi',
+            'actual_return_condition.in' => 'Trường tình trạng trả sách phải là excellent,good,fair,poor,damaged,lost',
+            'fine_amount.required_if' => 'Trường tiền phạt là bắt buộc',
+            'fine_amount.numeric' => 'Trường tiền phạt phải là kiểu số',
+            'fine_amount.min' => 'Trường tiền phạt không được nhỏ hơn 0',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                "status" => false,
+                "message" => "Validation error",
+                "errors" => $validator->errors()
+            ], 400);
+        }
+
+        $orderDetail = LoanOrderDetails::find($id);
+
+        if ($orderDetail->status != 'active' && $orderDetail->status != 'extended') {
+            return response()->json([
+                'status' => false,
+                'message' => 'Chi tiết đơn hàng không ở trạng thái đang mượn',
+            ], 400);
+        }
+
+        try {
+            $orderDetail->createReturnHistory(array_merge($request->all(), [
+                'processed_by' => auth()->id(),
+                'return_date' => now(),
+                'return_method' => 'library',
+                'received_at_library_date' => now(),
+            ]));
+
+            $orderDetail->update([
+                'status' => 'completed',
+                'actual_return_condition' => $request->actual_return_condition,
+                'fine_amount' => $request->fine_amount ?? 0,
+                'return_date' => now()
+            ]);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Trả sách thành công',
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Hoàn thành đơn hàng thất bại',
+                'errors' => $th->getMessage()
+            ], 500); 
+        }
     }
 }
