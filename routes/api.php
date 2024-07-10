@@ -93,6 +93,7 @@ Route::group([
             Route::post('/create', [OrderController::class, 'store']);
             Route::put('/cancel/{id}', [OrderController::class, 'cancelOrder']);
             Route::post('/payment/{id}', [OrderController::class, 'paymentOrder']);
+            Route::post('/cancel-payment/{id}', [OrderController::class, 'cancelPayment']);
             Route::post('/extension/{id}', [OrderController::class, 'extensionAllOrder']);
             Route::put('/return-each-book/{id}', [AdminOrderController::class, 'returnEachBook']);
         });
@@ -108,7 +109,7 @@ Route::group([
             "prefix" => "transactions"
         ], function () {
             Route::get('/', [TransactionController::class, 'index']);
-
+            Route::get('/balance-holding', [TransactionController::class, 'getBalanceHolding']);
         });
     });
 

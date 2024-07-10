@@ -22,7 +22,7 @@ class VnpayCreatePayment extends Controller
         $this->vnp_TmnCode = "NWEVMRXZ";
         $this->vnp_HashSecret = "BANLO0CS7GCLSS2TO9QP7H6PTI7R4BYB";
         $this->vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-        $this->vnp_Returnurl = "http://localhost:3000/account/wallet/transaction-error";
+        $this->vnp_Returnurl = "http://localhost:3000/payment/result?portal=vnpay";
         $this->vnp_apiUrl = "http://sandbox.vnpayment.vn/merchant_webapi/merchant.html";
         $this->apiUrl = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
     }

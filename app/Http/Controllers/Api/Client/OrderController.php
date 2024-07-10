@@ -323,6 +323,50 @@ use PayOS\PayOS;
     ]
 )]
 
+#[OA\Post(
+    path: '/api/v1/account/orders/cancel-payment/{id}',
+    operationId: 'cancelPaymentOrder',
+    tags: ['Account / Orders'],
+    summary: 'Cancel payment order',
+    description: 'Cancel payment order',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            required: ['body'],
+            properties: [
+                new OA\Property(property: 'body', type: 'string', description: 'Lý do hủy đơn hàng'),
+            ]
+        )
+    ),
+    parameters: [
+        new OA\Parameter(
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Id của order',
+            schema: new OA\Schema(type: 'integer')
+        ),
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Cancel payment order successfully'
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error',
+        ),
+        new OA\Response(
+            response: 500,
+            description: 'Cancel payment order failed',
+        ),
+    ]
+)]
+
+
 
 class OrderController extends Controller
 {
@@ -729,8 +773,8 @@ class OrderController extends Controller
                 $body["orderCode"] = intval($transaction->transaction_code);
                 $body["description"] =  $loanOrder->order_code;
                 $body["expiredAt"] = now()->addMinutes(30)->getTimestamp();
-                $body["returnUrl"] = "http://localhost:3000/account/wallet/transaction-success";
-                $body["cancelUrl"] = "http://localhost:3000/account/wallet/transaction-error";
+                $body["returnUrl"] = "http://localhost:3000/account/wallet/transaction-success?portal=payos";
+                $body["cancelUrl"] = "http://localhost:3000/payment/result?portal=payos";
                 $payOS = new PayOS($this->payOSClientId, $this->payOSApiKey, $this->payOSChecksumKey);
 
                 $response = $payOS->createPaymentLink($body);
@@ -1027,6 +1071,74 @@ class OrderController extends Controller
                 'message' => 'Hoàn thành đơn hàng thất bại',
                 'errors' => $th->getMessage()
             ], 500);
+        }
+    }
+
+    public function cancelPayment(Request $request, $id)
+    {
+        $validator = Validator::make(array_merge(
+            $request->all(),
+            ['transaction_code' => $id]
+        ), [
+            'transaction_code' => 'required|exists:transactions,transaction_code',
+            'body' => 'required|array',
+        ], [
+            'transaction_code.required' => 'Trường id là bắt buộc',
+            'body.required' => 'Trường lý do hủy đơn hàng là bắt buộc',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                "status" => false,
+                "message" => "Validation error",
+                "errors" => $validator->errors()
+            ], 400);
+        }
+
+        try {
+            $transaction = Transaction::where('transaction_code', $id)->first();
+
+            if ($transaction->status !== 'pending') {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Cancel payment order failed',
+                    'errors' => 'Không thể hủy thanh toán'
+                ]);
+            }
+
+            $transaction->update([
+                'status' => 'canceled',
+                'extra_info' => [
+                    $transaction->extra_info,
+                    $request->body
+                ]
+            ]);
+
+            $order = LoanOrders::find($transaction->loan_order_id);
+
+            if ($order) {
+                $order->update([
+                    'status' => 'canceled'
+                ]);
+
+                foreach ($order->loanOrderDetails as $orderDetail) {
+                    $orderDetail->update([
+                        'status' => 'canceled'
+                    ]);
+                }
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Cancel payment order successfully',
+                'data' => $transaction
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Cancel payment order failed',
+                'errors' => $th->getMessage()
+            ]);
         }
     }
 }

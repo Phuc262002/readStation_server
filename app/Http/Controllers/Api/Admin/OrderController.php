@@ -517,7 +517,7 @@ class OrderController extends Controller
                 $body["description"] =  $order->order_code;
                 $body["expiredAt"] = now()->addMinutes(30)->getTimestamp();
                 $body["returnUrl"] = "http://localhost:3000/account/wallet/transaction-success";
-                $body["cancelUrl"] = "http://localhost:3000/account/wallet/transaction-error";
+                $body["cancelUrl"] = "http://localhost:3000/payment/result";
                 $payOS = new PayOS($this->payOSClientId, $this->payOSApiKey, $this->payOSChecksumKey);
 
                 $response = $payOS->createPaymentLink($body);

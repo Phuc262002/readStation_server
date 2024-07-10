@@ -5673,6 +5673,62 @@
                 ]
             }
         },
+        "/api/v1/account/orders/cancel-payment/{id}": {
+            "post": {
+                "tags": [
+                    "Account / Orders"
+                ],
+                "summary": "Cancel payment order",
+                "description": "Cancel payment order",
+                "operationId": "cancelPaymentOrder",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id của order",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "body"
+                                ],
+                                "properties": {
+                                    "body": {
+                                        "description": "Lý do hủy đơn hàng",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Cancel payment order successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Cancel payment order failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/account/get-posts": {
             "get": {
                 "tags": [
@@ -5994,8 +6050,8 @@
                 "tags": [
                     "Account / Transaction"
                 ],
-                "summary": "Get all order",
-                "description": "Get all order",
+                "summary": "Get all transaction",
+                "description": "Get all transaction",
                 "operationId": "transactionIndex",
                 "parameters": [
                     {
@@ -6017,6 +6073,20 @@
                             "type": "integer",
                             "default": 10
                         }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sắp xếp theo tháng hoặc tất cả thời gian",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "allTime",
+                            "enum": [
+                                "inMonth",
+                                "allTime"
+                            ]
+                        }
                     }
                 ],
                 "responses": {
@@ -6025,6 +6095,29 @@
                     },
                     "400": {
                         "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/account/transactions/balance-holding": {
+            "get": {
+                "tags": [
+                    "Account / Transaction"
+                ],
+                "summary": "Get balance holding",
+                "description": "Get balance holding",
+                "operationId": "transactionBalanceHolding",
+                "responses": {
+                    "200": {
+                        "description": "Get balance holding successfully"
+                    },
+                    "500": {
+                        "description": "Failed to get balance holding"
                     }
                 },
                 "security": [
