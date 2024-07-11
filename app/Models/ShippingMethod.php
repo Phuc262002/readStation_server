@@ -45,6 +45,11 @@ class ShippingMethod extends Model
         return $this->hasMany(LoanOrders::class);
     }
 
+    public function returnHistory()
+    {
+        return $this->hasMany(ReturnHistory::class);
+    }
+
     public function delete()
     {
         if ($this->order()->count() > 0) {
@@ -56,4 +61,6 @@ class ShippingMethod extends Model
 
         return true;
     }
+
+
 }

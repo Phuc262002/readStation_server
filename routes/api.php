@@ -281,6 +281,7 @@ Route::group([
             "prefix" => "return-histories"
         ], function () {
             Route::get('/', [ReturnHistoryController::class, 'index']);
+            Route::get('/{id}', [ReturnHistoryController::class, 'show']);
         });
     });
 

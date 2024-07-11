@@ -12,7 +12,7 @@ class ReturnHistory extends Model
     protected $table = 'return_histories';
 
     protected $fillable = [
-        'loan_order_detail_id',
+        'loan_order_details_id',
         'return_date',
         'condition',
         'fine_amount',
@@ -35,7 +35,7 @@ class ReturnHistory extends Model
 
     public function loanOrderDetail()
     {
-        return $this->belongsTo(LoanOrderDetails::class);
+        return $this->belongsTo(LoanOrderDetails::class, 'loan_order_details_id', 'id');
     }
 
     public function processedBy()
@@ -45,11 +45,11 @@ class ReturnHistory extends Model
 
     public function shippingMethod()
     {
-        return $this->belongsTo(ShippingMethod::class);
+        return $this->belongsTo(ShippingMethod::class, 'shipping_method_id', 'id');
     }
 
-    public function shippingFeeTransaction()
-    {
-        return $this->belongsTo(Transaction::class, 'return_shipping_fee', 'id');
-    }
+    // public function shippingFeeTransaction()
+    // {
+    //     return $this->belongsTo(Transaction::class, 'return_shipping_fee', 'id');
+    // }
 }

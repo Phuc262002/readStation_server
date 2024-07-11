@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\LoanOrderDetails;
 use App\Models\ReturnHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -97,19 +98,49 @@ class ReturnHistoryController extends Controller
         }
     }
 
-    public function store(Request $request)
+    public function show(ReturnHistory $returnHistory, $id)
     {
-        //
-    }
+        $validator = Validator::make(['id' => $id], [
+            'id' => 'required|exists:return_histories,id',
+        ], [
+            'id.required' => 'Id không được để trống',
+            'id.exists' => 'Id không tồn tại',
+        ]);
 
-    public function show(ReturnHistory $returnHistory)
-    {
-        //
+        if ($validator->fails()) {
+            return response()->json([
+                "staus" => false,
+                "message" => "Validation error",
+                "errors" => $validator->errors()
+            ], 400);
+        }
+
+        try {
+            $returnHistory = ReturnHistory::with([
+                'loanOrderDetail',
+                'loanOrderDetail.loanOrder',
+                'loanOrderDetail.loanOrder.user',
+                'loanOrderDetail.bookDetails',
+                'processedBy',
+                'shippingMethod'
+            ])->find($id);
+
+            return response()->json([
+                "status" => true,
+                "message" => "Get return history successfully!",
+                "data" => $returnHistory
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Failed to get return history',
+                'errors' => $th->getMessage()
+            ], 500);
+        }
     }
 
     public function update(Request $request, ReturnHistory $returnHistory)
     {
         //
     }
-
 }
