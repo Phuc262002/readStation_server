@@ -2388,7 +2388,7 @@
             }
         },
         "/api/v1/admin/orders/return-each-book/{id}": {
-            "put": {
+            "post": {
                 "tags": [
                     "Admin / Orders"
                 ],
@@ -2871,6 +2871,51 @@
                     },
                     "500": {
                         "description": "Delete publishing company failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/return-histories": {
+            "get": {
+                "tags": [
+                    "Admin / Return History"
+                ],
+                "summary": "Get all return histories",
+                "description": "Get all return histories",
+                "operationId": "getReturnHistories",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Số trang hiện tại",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "pageSize",
+                        "in": "query",
+                        "description": "Số lượng mục trên mỗi trang",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get all return histories successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
                     }
                 },
                 "security": [
@@ -5590,7 +5635,7 @@
             }
         },
         "/api/v1/account/orders/return-each-book/{id}": {
-            "put": {
+            "post": {
                 "tags": [
                     "Account / Orders"
                 ],
@@ -5614,22 +5659,14 @@
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "loan_order_details_id",
                                     "return_method",
                                     "pickup_info"
                                 ],
                                 "properties": {
-                                    "loan_order_details_id": {
-                                        "description": "Id chi tiết đơn hàng",
-                                        "type": "integer"
-                                    },
                                     "return_method": {
                                         "description": "Phương thức trả sách",
                                         "type": "string",
-                                        "enum": [
-                                            "pickup",
-                                            "library"
-                                        ]
+                                        "default": "enum => pickup | library"
                                     },
                                     "pickup_info": {
                                         "description": "Thông tin lấy sách",

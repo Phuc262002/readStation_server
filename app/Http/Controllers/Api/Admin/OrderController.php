@@ -234,7 +234,7 @@ use OpenApi\Attributes as OA;
     ]
 )]
 
-#[OA\Put(
+#[OA\Post(
     path: '/api/v1/admin/orders/return-each-book/{id}',
     operationId: 'adminOrderReturnEachBook',
     tags: ['Admin / Orders'],

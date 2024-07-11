@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\Admin\InvoiceEnterController;
 use App\Http\Controllers\Api\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Api\Admin\PostController as AdminPostController;
 use App\Http\Controllers\Api\Admin\PublishingCompanyController as AdminPublishingCompanyController;
+use App\Http\Controllers\Api\Admin\ReturnHistoryController;
 use App\Http\Controllers\Api\Admin\RoleController;
 use App\Http\Controllers\Api\Admin\ShelveController;
 use App\Http\Controllers\Api\Admin\ShippingMethodController;
@@ -95,7 +96,7 @@ Route::group([
             Route::post('/payment/{id}', [OrderController::class, 'paymentOrder']);
             Route::post('/cancel-payment/{id}', [OrderController::class, 'cancelPayment']);
             Route::post('/extension/{id}', [OrderController::class, 'extensionAllOrder']);
-            Route::put('/return-each-book/{id}', [AdminOrderController::class, 'returnEachBook']);
+            Route::post('/return-each-book/{id}', [OrderController::class, 'returnEachBook']);
         });
 
         Route::group([
@@ -142,7 +143,7 @@ Route::group([
             Route::get('/', [AdminOrderController::class, 'index']);
             Route::get('/{id}', [AdminOrderController::class, 'show']);
             Route::put('/update/{id}', [AdminOrderController::class, 'update']);
-            Route::put('/return-each-book/{id}', [AdminOrderController::class, 'returnEachBook']);
+            Route::post('/return-each-book/{id}', [AdminOrderController::class, 'returnEachBook']);
             Route::post('/store-has-user', [AdminOrderController::class, 'store']);
         });
 
@@ -227,8 +228,6 @@ Route::group([
             Route::delete('/delete/{id}', [BookDetailController::class, 'destroy']);
         });
 
-
-
         Route::group([
             "prefix" => "invoice-enters",
         ], function () {
@@ -276,6 +275,12 @@ Route::group([
             Route::get('/', [VerificationRequestController::class, 'index']);
             Route::get('/{id}', [VerificationRequestController::class, 'show']);
             Route::put('/update/{id}', [VerificationRequestController::class, 'update']);
+        });
+
+        Route::group([
+            "prefix" => "return-histories"
+        ], function () {
+            Route::get('/', [ReturnHistoryController::class, 'index']);
         });
     });
 

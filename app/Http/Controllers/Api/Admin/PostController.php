@@ -149,7 +149,7 @@ class PostController extends Controller
         $status = $request->input('status');
 
         // Tạo query ban đầu
-        $query = Post::query()->with(['user', 'category']);;
+        $query = Post::query()->with(['user', 'category']);
 
         $totalItems = $query->count();
         $query = $query->filter($category_id, $status, $type);

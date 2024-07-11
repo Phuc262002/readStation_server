@@ -269,7 +269,7 @@ use PayOS\PayOS;
     ]
 )]
 
-#[OA\Put(
+#[OA\Post(
     path: '/api/v1/account/orders/return-each-book/{id}',
     operationId: 'returnEachBook',
     tags: ['Account / Orders'],
@@ -290,10 +290,9 @@ use PayOS\PayOS;
     requestBody: new OA\RequestBody(
         required: true,
         content: new OA\JsonContent(
-            required: ['loan_order_details_id', 'return_method', 'pickup_info'],
+            required: ['return_method', 'pickup_info'],
             properties: [
-                new OA\Property(property: 'loan_order_details_id', type: 'integer', description: 'Id chi tiết đơn hàng'),
-                new OA\Property(property: 'return_method', type: 'string', description: 'Phương thức trả sách', enum: ['pickup', 'library']),
+                new OA\Property(property: 'return_method', type: 'string', description: 'Phương thức trả sách', default: 'enum => pickup | library'),
                 new OA\Property(
                     property: 'pickup_info',
                     type: 'object',
