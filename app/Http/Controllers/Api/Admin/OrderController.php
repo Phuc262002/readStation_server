@@ -360,15 +360,20 @@ class OrderController extends Controller
             $query->where('status', $status);
         }
 
-        $total = $query->count();
+        
 
         if ($search) {
-            $query->where('order_code', 'like', "%$search%")->orWhereHas('user', function ($query) use ($search) {
-                $query->where('fullname', 'like', "%$search%")
-                    ->orWhere('email', 'like', "%$search%")
-                    ->orWhere('phone', 'like', "%$search%");
+            $query->where(function($q) use ($search) {
+                $q->where('order_code', 'like', "%$search%")
+                  ->orWhereHas('user', function ($query) use ($search) {
+                      $query->where('fullname', 'like', "%$search%")
+                            ->orWhere('email', 'like', "%$search%")
+                            ->orWhere('phone', 'like', "%$search%");
+                  });
             });
         }
+
+        $total = $query->count();
 
 
         $orders = $query->orderBy('id', $sort)->paginate($pageSize, ['*'], 'page', $page);
