@@ -145,6 +145,8 @@ Route::group([
             Route::get('/{id}', [AdminOrderController::class, 'show']);
             Route::put('/update/{id}', [AdminOrderController::class, 'update']);
             Route::post('/return-each-book/{id}', [AdminOrderController::class, 'returnEachBook']);
+            Route::post('/extension-all/{id}', [AdminOrderController::class, 'extensionAllOrder']);
+            Route::post('/extension-each-book/{id}', [AdminOrderController::class, 'extensionEachBook']);
             Route::post('/store-has-user', [AdminOrderController::class, 'store']);
         });
 
