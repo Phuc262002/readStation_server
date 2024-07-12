@@ -1259,13 +1259,9 @@ class OrderController extends Controller
             ['id' => $id]
         ), [
             'id' => "required|exists:loan_order_details,id",
-            'extended_method' => 'required|string|in:online,cash',
         ], [
             'id.required' => 'Trường id là bắt buộc',
             'id.exists' => 'Id không tồn tại',
-            'extended_method.required' => 'Trường phương thức gia hạn là bắt buộc',
-            'extended_method.string' => 'Trường phương thức gia hạn phải là kiểu chuỗi',
-            'extended_method.in' => 'Trường phương thức gia hạn phải là online hoặc cash',
         ]);
 
         if ($validator->fails()) {
