@@ -46,6 +46,40 @@ use OpenApi\Attributes as OA;
     ],
 )]
 
+#[OA\Get(
+    path: '/api/v1/admin/return-histories/{id}',
+    operationId: 'getReturnHistory',
+    summary: 'Get return history',
+    description: 'Get return history',
+    tags: ['Admin / Return History'],
+    security: [
+        ['bearerAuth' => []]
+    ],
+    parameters: [
+        new OA\Parameter(
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Id của return history',
+            schema: new OA\Schema(type: 'integer')
+        ),
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Get return history successfully',
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error',
+        ),
+        new OA\Response(
+            response: 500,
+            description: 'Failed to get return history',
+        ),
+    ],
+)]
+
 class ReturnHistoryController extends Controller
 {
     /**
@@ -73,7 +107,15 @@ class ReturnHistoryController extends Controller
         $pageSize = $request->input('pageSize', 10);
 
         try {
-            $query = ReturnHistory::query();
+            $query = ReturnHistory::query()->with([
+                'loanOrderDetail',
+                'loanOrderDetail.loanOrder',
+                'loanOrderDetail.loanOrder.user',
+                'loanOrderDetail.bookDetails',
+                'loanOrderDetail.bookDetails.book',
+                'processedBy',
+                'shippingMethod'
+            ]);
             $totalItems = $query->count();
 
             $returnHistory = $query->orderBy('created_at', 'desc')->paginate($pageSize, ['*'], 'page', $page);
@@ -94,6 +136,7 @@ class ReturnHistoryController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'Failed to get all return histories',
+                'errors' => $th->getMessage()
             ], 500);
         }
     }
@@ -121,6 +164,7 @@ class ReturnHistoryController extends Controller
                 'loanOrderDetail.loanOrder',
                 'loanOrderDetail.loanOrder.user',
                 'loanOrderDetail.bookDetails',
+                'loanOrderDetail.bookDetails.book',
                 'processedBy',
                 'shippingMethod'
             ])->find($id);

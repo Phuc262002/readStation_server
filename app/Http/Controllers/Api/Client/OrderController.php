@@ -8,6 +8,7 @@ use App\Models\BookDetail;
 use App\Models\Extensions;
 use App\Models\LoanOrderDetails;
 use App\Models\LoanOrders;
+use App\Models\ShippingMethod;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -236,7 +237,7 @@ use PayOS\PayOS;
 )]
 
 #[OA\Post(
-    path: '/api/v1/account/orders/extension/{id}',
+    path: '/api/v1/account/orders/extension-all/{id}',
     operationId: 'extensionAllOrder',
     tags: ['Account / Orders'],
     summary: 'Extension all order',
@@ -253,6 +254,58 @@ use PayOS\PayOS;
             schema: new OA\Schema(type: 'integer')
         ),
     ],
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            required: ['extended_method'],
+            properties: [
+                new OA\Property(property: 'extended_method', type: 'string', description: 'Phương thức gia hạn', default: 'enum => pickup | library'),
+            ]
+        )
+    ),
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Extension all order successfully'
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Validation error',
+        ),
+        new OA\Response(
+            response: 500,
+            description: 'Extension all order failed',
+        ),
+    ]
+)]
+
+#[OA\Post(
+    path: '/api/v1/account/orders/extension-each-book/{id}',
+    operationId: 'extensionEachBook',
+    tags: ['Account / Orders'],
+    summary: 'Extension each book',
+    description: 'Extension each book',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    parameters: [
+        new OA\Parameter(
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Id của order chi tiết',
+            schema: new OA\Schema(type: 'integer')
+        ),
+    ],
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            required: ['extended_method'],
+            properties: [
+                new OA\Property(property: 'extended_method', type: 'string', description: 'Phương thức gia hạn', default: 'enum => pickup | library'),
+            ]
+        )
+    ),
     responses: [
         new OA\Response(
             response: 200,
@@ -502,15 +555,15 @@ class OrderController extends Controller
 
             $allOrder = LoanOrders::where('user_id', auth()->user()->id)->get();
 
-            foreach ($allOrder as $order) {
-                if (in_array($order->status, ['wating_payment', 'pending', 'approved', 'ready_for_pickup', 'preparing_shipment', 'in_transit', 'active', 'extended', 'returning', 'overdue'])) {
-                    return response()->json([
-                        'status' => false,
-                        'message' => 'Create order failed',
-                        'errors' => 'Bạn hiện đang có đơn hàng đang chờ xử lý, vui lòng chờ đơn hàng hiện tại được xử lý xong'
-                    ]);
-                }
-            }
+            // foreach ($allOrder as $order) {
+            //     if (in_array($order->status, ['wating_payment', 'pending', 'approved', 'ready_for_pickup', 'preparing_shipment', 'in_transit', 'active', 'extended', 'returning', 'overdue'])) {
+            //         return response()->json([
+            //             'status' => false,
+            //             'message' => 'Create order failed',
+            //             'errors' => 'Bạn hiện đang có đơn hàng đang chờ xử lý, vui lòng chờ đơn hàng hiện tại được xử lý xong'
+            //         ]);
+            //     }
+            // }
 
             if ($request->delivery_method === 'shipper') {
                 $validator2 = Validator::make($request->all(), [
@@ -883,108 +936,6 @@ class OrderController extends Controller
         }
     }
 
-    public function extensionAllOrder($id)
-    {
-        $validator = Validator::make(['id' => $id], [
-            'id' => 'required|exists:loan_orders,id',
-        ], [
-            'id.required' => 'Trường id là bắt buộc',
-            'id.exists' => 'Id không tồn tại',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                "staus" => false,
-                "message" => "Validation error",
-                "errors" => $validator->errors()
-            ], 400);
-        }
-
-        try {
-            $order = LoanOrders::with('loanOrderDetails')->find($id);
-
-            if ($order->status !== 'active' && $order->status !== 'extended') {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Extension order failed',
-                    'errors' => 'Không thể gia hạn đơn hàng'
-                ]);
-            }
-
-            if ($order->current_extensions >= $order->max_extensions) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Extension order failed',
-                    'errors' => 'Đơn hàng đã hết lượt gia hạn'
-                ]);
-            }
-
-            if ($order->discount != 0) {
-                $extension_fee = $order->discount / 100 * (count($order->loanOrderDetails) * 10000);
-            } else {
-                $extension_fee = count($order->loanOrderDetails) * 10000;
-            }
-
-            $extension = Extensions::create([
-                'loan_order_id' => $order->id,
-                'extension_date' => now(),
-                'new_due_date' => date('Y-m-d', strtotime($order->current_due_date . ' + 4 days')),
-                'extension_fee' => $extension_fee,
-                'status' => 'approved'
-            ]);
-
-            $extensionDetails = $order->loanOrderDetails->map(function ($orderDetail) use ($extension) {
-                return [
-                    'extension_id' => $extension->id,
-                    'loan_order_detail_id' => $orderDetail->id,
-                    'new_due_date' => date('Y-m-d', strtotime($orderDetail->current_due_date . ' + 4 days')),
-                    'extension_fee' => 10000
-                ];
-            });
-
-            $extension->extensionDetails()->createMany($extensionDetails);
-
-            $transaction_code = intval(substr(strtotime(now()) . rand(1000, 9999), -9));
-            $transaction = Transaction::create([
-                'transaction_code' => $transaction_code,
-                'transaction_type' => 'payment',
-                'transaction_method' => 'wallet',
-                'amount' => $extension_fee,
-                'status' => 'completed',
-                'completed_at' => now(),
-                'description' => 'Thanh toán gia hạn đơn thuê ' . $order->order_code,
-            ]);
-
-            $extension->update([
-                'fee_transaction_id' => $transaction->id
-            ]);
-
-            foreach ($order->loanOrderDetails as $orderDetail) {
-                $orderDetail->update([
-                    'current_due_date' => date('Y-m-d', strtotime($orderDetail->current_due_date . ' + 4 days')),
-                    'status' => 'extended'
-                ]);
-            }
-
-            $order->update([
-                'status' => 'extended',
-                'current_extensions' => $order->current_extensions + 1
-            ]);
-
-            return response()->json([
-                'status' => true,
-                'message' => 'Extension order successfully',
-                'data' => $order
-            ]);
-        } catch (\Throwable $th) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Extension order failed',
-                'errors' => $th->getMessage()
-            ]);
-        }
-    }
-
     public function returnEachBook(Request $request, $id)
     {
         $validator = Validator::make(array_merge(
@@ -1008,6 +959,7 @@ class OrderController extends Controller
         }
 
         $orderDetail = LoanOrderDetails::find($id);
+        $order = LoanOrders::find($orderDetail->loan_order_id);
 
         if ($orderDetail->status != 'active' && $orderDetail->status != 'extended') {
             return response()->json([
@@ -1016,54 +968,102 @@ class OrderController extends Controller
             ], 400);
         }
 
-        if ($request->return_method == 'pickup') {
-            $validator2 = Validator::make($request->all(), [
-                'shipping_method_id' => 'required|integer|exists:shipping_methods,id',
-                'pickup_info' => 'required|array',
-                'pickup_info.fullname' => 'required|string',
-                'pickup_info.phone' => 'required|regex:/^(0[35789])[0-9]{8}$/',
-                'pickup_info.address' => 'required|string',
-            ], [
-                'shipping_method_id.required' => 'Trường phương thức vận chuyển là bắt buộc',
-                'shipping_method_id.integer' => 'Trường phương thức vận chuyển phải là kiểu số',
-                'shipping_method_id.exists' => 'Id phương thức vận chuyển không tồn tại',
-                'pickup_info.required' => 'Trường thông tin nhận sách là bắt buộc',
-                'pickup_info.array' => 'Trường thông tin nhận sách phải là kiểu mảng',
-                'pickup_info.fullname.required' => 'Trường họ tên là bắt buộc',
-                'pickup_info.phone.required' => 'Trường số điện thoại là bắt buộc',
-                'pickup_info.address.required' => 'Trường địa chỉ là bắt buộc',
-                'pickup_info.fullname.string' => 'Trường họ tên phải là kiểu chuỗi',
-                'pickup_info.phone.regex' => 'Trường số điện thoại không hợp lệ',
-                'pickup_info.address.string' => 'Trường địa chỉ phải là kiểu chuỗi',
-            ]);
-
-            if ($validator2->fails()) {
-                return response()->json([
-                    "status" => false,
-                    "message" => "Validation error",
-                    "errors" => $validator2->errors()
-                ], 400);
-            }
-        }
-
         try {
 
-            $orderDetail->createReturnHistory(array_merge(
-                $request->all(),
-                [
-                    'return_date' => now(),
-                    'status' => 'pending'
-                ]
-            ));
+            if ($request->return_method == 'pickup') {
+                $validator2 = Validator::make($request->all(), [
+                    'shipping_method_id' => 'required|integer|exists:shipping_methods,id',
+                    'pickup_info' => 'required|array',
+                    'pickup_info.fullname' => 'required|string',
+                    'pickup_info.phone' => 'required|regex:/^(0[35789])[0-9]{8}$/',
+                    'pickup_info.address' => 'required|string',
+                ], [
+                    'shipping_method_id.required' => 'Trường phương thức vận chuyển là bắt buộc',
+                    'shipping_method_id.integer' => 'Trường phương thức vận chuyển phải là kiểu số',
+                    'shipping_method_id.exists' => 'Id phương thức vận chuyển không tồn tại',
+                    'pickup_info.required' => 'Trường thông tin nhận sách là bắt buộc',
+                    'pickup_info.array' => 'Trường thông tin nhận sách phải là kiểu mảng',
+                    'pickup_info.fullname.required' => 'Trường họ tên là bắt buộc',
+                    'pickup_info.phone.required' => 'Trường số điện thoại là bắt buộc',
+                    'pickup_info.address.required' => 'Trường địa chỉ là bắt buộc',
+                    'pickup_info.fullname.string' => 'Trường họ tên phải là kiểu chuỗi',
+                    'pickup_info.phone.regex' => 'Trường số điện thoại không hợp lệ',
+                    'pickup_info.address.string' => 'Trường địa chỉ phải là kiểu chuỗi',
+                ]);
 
-            $orderDetail->update([
-                'status' => 'returning',
-            ]);
+                if ($validator2->fails()) {
+                    return response()->json([
+                        "status" => false,
+                        "message" => "Validation error",
+                        "errors" => $validator2->errors()
+                    ], 400);
+                }
 
-            return response()->json([
-                'status' => true,
-                'message' => 'Trả sách thành công',
-            ]);
+                $transaction_code = intval(substr(strtotime(now()) . rand(1000, 9999), -9));
+                $shipping_fee = ShippingMethod::find($request->shipping_method_id)->fee;
+
+                $transaction = Transaction::create([
+                    'user_id' => auth()->user()->id,
+                    'transaction_code' => $transaction_code,
+                    'portal' => 'payos',
+                    'loan_order_id' => $orderDetail->loan_order_id,
+                    'transaction_type' => 'extend',
+                    'transaction_method' => 'online',
+                    'amount' => $shipping_fee,
+                    'description' => 'Thanh toán gia hạn ' . $order->order_code,
+                ]);
+                $body = $request->input();
+                $body["amount"] = intval($shipping_fee);
+                $body["orderCode"] = intval($transaction->transaction_code);
+                $body["description"] =  $order->order_code;
+                $body["expiredAt"] = now()->addMinutes(30)->getTimestamp();
+                $body["returnUrl"] = "http://localhost:3000/account/wallet/transaction-success?portal=payos&transac_type=extended";
+                $body["cancelUrl"] = "http://localhost:3000/payment/result?portal=payos&transac_type=extended";
+                $payOS = new PayOS($this->payOSClientId, $this->payOSApiKey, $this->payOSChecksumKey);
+
+                $response = $payOS->createPaymentLink($body);
+
+                $transaction->update([
+                    'status' => 'pending',
+                    'expired_at' => now()->addMinutes(30),
+                    'extra_info' => $response
+                ]);
+
+                $orderDetail->createReturnHistory(array_merge(
+                    $request->all(),
+                    [
+                        'return_date' => now(),
+                        'status' => 'pending'
+                    ]
+                ));
+
+                $orderDetail->update([
+                    'status' => 'returning',
+                ]);
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Trả sách thành công',
+                    'data' => $response
+                ]);
+            } else {
+                $orderDetail->createReturnHistory(array_merge(
+                    $request->all(),
+                    [
+                        'return_date' => now(),
+                        'status' => 'pending'
+                    ]
+                ));
+
+                $orderDetail->update([
+                    'status' => 'returning',
+                ]);
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Trả sách thành công',
+                ]);
+            }
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
@@ -1136,6 +1136,398 @@ class OrderController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'Cancel payment order failed',
+                'errors' => $th->getMessage()
+            ]);
+        }
+    }
+
+    public function extensionAllOrder(Request $request, $id)
+    {
+        $validator = Validator::make(array_merge(
+            $request->all(),
+            ['id' => $id]
+        ), [
+            'id' => 'required|exists:loan_orders,id',
+            'extended_method' => 'required|string|in:online,cash',
+        ], [
+            'id.required' => 'Trường id là bắt buộc',
+            'id.exists' => 'Id không tồn tại',
+            'extended_method.required' => 'Trường phương thức gia hạn là bắt buộc',
+            'extended_method.string' => 'Trường phương thức gia hạn phải là kiểu chuỗi',
+            'extended_method.in' => 'Trường phương thức gia hạn phải là online hoặc cash',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                "staus" => false,
+                "message" => "Validation error",
+                "errors" => $validator->errors()
+            ], 400);
+        }
+
+        try {
+            $order = LoanOrders::with('loanOrderDetails')->find($id);
+
+            if ($order->status !== 'active' && $order->status !== 'extended') {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Extension order failed',
+                    'errors' => 'Không thể gia hạn đơn hàng'
+                ]);
+            }
+
+            if ($order->current_extensions >= $order->max_extensions) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Extension order failed',
+                    'errors' => 'Đơn hàng đã đạt số lần gia hạn tối đa'
+                ]);
+            }
+
+            if ($order->current_due_date < now()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Extension order failed',
+                    'errors' => 'Đơn hàng đã quá hạn'
+                ]);
+            }
+
+            if ($order->discount != 0) {
+                $extension_fee = $order->discount / 100 * (count($order->loanOrderDetails) * 10000);
+            } else {
+                $extension_fee = count($order->loanOrderDetails) * 10000;
+            }
+
+            if ($request->extended_method == 'online') {
+                $extension = Extensions::create([
+                    'loan_order_id' => $order->id,
+                    'extension_date' => now(),
+                    'new_due_date' => date('Y-m-d', strtotime($order->current_due_date . ' + 5 days')),
+                    'extension_fee' => $extension_fee,
+                    'status' => 'pending'
+                ]);
+
+                $transaction_code = intval(substr(strtotime(now()) . rand(1000, 9999), -9));
+
+                $transaction = Transaction::create([
+                    'user_id' => auth()->user()->id,
+                    'transaction_code' => $transaction_code,
+                    'portal' => 'payos',
+                    'loan_order_id' => $order->id,
+                    'transaction_type' => 'extend',
+                    'transaction_method' => 'online',
+                    'amount' => $extension_fee,
+                    'description' => 'Thanh toán gia hạn ' . $order->order_code,
+                ]);
+                $body = $request->input();
+                $body["amount"] = intval($extension_fee);
+                $body["orderCode"] = intval($transaction->transaction_code);
+                $body["description"] =  $order->order_code;
+                $body["expiredAt"] = now()->addMinutes(30)->getTimestamp();
+                $body["returnUrl"] = "http://localhost:3000/account/wallet/transaction-success?portal=payos&transac_type=extended";
+                $body["cancelUrl"] = "http://localhost:3000/payment/result?portal=payos&transac_type=extended";
+                $payOS = new PayOS($this->payOSClientId, $this->payOSApiKey, $this->payOSChecksumKey);
+
+                $response = $payOS->createPaymentLink($body);
+
+                $transaction->update([
+                    'status' => 'pending',
+                    'expired_at' => now()->addMinutes(30),
+                    'extra_info' => $response
+                ]);
+
+                $extensionDetails = $order->loanOrderDetails->map(function ($orderDetail) use ($extension) {
+                    return [
+                        'extension_id' => $extension->id,
+                        'loan_order_detail_id' => $orderDetail->id,
+                        'new_due_date' => date('Y-m-d', strtotime($orderDetail->current_due_date . ' + 4 days')),
+                        'extension_fee' => 10000
+                    ];
+                });
+
+                $extension->extensionDetails()->createMany($extensionDetails);
+
+                $extension->update([
+                    'fee_transaction_id' => $transaction->id
+                ]);
+
+                foreach ($order->loanOrderDetails as $orderDetail) {
+                    $orderDetail->update([
+                        'current_due_date' => date('Y-m-d', strtotime($orderDetail->current_due_date . ' + 4 days')),
+                        'status' => 'extended'
+                    ]);
+                }
+
+                $order->update([
+                    'status' => 'extended',
+                    'current_extensions' => $order->current_extensions + 1,
+                    'current_due_date' => date('Y-m-d', strtotime($order->current_due_date . ' + 5 days'))
+                ]);
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Extension order successfully',
+                    'data' => [
+                        'order' => $order,
+                        'extension' => $extension,
+                        'transaction' => $transaction
+                    ]
+                ]);
+            } else {
+                $extension = Extensions::create([
+                    'loan_order_id' => $order->id,
+                    'extension_date' => now(),
+                    'new_due_date' => date('Y-m-d', strtotime($order->current_due_date . ' + 5 days')),
+                    'extension_fee' => $extension_fee,
+                    'status' => 'approved'
+                ]);
+
+                $extensionDetails = $order->loanOrderDetails->map(function ($orderDetail) use ($extension) {
+                    return [
+                        'extension_id' => $extension->id,
+                        'loan_order_detail_id' => $orderDetail->id,
+                        'new_due_date' => date('Y-m-d', strtotime($orderDetail->current_due_date . ' + 4 days')),
+                        'extension_fee' => 10000
+                    ];
+                });
+
+                $extension->extensionDetails()->createMany($extensionDetails);
+
+                $transaction_code = intval(substr(strtotime(now()) . rand(1000, 9999), -9));
+
+                $transaction = Transaction::create([
+                    'user_id' => auth()->user()->id,
+                    'transaction_code' => $transaction_code,
+                    'portal' => 'payos',
+                    'loan_order_id' => $order->id,
+                    'transaction_type' => 'extend',
+                    'transaction_method' => 'offline',
+                    'amount' => $extension_fee,
+                    'description' => 'Thanh toán gia hạn ' . $order->order_code,
+                ]);
+
+                $extension->update([
+                    'fee_transaction_id' => $transaction->id
+                ]);
+
+                foreach ($order->loanOrderDetails as $orderDetail) {
+                    $orderDetail->update([
+                        'current_due_date' => date('Y-m-d', strtotime($orderDetail->current_due_date . ' + 4 days')),
+                        'status' => 'extended'
+                    ]);
+                }
+
+                $order->update([
+                    'status' => 'extended',
+                    'current_extensions' => $order->current_extensions + 1,
+                    'current_due_date' => date('Y-m-d', strtotime($order->current_due_date . ' + 5 days'))
+                ]);
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Extension order successfully',
+                    'data' => [
+                        'order' => $order,
+                        'extension' => $extension,
+                        'transaction' => $transaction
+                    ]
+                ]);
+            }
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Extension order failed',
+                'errors' => $th->getMessage()
+            ]);
+        }
+    }
+
+    public function extensionEachBook(Request $request, $id)
+    {
+        $validator = Validator::make(array_merge(
+            $request->all(),
+            ['id' => $id]
+        ), [
+            'id' => 'required|exists:loan_orders,id',
+            'extended_method' => 'required|string|in:online,cash',
+            'loan_order_detail_id' => "required|exists:loan_order_details,id"
+        ], [
+            'id.required' => 'Trường id là bắt buộc',
+            'id.exists' => 'Id không tồn tại',
+            'extended_method.required' => 'Trường phương thức gia hạn là bắt buộc',
+            'extended_method.string' => 'Trường phương thức gia hạn phải là kiểu chuỗi',
+            'extended_method.in' => 'Trường phương thức gia hạn phải là online hoặc cash',
+            'loan_order_detail_id.required' => 'Trường id chi tiết đơn hàng là bắt buộc',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                "staus" => false,
+                "message" => "Validation error",
+                "errors" => $validator->errors()
+            ], 400);
+        }
+
+        try {
+            $orderDetail = LoanOrderDetails::find($request->loan_order_detail_id);
+            $order = LoanOrders::with('loanOrderDetails')->find($orderDetail->loan_order_id);
+
+            if ($order->status !== 'active' && $order->status !== 'extended') {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Extension order failed',
+                    'errors' => 'Không thể gia hạn đơn hàng'
+                ]);
+            }
+
+            if ($order->current_extensions >= $order->max_extensions) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Extension order failed',
+                    'errors' => 'Đơn hàng đã đạt số lần gia hạn tối đa'
+                ]);
+            }
+
+            if ($order->current_due_date < now()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Extension order failed',
+                    'errors' => 'Đơn hàng đã quá hạn'
+                ]);
+            }
+
+            if ($order->discount != 0) {
+                $extension_fee = $order->discount / 100 * (count($order->loanOrderDetails) * 10000);
+            } else {
+                $extension_fee = count($order->loanOrderDetails) * 10000;
+            }
+
+            if ($request->extended_method == 'online') {
+                $extension = Extensions::create([
+                    'loan_order_id' => $order->id,
+                    'extension_date' => now(),
+                    'new_due_date' => date('Y-m-d', strtotime($order->current_due_date . ' + 5 days')),
+                    'extension_fee' => $extension_fee,
+                    'status' => 'pending'
+                ]);
+
+                $transaction_code = intval(substr(strtotime(now()) . rand(1000, 9999), -9));
+
+                $transaction = Transaction::create([
+                    'user_id' => auth()->user()->id,
+                    'transaction_code' => $transaction_code,
+                    'portal' => 'payos',
+                    'loan_order_id' => $order->id,
+                    'transaction_type' => 'extend',
+                    'transaction_method' => 'online',
+                    'amount' => $extension_fee,
+                    'description' => 'Thanh toán gia hạn ' . $order->order_code,
+                ]);
+                $body = $request->input();
+                $body["amount"] = intval($extension_fee);
+                $body["orderCode"] = intval($transaction->transaction_code);
+                $body["description"] =  $order->order_code;
+                $body["expiredAt"] = now()->addMinutes(30)->getTimestamp();
+                $body["returnUrl"] = "http://localhost:3000/account/wallet/transaction-success?portal=payos&transac_type=extended";
+                $body["cancelUrl"] = "http://localhost:3000/payment/result?portal=payos&transac_type=extended";
+                $payOS = new PayOS($this->payOSClientId, $this->payOSApiKey, $this->payOSChecksumKey);
+
+                $response = $payOS->createPaymentLink($body);
+
+                $transaction->update([
+                    'status' => 'pending',
+                    'expired_at' => now()->addMinutes(30),
+                    'extra_info' => $response
+                ]);
+
+                $extension->extensionDetails()->createMany([[
+                    'extension_id' => $extension->id,
+                    'loan_order_detail_id' => $request->loan_order_detail_id,
+                    'new_due_date' => date('Y-m-d', strtotime($orderDetail->current_due_date . ' + 5 days')),
+                    'extension_fee' => 10000
+                ]]);
+
+                $extension->update([
+                    'fee_transaction_id' => $transaction->id
+                ]);
+
+                $orderDetail->update([
+                    'current_due_date' => date('Y-m-d', strtotime($orderDetail->current_due_date . ' + 5 days')),
+                    'status' => 'extended'
+                ]);
+
+                $order->update([
+                    'status' => 'extended',
+                    'current_extensions' => $order->current_extensions + 1,
+                    'current_due_date' => date('Y-m-d', strtotime($order->current_due_date . ' + 5 days'))
+                ]);
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Extension order successfully',
+                    'data' => [
+                        'order' => $order,
+                        'extension' => $extension,
+                        'transaction' => $transaction
+                    ]
+                ]);
+            } else {
+                $extension = Extensions::create([
+                    'loan_order_id' => $order->id,
+                    'extension_date' => now(),
+                    'new_due_date' => date('Y-m-d', strtotime($order->current_due_date . ' + 5 days')),
+                    'extension_fee' => $extension_fee,
+                ]);
+
+                $extension->extensionDetails()->createMany([
+                    'extension_id' => $extension->id,
+                    'loan_order_detail_id' => $request->loan_order_detail_id,
+                    'new_due_date' => date('Y-m-d', strtotime($orderDetail->current_due_date . ' + 4 days')),
+                    'extension_fee' => 10000
+                ]);
+
+                $transaction_code = intval(substr(strtotime(now()) . rand(1000, 9999), -9));
+
+                $transaction = Transaction::create([
+                    'user_id' => auth()->user()->id,
+                    'transaction_code' => $transaction_code,
+                    'portal' => 'payos',
+                    'loan_order_id' => $order->id,
+                    'transaction_type' => 'extend',
+                    'transaction_method' => 'offline',
+                    'amount' => $extension_fee,
+                    'description' => 'Thanh toán gia hạn ' . $order->order_code,
+                ]);
+
+                $extension->update([
+                    'fee_transaction_id' => $transaction->id
+                ]);
+
+                $orderDetail->update([
+                    'current_due_date' => date('Y-m-d', strtotime($orderDetail->current_due_date . ' + 4 days')),
+                    'status' => 'extended'
+                ]);
+
+                $order->update([
+                    'status' => 'extended',
+                    'current_extensions' => $order->current_extensions + 1,
+                    'current_due_date' => date('Y-m-d', strtotime($order->current_due_date . ' + 5 days'))
+                ]);
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Extension order successfully',
+                    'data' => [
+                        'order' => $order,
+                        'extension' => $extension,
+                        'transaction' => $transaction
+                    ]
+                ]);
+            }
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Extension order failed',
                 'errors' => $th->getMessage()
             ]);
         }

@@ -95,7 +95,8 @@ Route::group([
             Route::put('/cancel/{id}', [OrderController::class, 'cancelOrder']);
             Route::post('/payment/{id}', [OrderController::class, 'paymentOrder']);
             Route::post('/cancel-payment/{id}', [OrderController::class, 'cancelPayment']);
-            Route::post('/extension/{id}', [OrderController::class, 'extensionAllOrder']);
+            Route::post('/extension-all/{id}', [OrderController::class, 'extensionAllOrder']);
+            Route::post('/extension-each-book/{id}', [OrderController::class, 'extensionEachBook']);
             Route::post('/return-each-book/{id}', [OrderController::class, 'returnEachBook']);
         });
 

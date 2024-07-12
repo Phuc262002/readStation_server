@@ -2453,6 +2453,80 @@
                 ]
             }
         },
+        "/api/v1/admin/orders/extension-all/{id}": {
+            "post": {
+                "tags": [
+                    "Admin / Orders"
+                ],
+                "summary": "Extension all order",
+                "description": "Extension all order",
+                "operationId": "extensionAllOrderAdmin",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id của order",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Extension all order successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Extension all order failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/orders/extension-each-book/{id}": {
+            "post": {
+                "tags": [
+                    "Admin / Orders"
+                ],
+                "summary": "Extension each book",
+                "description": "Extension each book",
+                "operationId": "extensionEachBookAdmin",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id của order chi tiết",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Extension all order successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Extension all order failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/admin/posts": {
             "get": {
                 "tags": [
@@ -2916,6 +2990,43 @@
                     },
                     "400": {
                         "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/return-histories/{id}": {
+            "get": {
+                "tags": [
+                    "Admin / Return History"
+                ],
+                "summary": "Get return history",
+                "description": "Get return history",
+                "operationId": "getReturnHistory",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id của return history",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get return history successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Failed to get return history"
                     }
                 },
                 "security": [
@@ -5597,7 +5708,7 @@
                 ]
             }
         },
-        "/api/v1/account/orders/extension/{id}": {
+        "/api/v1/account/orders/extension-all/{id}": {
             "post": {
                 "tags": [
                     "Account / Orders"
@@ -5616,6 +5727,83 @@
                         }
                     }
                 ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "extended_method"
+                                ],
+                                "properties": {
+                                    "extended_method": {
+                                        "description": "Phương thức gia hạn",
+                                        "type": "string",
+                                        "default": "enum => pickup | library"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Extension all order successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Extension all order failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/account/orders/extension-each-book/{id}": {
+            "post": {
+                "tags": [
+                    "Account / Orders"
+                ],
+                "summary": "Extension each book",
+                "description": "Extension each book",
+                "operationId": "extensionEachBook",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id của order chi tiết",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "extended_method"
+                                ],
+                                "properties": {
+                                    "extended_method": {
+                                        "description": "Phương thức gia hạn",
+                                        "type": "string",
+                                        "default": "enum => pickup | library"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "Extension all order successfully"
