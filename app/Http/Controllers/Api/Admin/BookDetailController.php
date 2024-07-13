@@ -496,8 +496,8 @@ class BookDetailController extends Controller
     public function update(Request $request, $id)
     {
         $validator = Validator::make(array_merge(['id' => $id], $request->all()), [
-            'id' => 'required|integer|min:1|exists:book_details,id',
-            'book_id' => "required|integer",
+            'id' => 'required|min:1|exists:book_details,id',
+            'book_id' => "required",
             'sku_origin' => 'required|string',
             'poster' => "required|string",
             'images' => "required|array",
@@ -506,7 +506,7 @@ class BookDetailController extends Controller
             'hire_percent' => "required",
             'stock' => "required",
             'publish_date' => "required|date",
-            'publishing_company_id' => "required",
+            'publishing_company_id' => "required|exists:publishing_companies,id",
             'issuing_company' => "required|string",
             'cardboard' => "required|string|in:hard,soft",
             'total_page' => "required",
@@ -515,7 +515,6 @@ class BookDetailController extends Controller
             'book_size' => "nullable|string",
         ], [
             'id.required' => 'Trường id là bắt buộc.',
-            'id.integer' => 'Id phải là một số nguyên.',
             'id.min' => 'Id phải lớn hơn hoặc bằng 1.',
             'id.exists' => 'id không tồn tai.',
             'book_id.required' => 'Trường book_id là bắt buộc.',
@@ -528,6 +527,7 @@ class BookDetailController extends Controller
             'stock.required' => 'Trường stock là bắt buộc.',
             'publish_date.required' => 'Trường publish_date là bắt buộc.',
             'publishing_company_id.required' => 'Trường publishing_company_id là bắt buộc.',
+            'publishing_company_id.exists' => 'Trường publishing_company_id không tồn tại.',
             'issuing_company.required' => 'Trường issuing_company là bắt buộc.',
             'cardboard.required' => 'Trường cardboard là bắt buộc.',
             'total_page.required' => 'Trường total_page là bắt buộc.',
@@ -564,7 +564,8 @@ class BookDetailController extends Controller
         } catch (\Throwable $th) {
             return response()->json([
                 "status" => false,
-                "message" => "Update book detail failed!"
+                "message" => "Update book detail failed!",
+                "errors" => $th->getMessage()
             ], 500);
         }
     }

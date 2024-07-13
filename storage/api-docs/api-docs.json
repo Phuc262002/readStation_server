@@ -3881,6 +3881,65 @@
                 ]
             }
         },
+        "/api/v1/admin/transactions": {
+            "get": {
+                "tags": [
+                    "Admin / Transaction"
+                ],
+                "summary": "Get all transaction",
+                "description": "Get all transaction",
+                "operationId": "transactionIndexAdmin",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Số trang hiện tại",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "pageSize",
+                        "in": "query",
+                        "description": "Số lượng mục trên mỗi trang",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sắp xếp theo tháng hoặc tất cả thời gian",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "allTime",
+                            "enum": [
+                                "inMonth",
+                                "allTime"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get all order successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/admin/users/static": {
             "get": {
                 "tags": [

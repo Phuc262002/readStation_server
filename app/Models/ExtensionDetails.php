@@ -29,6 +29,6 @@ class ExtensionDetails extends Model
 
     public function loanOrderDetail()
     {
-        return $this->belongsTo(LoanOrderDetails::class);
+        return $this->belongsTo(LoanOrderDetails::class, 'loan_order_detail_id', 'id');
     }
 }

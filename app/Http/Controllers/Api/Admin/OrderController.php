@@ -695,6 +695,9 @@ class OrderController extends Controller
                 'transactions',
                 'extensions',
                 'extensions.extensionDetails',
+                'extensions.extensionDetails.loanOrderDetail',
+                'extensions.extensionDetails.loanOrderDetail.bookDetails',
+                'extensions.extensionDetails.loanOrderDetail.bookDetails.book',
             ])->find($id);
 
             return response()->json([
@@ -1314,7 +1317,7 @@ class OrderController extends Controller
                 'status' => 'approved'
             ]);
 
-            $extension->extensionDetails()->createMany([
+            $extension->extensionDetails()->create([
                 'extension_id' => $extension->id,
                 'loan_order_detail_id' => $request->loan_order_detail_id,
                 'new_due_date' => date('Y-m-d', strtotime($orderDetail->current_due_date . ' + 5 days')),

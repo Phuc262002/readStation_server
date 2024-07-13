@@ -755,7 +755,11 @@ class OrderController extends Controller
                 'loanOrderDetails.bookDetails.book.shelve.bookcase',
                 'transactions',
                 'extensions',
+                'extensions',
                 'extensions.extensionDetails',
+                'extensions.extensionDetails.loanOrderDetail',
+                'extensions.extensionDetails.loanOrderDetail.bookDetails',
+                'extensions.extensionDetails.loanOrderDetail.bookDetails.book',
             );
 
             if (is_numeric($id)) {

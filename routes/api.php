@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\Admin\RoleController;
 use App\Http\Controllers\Api\Admin\ShelveController;
 use App\Http\Controllers\Api\Admin\ShippingMethodController;
 use App\Http\Controllers\Api\Admin\SupplierController;
+use App\Http\Controllers\Api\Admin\TransactionController as AdminTransactionController;
 use App\Http\Controllers\Api\Admin\UserController;
 use App\Http\Controllers\Api\Admin\VerificationRequestController;
 use App\Http\Controllers\Api\Auth\AuthController;
@@ -260,6 +261,12 @@ Route::group([
             Route::get('/statistic-admin', [DashboardController::class, 'statisticAdmin']);
             Route::get('/book-hire-top-by-month', [DashboardController::class, 'bookHireTopByMonth']);
             Route::get('/invoice-enter-by-month', [DashboardController::class, 'invoiceEnterTopByMonth']);
+        });
+
+        Route::group([
+            "prefix" => "transactions"
+        ], function () {
+            Route::get('/', [AdminTransactionController::class, 'index']);
         });
 
         Route::group([
