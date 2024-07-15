@@ -8,11 +8,59 @@ use App\Models\BookDetail;
 use App\Models\BookReviews;
 use App\Models\InvoiceEnter;
 use App\Models\LoanOrderDetails;
+use App\Models\LoanOrders;
 use App\Models\Post;
+use App\Models\ReturnHistory;
 use App\Models\Shelve;
 use App\Models\User;
+use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use OpenApi\Attributes as OA;
+
+#[OA\Get(
+    path: '/api/v1/admin/dashboard/statistic-pie-user',
+    tags: ['Admin / Dashboard'],
+    operationId: 'staticPieUser',
+    summary: 'Get static user',
+    description: 'Get static user',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Get static user successfully!',
+        ),
+    ],
+)]
+
+#[OA\Get(
+    path: '/api/v1/admin/dashboard/statistic-column-order',
+    tags: ['Admin / Dashboard'],
+    operationId: 'staticColumnOrder',
+    summary: 'Get static column order',
+    description: 'Get static column order',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    parameters: [
+        new OA\Parameter(
+            name: 'sort',
+            in: 'query',
+            required: false,
+            description: 'Sort by time',
+            schema: new OA\Schema(type: 'string', enum: ['all', '1m', '3m', '6m', '9m', '1y'], default: 'all')
+        ),
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Get static column order successfully!',
+        ),
+    ],
+)]
 
 #[OA\Get(
     path: '/api/v1/admin/dashboard/statistic-admin',
@@ -58,6 +106,106 @@ use OpenApi\Attributes as OA;
 
 class DashboardController extends Controller
 {
+    public function staticUserPieChart()
+    {
+        $totalUser = User::count();
+
+        $totalManager = User::where('role_id', '3')->count();
+        $totalAdmin = User::where('role_id', '4')->count();
+        $totalManagerAll = $totalManager + $totalAdmin;
+
+        $totalStudent = User::where('role_id', '2')->count();
+        $totalUserDefault = User::where('role_id', '1')->count();
+
+        return response()->json([
+            "status" => true,
+            "message" => "Get static user successfully!",
+            "data" => [
+                "totalUser" => $totalUser,
+                "totalManager" => $totalManagerAll,
+                "totalStudent" => $totalStudent,
+                "totalUserDefault" => $totalUserDefault
+            ],
+        ], 200);
+    }
+
+    public function staticOrderComlumnChart(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'sort' => 'required|in:all,1m,3m,6m,9m,1y',
+        ], [
+            'sort.required' => 'Sort là trường bắt buộc',
+            'sort.in' => 'Sort phải là một trong các giá trị: all, 1m, 3m, 6m, 9m, 1y',
+        ]);
+    
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => $validator->errors()->first()
+            ], 400);
+        }
+    
+        $sort = $request->input('sort', 'all');
+    
+        $query = LoanOrders::query();
+    
+        if ($sort !== 'all') {
+            switch ($sort) {
+                case '1m':
+                    $startDate = now()->subMonth();
+                    break;
+                case '3m':
+                    $startDate = now()->subMonths(3);
+                    break;
+                case '6m':
+                    $startDate = now()->subMonths(6);
+                    break;
+                case '9m':
+                    $startDate = now()->subMonths(9);
+                    break;
+                case '1y':
+                    $startDate = now()->subYear();
+                    break;
+            }
+            $query->where('created_at', '>=', $startDate);
+        } else {
+            $startDate = LoanOrders::min('created_at');
+        }
+    
+        $endDate = now();
+        $orderDetails = $query->get();
+    
+        $ordersByDate = $orderDetails->groupBy(function($date) {
+            return Carbon::parse($date->created_at)->format('Y-m-d');
+        });
+    
+        $result = [];
+        $period = CarbonPeriod::create($startDate, $endDate);
+    
+        foreach ($period as $date) {
+            $formattedDate = $date->format('Y-m-d');
+            $orders = $ordersByDate->get($formattedDate, collect());
+            $totalOrders = $orders->count();
+            $completedOrders = $orders->where('status', 'completed')->count();
+            $canceledOrders = $orders->where('status', 'canceled')->count();
+            $revenue = $orders->where('status', 'completed')->sum('amount');
+    
+            $result[] = [
+                'date' => $formattedDate,
+                'total_orders' => $totalOrders,
+                'completed_orders' => $completedOrders,
+                'canceled_orders' => $canceledOrders,
+                'revenue' => $revenue
+            ];
+        }
+    
+        return response()->json([
+            'status' => true,
+            'data' => $result
+        ]);
+    }
+    
+
+
     public function statisticAdmin(Request $request)
     {
 
@@ -73,6 +221,7 @@ class DashboardController extends Controller
         $fineFeeSum = LoanOrderDetails::where('status', 'completed')->sum('fine_amount');
 
         $revenue = $serviceFeeSum + $fineFeeSum;
+        $returnHistoy = ReturnHistory::where('status', 'completed')->count();
 
 
         return response()->json([
@@ -85,7 +234,8 @@ class DashboardController extends Controller
                 'bookcase' => $bookcase,
                 'shelve' => $shelve,
                 'book' => $book,
-                'post' => $post
+                'post' => $post,
+                'returnHistory' => $returnHistoy
             ]
         ]);
     }
@@ -117,11 +267,10 @@ class DashboardController extends Controller
         // Calculate the average rate, rating total, and hire count for each book
         $books->each(function ($book) {
             $bookReviews = BookReviews::where('book_details_id', $book->id);
-                ;
             $averageRateRounded = round($bookReviews->avg('rating'), 1);
 
             $book->average_rate = $averageRateRounded;
-            $book->rating_total = $bookReviews->count(); 
+            $book->rating_total = $bookReviews->count();
             $book->hire_count = $book->order_details->count(); // Count the total hires
 
             unset($book->order_details);

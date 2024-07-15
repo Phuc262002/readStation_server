@@ -259,6 +259,8 @@ Route::group([
             "prefix" => "dashboard"
         ], function () {
             Route::get('/statistic-admin', [DashboardController::class, 'statisticAdmin']);
+            Route::get('/statistic-pie-user', [DashboardController::class, 'staticUserPieChart']);
+            Route::get('/statistic-column-order', [DashboardController::class, 'staticOrderComlumnChart']);
             Route::get('/book-hire-top-by-month', [DashboardController::class, 'bookHireTopByMonth']);
             Route::get('/invoice-enter-by-month', [DashboardController::class, 'invoiceEnterTopByMonth']);
         });

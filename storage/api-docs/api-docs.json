@@ -1755,6 +1755,66 @@
                 ]
             }
         },
+        "/api/v1/admin/dashboard/statistic-pie-user": {
+            "get": {
+                "tags": [
+                    "Admin / Dashboard"
+                ],
+                "summary": "Get static user",
+                "description": "Get static user",
+                "operationId": "staticPieUser",
+                "responses": {
+                    "200": {
+                        "description": "Get static user successfully!"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/dashboard/statistic-column-order": {
+            "get": {
+                "tags": [
+                    "Admin / Dashboard"
+                ],
+                "summary": "Get static column order",
+                "description": "Get static column order",
+                "operationId": "staticColumnOrder",
+                "parameters": [
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sort by time",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "all",
+                            "enum": [
+                                "all",
+                                "1m",
+                                "3m",
+                                "6m",
+                                "9m",
+                                "1y"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get static column order successfully!"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/admin/dashboard/statistic-admin": {
             "get": {
                 "tags": [
