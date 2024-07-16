@@ -17,6 +17,7 @@ use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 use OpenApi\Attributes as OA;
 
 #[OA\Get(
@@ -129,25 +130,26 @@ class DashboardController extends Controller
         ], 200);
     }
 
-    public function staticOrderComlumnChart(Request $request) {
+    public function staticOrderComlumnChart(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'sort' => 'required|in:all,1m,3m,6m,9m,1y',
         ], [
             'sort.required' => 'Sort là trường bắt buộc',
             'sort.in' => 'Sort phải là một trong các giá trị: all, 1m, 3m, 6m, 9m, 1y',
         ]);
-    
+
         if ($validator->fails()) {
             return response()->json([
                 'status' => false,
                 'message' => $validator->errors()->first()
             ], 400);
         }
-    
+
         $sort = $request->input('sort', 'all');
-    
+
         $query = LoanOrders::query();
-    
+
         if ($sort !== 'all') {
             switch ($sort) {
                 case '1m':
@@ -170,25 +172,25 @@ class DashboardController extends Controller
         } else {
             $startDate = LoanOrders::min('created_at');
         }
-    
+
         $endDate = now();
         $orderDetails = $query->get();
-    
-        $ordersByDate = $orderDetails->groupBy(function($date) {
+
+        $ordersByDate = $orderDetails->groupBy(function ($date) {
             return Carbon::parse($date->created_at)->format('Y-m-d');
         });
-    
+
         $result = [];
         $period = CarbonPeriod::create($startDate, $endDate);
-    
+
         foreach ($period as $date) {
             $formattedDate = $date->format('Y-m-d');
             $orders = $ordersByDate->get($formattedDate, collect());
             $totalOrders = $orders->count();
             $completedOrders = $orders->where('status', 'completed')->count();
             $canceledOrders = $orders->where('status', 'canceled')->count();
-            $revenue = $orders->where('status', 'completed')->sum('amount');
-    
+            $revenue = $orders->where('status', 'completed')->sum('amount')/1000;
+
             $result[] = [
                 'date' => $formattedDate,
                 'total_orders' => $totalOrders,
@@ -197,13 +199,32 @@ class DashboardController extends Controller
                 'revenue' => $revenue
             ];
         }
-    
+
+        // return $orderDetails;
+
         return response()->json([
             'status' => true,
-            'data' => $result
+            'data' => [
+                'dataChart' => $result,
+                'static' => [
+                    'total' => $orderDetails->count(),
+                    'completed' => $orderDetails->where('status', 'completed')->count(),
+                    'pending' => $orderDetails->where('status', 'wating_payment')->count() +
+                                    $orderDetails->where('status', 'pending')->count() +
+                                    $orderDetails->where('status', 'approved')->count() +
+                                    $orderDetails->where('status', 'ready_for_pickup')->count() +
+                                    $orderDetails->where('status', 'preparing_shipment')->count() +
+                                    $orderDetails->where('status', 'returning')->count() +
+                                    $orderDetails->where('status', 'in_transit')->count(),
+                    'canceled' => $orderDetails->where('status', 'canceled')->count(),
+                    'active' => $orderDetails->where('status', 'active')->count() + 
+                                $orderDetails->where('status', 'extended')->count(),
+                    'overdue' => $orderDetails->where('status', 'overdue')->count()
+                ]
+            ]
         ]);
     }
-    
+
 
 
     public function statisticAdmin(Request $request)
