@@ -440,7 +440,7 @@ class OrderController extends Controller
         $validator = Validator::make($request->all(), [
             'page' => 'integer|min:1',
             'pageSize' => 'integer|min:1',
-            'status' => 'string|in:pending,hiring,completed,canceled,out_of_date',
+            'status' => 'in:wating_payment,pending,approved,ready_for_pickup,preparing_shipment,in_transit,extended,active,returning,completed,canceled,overdue',
             'search' => 'string',
         ], [
             'page.integer' => 'Trường trang phải là kiểu số',
@@ -448,7 +448,7 @@ class OrderController extends Controller
             'pageSize.integer' => 'Trường pageSize phải là kiểu số',
             'pageSize.min' => 'Trường pageSize không được nhỏ hơn 1',
             'status.string' => 'Trường status phải là kiểu chuỗi',
-            'status.in' => 'Trường status phải là pending, hiring, completed, canceled hoặc out_of_date',
+            'status.in' => 'Trường status phải là wating_payment, pending, approved, ready_for_pickup, preparing_shipment, in_transit, extended, active, returning, completed, canceled, overdue',
             'search.string' => 'Trường search phải là kiểu chuỗi',
         ]);
 
@@ -830,8 +830,8 @@ class OrderController extends Controller
                 $body["orderCode"] = intval($transaction->transaction_code);
                 $body["description"] =  $loanOrder->order_code;
                 $body["expiredAt"] = now()->addMinutes(30)->getTimestamp();
-                $body["returnUrl"] = "http://localhost:3000/payment/result?portal=payos&amount=" . $transaction->amount."&description=".$transaction->transaction_code;
-                $body["cancelUrl"] = "http://localhost:3000/payment/result?portal=payos&amount=" . $transaction->amount."&description=".$transaction->transaction_code;
+                $body["returnUrl"] = env('CLIENT_URL') . "/payment/result?portal=payos&amount=" . $transaction->amount . "&description=" . $transaction->transaction_code;
+                $body["cancelUrl"] = env('CLIENT_URL') . "/payment/result?portal=payos&amount=" . $transaction->amount . "&description=" . $transaction->transaction_code;
                 $payOS = new PayOS($this->payOSClientId, $this->payOSApiKey, $this->payOSChecksumKey);
 
                 $response = $payOS->createPaymentLink($body);
@@ -1022,8 +1022,8 @@ class OrderController extends Controller
                 $body["orderCode"] = intval($transaction->transaction_code);
                 $body["description"] =  $order->order_code;
                 $body["expiredAt"] = now()->addMinutes(30)->getTimestamp();
-                $body["returnUrl"] = "http://localhost:3000/payment/result?portal=payos&transaction_type=extended&description=".$transaction->transaction_code;
-                $body["cancelUrl"] = "http://localhost:3000/payment/result?portal=payos&transaction_type=extended&description=".$transaction->transaction_code;
+                $body["returnUrl"] = env('CLIENT_URL') . "/payment/result?portal=payos&transaction_type=extended&description=" . $transaction->transaction_code;
+                $body["cancelUrl"] = env('CLIENT_URL') . "/payment/result?portal=payos&transaction_type=extended&description=" . $transaction->transaction_code;
                 $payOS = new PayOS($this->payOSClientId, $this->payOSApiKey, $this->payOSChecksumKey);
 
                 $response = $payOS->createPaymentLink($body);
@@ -1229,8 +1229,8 @@ class OrderController extends Controller
                 $body["orderCode"] = intval($transaction->transaction_code);
                 $body["description"] =  $order->order_code;
                 $body["expiredAt"] = now()->addMinutes(30)->getTimestamp();
-                $body["returnUrl"] = "http://localhost:3000/payment/result?portal=payos&transaction_type=extended&amount=" . $extension_fee."&description=".$transaction->transaction_code;
-                $body["cancelUrl"] = "http://localhost:3000/payment/result?portal=payos&transaction_type=extended&amount=" . $extension_fee."&description=".$transaction->transaction_code;
+                $body["returnUrl"] = env('CLIENT_URL') . "/payment/result?portal=payos&transaction_type=extended&amount=" . $extension_fee . "&description=" . $transaction->transaction_code;
+                $body["cancelUrl"] = env('CLIENT_URL') . "/payment/result?portal=payos&transaction_type=extended&amount=" . $extension_fee . "&description=" . $transaction->transaction_code;
                 $payOS = new PayOS($this->payOSClientId, $this->payOSApiKey, $this->payOSChecksumKey);
 
                 $response = $payOS->createPaymentLink($body);
@@ -1431,8 +1431,8 @@ class OrderController extends Controller
                 $body["orderCode"] = intval($transaction->transaction_code);
                 $body["description"] =  $order->order_code;
                 $body["expiredAt"] = now()->addMinutes(30)->getTimestamp();
-                $body["returnUrl"] = "http://localhost:3000/payment/result?portal=payos&transaction_type=extended&amount=" . $extension_fee."&description=".$transaction->transaction_code;
-                $body["cancelUrl"] = "http://localhost:3000/payment/result?portal=payos&transaction_type=extended&amount=" . $extension_fee."&description=".$transaction->transaction_code;
+                $body["returnUrl"] = env('CLIENT_URL') . "/payment/result?portal=payos&transaction_type=extended&amount=" . $extension_fee . "&description=" . $transaction->transaction_code;
+                $body["cancelUrl"] = env('CLIENT_URL') . "/payment/result?portal=payos&transaction_type=extended&amount=" . $extension_fee . "&description=" . $transaction->transaction_code;
                 $payOS = new PayOS($this->payOSClientId, $this->payOSApiKey, $this->payOSChecksumKey);
 
                 $response = $payOS->createPaymentLink($body);

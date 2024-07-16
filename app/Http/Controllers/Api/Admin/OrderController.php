@@ -591,8 +591,8 @@ class OrderController extends Controller
                 $body["orderCode"] = intval($transaction->transaction_code);
                 $body["description"] =  $order->order_code;
                 $body["expiredAt"] = now()->addMinutes(30)->getTimestamp();
-                $body["returnUrl"] = "http://localhost:3000/payment/result?portal=payos&amount=" . $transaction->amount."&description=".$transaction->transaction_code;
-                $body["cancelUrl"] = "http://localhost:3000/payment/result?portal=payos&amount=" . $transaction->amount."&description=".$transaction->transaction_code;
+                $body["returnUrl"] = env('CLIENT_URL')."/payment/result?portal=payos&amount=" . $transaction->amount."&description=".$transaction->transaction_code;
+                $body["cancelUrl"] = env('CLIENT_URL')."/payment/result?portal=payos&amount=" . $transaction->amount."&description=".$transaction->transaction_code;
                 $payOS = new PayOS($this->payOSClientId, $this->payOSApiKey, $this->payOSChecksumKey);
 
                 $response = $payOS->createPaymentLink($body);
