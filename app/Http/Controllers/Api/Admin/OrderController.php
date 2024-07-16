@@ -591,8 +591,8 @@ class OrderController extends Controller
                 $body["orderCode"] = intval($transaction->transaction_code);
                 $body["description"] =  $order->order_code;
                 $body["expiredAt"] = now()->addMinutes(30)->getTimestamp();
-                $body["returnUrl"] = "http://localhost:3000/account/wallet/transaction-success";
-                $body["cancelUrl"] = "http://localhost:3000/payment/result";
+                $body["returnUrl"] = "http://localhost:3000/payment/result?portal=payos&amount=" . $transaction->amount."&description=".$transaction->transaction_code;
+                $body["cancelUrl"] = "http://localhost:3000/payment/result?portal=payos&amount=" . $transaction->amount."&description=".$transaction->transaction_code;
                 $payOS = new PayOS($this->payOSClientId, $this->payOSApiKey, $this->payOSChecksumKey);
 
                 $response = $payOS->createPaymentLink($body);
@@ -609,6 +609,7 @@ class OrderController extends Controller
                     'loan_date' => now(),
                     'original_due_date' => date('Y-m-d', strtotime('+5 days')),
                     'current_due_date' => date('Y-m-d', strtotime('+5 days')),
+                    'status' => 'active',
                 ]));
 
                 $orderDetails = $request->order_details;
@@ -630,6 +631,8 @@ class OrderController extends Controller
                     'transaction_method' => 'offline',
                     'amount' => $request->total_all_fee,
                     'description' => 'Thanh toán tiền mặt đơn thuê ' . $order->order_code,
+                    'status' => 'completed',
+                    "completed_at" => now()
                 ]);
 
                 if (!$transaction) {
@@ -739,6 +742,9 @@ class OrderController extends Controller
         }
 
         switch ($request->status) {
+            case 'pending':
+                return $this->paymentDoneOrder($id);
+                break;
             case 'approved':
                 return $this->approvedOrder($id);
                 break;
@@ -768,6 +774,35 @@ class OrderController extends Controller
                     'message' => 'Trạng thái không hợp lệ',
                 ], 400);
                 break;
+        }
+    }
+
+    public function paymentDoneOrder($id)
+    {
+        try {
+            $order = LoanOrders::find($id);
+
+            if ($order->status != 'wating_payment') {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Đơn hàng không ở trạng thái chờ thanh toán',
+                ], 400);
+            }
+
+            $order->update([
+                'status' => 'pending'
+            ]);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Thanh toán đơn hàng thành công',
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Thanh toán đơn hàng thất bại',
+                'errors' => $th->getMessage()
+            ], 500);
         }
     }
 

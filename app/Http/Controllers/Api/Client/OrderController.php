@@ -830,8 +830,8 @@ class OrderController extends Controller
                 $body["orderCode"] = intval($transaction->transaction_code);
                 $body["description"] =  $loanOrder->order_code;
                 $body["expiredAt"] = now()->addMinutes(30)->getTimestamp();
-                $body["returnUrl"] = "http://localhost:3000/account/wallet/transaction-success?portal=payos";
-                $body["cancelUrl"] = "http://localhost:3000/payment/result?portal=payos";
+                $body["returnUrl"] = "http://localhost:3000/payment/result?portal=payos&amount=" . $transaction->amount."&description=".$transaction->transaction_code;
+                $body["cancelUrl"] = "http://localhost:3000/payment/result?portal=payos&amount=" . $transaction->amount."&description=".$transaction->transaction_code;
                 $payOS = new PayOS($this->payOSClientId, $this->payOSApiKey, $this->payOSChecksumKey);
 
                 $response = $payOS->createPaymentLink($body);
@@ -1022,8 +1022,8 @@ class OrderController extends Controller
                 $body["orderCode"] = intval($transaction->transaction_code);
                 $body["description"] =  $order->order_code;
                 $body["expiredAt"] = now()->addMinutes(30)->getTimestamp();
-                $body["returnUrl"] = "http://localhost:3000/account/wallet/transaction-success?portal=payos&transac_type=extended";
-                $body["cancelUrl"] = "http://localhost:3000/payment/result?portal=payos&transac_type=extended";
+                $body["returnUrl"] = "http://localhost:3000/payment/result?portal=payos&transaction_type=extended&description=".$transaction->transaction_code;
+                $body["cancelUrl"] = "http://localhost:3000/payment/result?portal=payos&transaction_type=extended&description=".$transaction->transaction_code;
                 $payOS = new PayOS($this->payOSClientId, $this->payOSApiKey, $this->payOSChecksumKey);
 
                 $response = $payOS->createPaymentLink($body);
@@ -1229,8 +1229,8 @@ class OrderController extends Controller
                 $body["orderCode"] = intval($transaction->transaction_code);
                 $body["description"] =  $order->order_code;
                 $body["expiredAt"] = now()->addMinutes(30)->getTimestamp();
-                $body["returnUrl"] = "http://localhost:3000/account/wallet/transaction-success?portal=payos&transac_type=extended";
-                $body["cancelUrl"] = "http://localhost:3000/payment/result?portal=payos&transac_type=extended";
+                $body["returnUrl"] = "http://localhost:3000/payment/result?portal=payos&transaction_type=extended&amount=" . $extension_fee."&description=".$transaction->transaction_code;
+                $body["cancelUrl"] = "http://localhost:3000/payment/result?portal=payos&transaction_type=extended&amount=" . $extension_fee."&description=".$transaction->transaction_code;
                 $payOS = new PayOS($this->payOSClientId, $this->payOSApiKey, $this->payOSChecksumKey);
 
                 $response = $payOS->createPaymentLink($body);
@@ -1431,8 +1431,8 @@ class OrderController extends Controller
                 $body["orderCode"] = intval($transaction->transaction_code);
                 $body["description"] =  $order->order_code;
                 $body["expiredAt"] = now()->addMinutes(30)->getTimestamp();
-                $body["returnUrl"] = "http://localhost:3000/account/wallet/transaction-success?portal=payos&transac_type=extended";
-                $body["cancelUrl"] = "http://localhost:3000/payment/result?portal=payos&transac_type=extended";
+                $body["returnUrl"] = "http://localhost:3000/payment/result?portal=payos&transaction_type=extended&amount=" . $extension_fee."&description=".$transaction->transaction_code;
+                $body["cancelUrl"] = "http://localhost:3000/payment/result?portal=payos&transaction_type=extended&amount=" . $extension_fee."&description=".$transaction->transaction_code;
                 $payOS = new PayOS($this->payOSClientId, $this->payOSApiKey, $this->payOSChecksumKey);
 
                 $response = $payOS->createPaymentLink($body);

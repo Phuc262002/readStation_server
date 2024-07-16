@@ -365,16 +365,16 @@ class AuthorController extends Controller
     {
         $validator = Validator::make(array_merge(['id' => $id], $request->all()), [
             'id' => 'required|integer|exists:authors,id|min:1',
-            'author' => 'required|string',
+            'author' => 'nullable|string',
             'avatar' => 'nullable|string',
             'description' => 'nullable|string',
             'is_featured' => 'nullable|boolean',
             'dob' => 'nullable|date',
+            'status' => 'nullable|string|in:active,inactive'
         ], [
             'id.required' => 'Trường id là bắt buộc.',
             'id.integer' => 'Id phải là một số nguyên.',
             'id.min' => 'Id phải lớn hơn hoặc bằng 1.',
-            'author.required' => 'Tên tác giả không được để trống.',
             'author.string' => 'Tên tác giả phải là một chuỗi.',
             'avatar.string' => 'Avatar phải là một chuỗi.',
             'description.string' => 'Mô tả phải là một chuỗi.',

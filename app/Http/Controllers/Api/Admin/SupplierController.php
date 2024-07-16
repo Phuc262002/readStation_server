@@ -259,7 +259,7 @@ class SupplierController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string',
             'address' => 'required|string',
-            'phone' => 'required|string',
+            'phone' => 'required|regex:/^(0[35789])[0-9]{8}$/',
             'email' => 'required|email',
         ],[
             'name.required' => 'Tên nhà cung cấp không được để trống',
@@ -268,6 +268,7 @@ class SupplierController extends Controller
             'address.string' => 'Địa chỉ nhà cung cấp phải là chuỗi',
             'phone.required' => 'Số điện thoại nhà cung cấp không được để trống',
             'phone.string' => 'Số điện thoại nhà cung cấp phải là chuỗi',
+            'phone.regex' => 'Số điện thoại nhà cung cấp không đúng định dạng',
             'email.required' => 'Email nhà cung cấp không được để trống',
             'email.email' => 'Email nhà cung cấp không đúng định dạng',
         ]);

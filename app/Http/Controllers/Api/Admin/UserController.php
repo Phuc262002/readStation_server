@@ -269,22 +269,22 @@ class UserController extends Controller
     public function staticUser()
     {
         $totalUser = User::count();
-        $totalManager = User::where('role_id', '3')->count();
-        $totalAdmin = User::where('role_id', '4')->count();
+        $totalAdmin = User::where('role_id', '3')->count() + User::where('role_id', '4')->count();
+        $totalGuest = User::where('role_id', '1')->count();
         $totalStudent = User::where('role_id', '2')->count();
-        $totalUserVerified = User::whereNotNull('user_verified_at')->where('role_id', '!=','3')->where('role_id', '!=','4')->count();
-        $totalUserUnverified = User::whereNull('user_verified_at')->where('role_id', '!=','3')->where('role_id', '!=','4')->count();
+        // $totalUserVerified = User::whereNotNull('user_verified_at')->where('role_id', '!=','3')->where('role_id', '!=','4')->count();
+        // $totalUserUnverified = User::whereNull('user_verified_at')->where('role_id', '!=','3')->where('role_id', '!=','4')->count();
 
         return response()->json([
             "status" => true,
             "message" => "Get static user successfully!",
             "data" => [
                 "totalUser" => $totalUser,
-                "totalManager" => $totalManager,
                 "totalAdmin" => $totalAdmin,
+                "totalGuest" => $totalGuest,
                 "totalStudent" => $totalStudent,
-                "totalUserVerified" => $totalUserVerified,
-                "totalUserUnverified" => $totalUserUnverified,
+                // "totalUserVerified" => $totalUserVerified,
+                // "totalUserUnverified" => $totalUserUnverified,
             ],
         ], 200);
     }
