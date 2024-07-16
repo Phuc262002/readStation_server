@@ -146,13 +146,36 @@ class CloudinaryController extends Controller
 
     public function getAllImages()
     {
-        $files = Cloudinary::search()->expression('resource_type:image')->execute();
+        try {
+            $allFiles = [];
+            $nextCursor = null;
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Get all files successfully',
-            'data' => $files
-        ], 200);
+            do {
+                $response = Cloudinary::search()
+                    ->expression('resource_type:image')
+                    ->maxResults(50)
+                    ->nextCursor($nextCursor)
+                    ->execute();
+
+                if (isset($response['resources']) && is_array($response['resources'])) {
+                    $allFiles = array_merge($allFiles, $response['resources']);
+                }
+
+                $nextCursor = $response['next_cursor'] ?? null;
+            } while ($nextCursor);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Get all files successfully',
+                'data' => $allFiles
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Failed to get files',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function deleteImage($publicId)
