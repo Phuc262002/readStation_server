@@ -246,7 +246,7 @@ class ShelveController extends Controller
             'category_id',
             'bookcase_id',
             'status' => 'string|in:active,inactive,deleted',
-        ],[
+        ], [
             'page.integer' => 'Trang phải là số nguyên.',
             'page.min' => 'Trang phải lớn hơn hoặc bằng 1.',
             'pageSize.integer' => 'Kích thước trang phải là số nguyên.',
@@ -308,7 +308,7 @@ class ShelveController extends Controller
             'category_id' => 'required',
             'name' => 'required|string',
             'description' => 'nullable|string',
-        ],[
+        ], [
             'bookcase_id.required' => 'Bookcase_id không được để trống.',
             'bookshelf_code.string' => 'Bookshelf_code phải là chuỗi.',
             'category_id.required' => 'Category_id không được để trống.',
@@ -337,11 +337,10 @@ class ShelveController extends Controller
     public function show($id)
     {
         $validator = Validator::make(['id' => $id], [
-            'id' => 'required|integer|min:1'
-        ],[
+            'id' => 'required|exists:shelves,id'
+        ], [
             'id.required' => 'Trường id là bắt buộc.',
-            'id.integer' => 'Id phải là một số nguyên.',
-            'id.min' => 'Id phải lớn hơn hoặc bằng 1.'
+            'id.exists' => 'Id không tồn tại.'
         ]);
 
         if ($validator->fails()) {
@@ -378,7 +377,7 @@ class ShelveController extends Controller
             'status' => 'string|in:active,inactive,deleted',
             'name' => 'nullable|string',
             'description' => 'string',
-        ],[
+        ], [
             'id.required' => 'Trường id là bắt buộc.',
             'id.integer' => 'Id phải là một số nguyên.',
             'id.min' => 'Id phải lớn hơn hoặc bằng 1.',
@@ -433,7 +432,7 @@ class ShelveController extends Controller
     {
         $validator = Validator::make(['id' => $id], [
             'id' => 'required|integer|min:1'
-        ],[
+        ], [
             'id.required' => 'Trường id là bắt buộc.',
             'id.integer' => 'Id phải là một số nguyên.',
             'id.min' => 'Id phải lớn hơn hoặc bằng 1.'

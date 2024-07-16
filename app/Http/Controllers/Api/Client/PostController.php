@@ -301,7 +301,7 @@ class PostController extends Controller
             "content" => "required|string",
             "summary" => "required|string",
             "image" => "required|string",
-            "status" => "string|in:published,draft",
+            "status" => "required|in:published,draft",
         ], [
             'category_id.required' => 'Category_id không được để trống.',
             'category_id.string' => 'Category_id phải là một chuỗi.',
@@ -314,6 +314,7 @@ class PostController extends Controller
             'summary.string' => 'Summary phải là một chuỗi.',
             'image.required' => 'Image không được để trống.',
             'image.string' => 'Image phải là một chuỗi.',
+            'status.required' => 'Status không được để trống.',
         ]);
 
         if ($validator->fails()) {
