@@ -48,6 +48,13 @@ use OpenApi\Attributes as OA;
             description: 'Lọc theo trạng thái',
             schema: new OA\Schema(type: 'string', enum: ['pending', 'approved', 'rejected'])
         ),
+        new OA\Parameter(
+            name: 'search',
+            in: 'query',
+            required: false,
+            description: 'Tìm kiếm theo ID hoặc trạng thái',
+            schema: new OA\Schema(type: 'string')
+        ),
     ],
     responses: [
         new OA\Response(
@@ -144,6 +151,7 @@ class VerificationRequestController extends Controller
             'pageSize' => 'integer|min:1',
             'verification_card_type' => 'string|in:student_card,citizen_card',
             'status' => 'string|in:pending,approved,rejected',
+            'search' => 'string',
         ], [
             'page.integer' => 'Trang phải là số nguyên.',
             'page.min' => 'Trang phải lớn hơn hoặc bằng 1.',
@@ -153,6 +161,7 @@ class VerificationRequestController extends Controller
             'verification_card_type.in' => 'Loại thẻ phải là student_card hoặc citizen_card.',
             'status.string' => 'Trạng thái phải là chuỗi.',
             'status.in' => 'Trạng thái phải là pending, approved hoặc rejected.',
+            'search.string' => 'Tìm kiếm phải là chuỗi.',
         ]);
 
         if ($validator->fails()) {
@@ -179,6 +188,19 @@ class VerificationRequestController extends Controller
             $query->where('status', $status);
         }
 
+        if ($request->has('search')) {
+            $search = $request->input('search');
+            $query->where(function ($query) use ($search) {
+                $query->where('id', 'like', '%' . $search . '%')
+                    ->orWhere('status', 'like', '%' . $search . '%')
+                    ->orWhereHas('userRequest', function ($query) use ($search) {
+                        $query->where('email', 'like', '%' . $search . '%')
+                            ->orWhere('phone', 'like', '%' . $search . '%')
+                            ->orWhere('full_name', 'like', '%' . $search . '%');
+                    });
+            });
+        }
+
         $verification_requests = $query->orderBy('created_at', 'desc')->paginate($pageSize, ['*'], 'page', $page);
 
         return response()->json([
@@ -194,6 +216,7 @@ class VerificationRequestController extends Controller
             ]
         ]);
     }
+
 
     public function show($id)
     {

@@ -545,6 +545,7 @@ class UserController extends Controller
             "message" => "Get user successfully!",
             "data" => array_merge($user->toArray(), [
                 'id' => $user->id,
+                'balance_holding' => Transaction::where('user_id', $user->id)->where('status', 'holding')->sum('amount'),
             ]),
         ], 200);
     }
