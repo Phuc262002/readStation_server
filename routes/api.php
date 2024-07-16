@@ -294,6 +294,7 @@ Route::group([
         ], function () {
             Route::get('/', [ReturnHistoryController::class, 'index']);
             Route::get('/{id}', [ReturnHistoryController::class, 'show']);
+            Route::put('/update/{id}', [ReturnHistoryController::class, 'update']);
         });
     });
 

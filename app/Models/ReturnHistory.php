@@ -15,6 +15,7 @@ class ReturnHistory extends Model
         'loan_order_details_id',
         'return_date',
         'condition',
+        'actual_return_condition',
         'fine_amount',
         'processed_by',
         'return_method',

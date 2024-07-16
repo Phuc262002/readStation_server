@@ -3096,6 +3096,77 @@
                 ]
             }
         },
+        "/api/v1/admin/return-histories/update/{id}": {
+            "put": {
+                "tags": [
+                    "Admin / Return History"
+                ],
+                "summary": "Update return history",
+                "description": "Update return history",
+                "operationId": "updateReturnHistory",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id của return history",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "condition",
+                                    "fine_amount",
+                                    "actual_return_condition"
+                                ],
+                                "properties": {
+                                    "condition": {
+                                        "type": "string"
+                                    },
+                                    "fine_amount": {
+                                        "type": "number"
+                                    },
+                                    "actual_return_condition": {
+                                        "type": "string",
+                                        "enum": [
+                                            "excellent",
+                                            "good",
+                                            "fair",
+                                            "poor",
+                                            "damaged",
+                                            "lost"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Update return history successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Failed to update return history"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/admin/roles": {
             "get": {
                 "tags": [
