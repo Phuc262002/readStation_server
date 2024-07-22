@@ -877,13 +877,16 @@ class OrderController extends Controller
         }
     }
 
-    public function cancelOrder($id)
+    public function cancelOrder(Request $request, $id)
     {
         $validator = Validator::make(['id' => $id], [
             'id' => 'required|exists:loan_orders,id',
+            'reason_cancel' => 'required|string',
         ], [
             'id.required' => 'Trường id là bắt buộc',
             'id.exists' => 'Id không tồn tại',
+            'reason_cancel.required' => 'Trường lý do hủy đơn hàng là bắt buộc',
+            'reason_cancel.string' => 'Trường lý do hủy đơn hàng phải là kiểu chuỗi',
         ]);
 
         if ($validator->fails()) {
@@ -911,12 +914,14 @@ class OrderController extends Controller
                 ]);
 
                 $orderDetail->update([
-                    'status' => 'canceled'
+                    'status' => 'canceled',
+                    'reason_cancel' => $request->reason_cancel
                 ]);
             }
 
             $order->update([
-                'status' => 'canceled'
+                'status' => 'canceled',
+                'reason_cancel' => $request->reason_cancel
             ]);
 
             $transaction = Transaction::where('loan_order_id', $order->id)->first();
