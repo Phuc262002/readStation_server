@@ -854,13 +854,12 @@ class OrderController extends Controller
 
                 $orderDetail->update([
                     'status' => 'canceled',
-                    'reason_cancel' => $request->reason_cancel
                 ]);
             }
 
             $order->update([
                 'status' => 'canceled',
-
+                'reason_cancel' => $request->reason_cancel
             ]);
 
             $transaction = Transaction::where('loan_order_id', $order->id)->first();
