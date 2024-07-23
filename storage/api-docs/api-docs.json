@@ -1126,6 +1126,67 @@
                 ]
             }
         },
+        "/api/v1/admin/book-reviews": {
+            "get": {
+                "tags": [
+                    "Admin / Book Review"
+                ],
+                "summary": "Get all bookReviews",
+                "description": "Get all bookReviews",
+                "operationId": "bookReviewIndex",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Số trang hiện tại",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "pageSize",
+                        "in": "query",
+                        "description": "Số lượng mục trên mỗi trang",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "rating",
+                        "in": "query",
+                        "description": "Đánh giá",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "enum": [
+                                1,
+                                2,
+                                3,
+                                4,
+                                5
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get all bookReviews successfully!"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/admin/bookcases": {
             "get": {
                 "tags": [
@@ -5219,6 +5280,58 @@
                 "responses": {
                     "200": {
                         "description": "Update profile successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/account/book-reviews/create": {
+            "post": {
+                "tags": [
+                    "Account / Book Review"
+                ],
+                "summary": "Store a newly created resource in storage",
+                "description": "Store a newly created resource in storage",
+                "operationId": "bookReviewStore",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "loan_order_details_id",
+                                    "review_text",
+                                    "rating"
+                                ],
+                                "properties": {
+                                    "loan_order_details_id": {
+                                        "description": "Loan order details id",
+                                        "type": "integer"
+                                    },
+                                    "review_text": {
+                                        "description": "Review text",
+                                        "type": "string"
+                                    },
+                                    "rating": {
+                                        "description": "Rating",
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Đánh giá sách thành công"
                     },
                     "400": {
                         "description": "Validation error"

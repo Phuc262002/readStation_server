@@ -19,8 +19,7 @@ return new class extends Migration
             $table->text('review_text');
             $table->unsignedTinyInteger('rating');
             $table->datetime('review_date');
-            $table->datetime('expired_date');
-            $table->enum('status', ['pending', 'active', 'inactive', 'closed', 'deleted'])->default('active');
+            $table->enum('status', ['active', 'inactive', 'deleted'])->default('active');
             $table->timestamps();
 
             $table->foreign('loan_order_details_id')->references('id')->on('loan_order_details')->onDelete('cascade');

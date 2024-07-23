@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\Admin\AuthorController as AdminAuthorController;
 use App\Http\Controllers\Api\Admin\BookcaseController;
 use App\Http\Controllers\Api\Admin\BookController as AdminBookController;
 use App\Http\Controllers\Api\Admin\BookDetailController;
+use App\Http\Controllers\Api\Admin\BookReviewController as AdminBookReviewController;
 use App\Http\Controllers\Api\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Api\Admin\CommentController as AdminCommentController;
 use App\Http\Controllers\Api\Admin\DashboardController;
@@ -25,6 +26,7 @@ use App\Http\Controllers\Api\Auth\VerifyEmailController;
 use App\Http\Controllers\Api\BotTelegram\GithubActionController;
 use App\Http\Controllers\Api\CheckSchedule\RemindReturnBookController;
 use App\Http\Controllers\Api\Client\AccountController;
+use App\Http\Controllers\Api\Client\BookReviewController;
 use App\Http\Controllers\Api\Client\CommentController;
 use App\Http\Controllers\Api\Client\OrderController;
 use App\Http\Controllers\Api\Client\PostController;
@@ -79,6 +81,7 @@ Route::group([
         Route::put('/update-profile', [AccountController::class, 'updateProfile']);
 
         Route::get('/get-posts', [PostController::class, 'getPostAccount']);
+        Route::post('/book-reviews/create', [BookReviewController::class, 'store']);
 
         Route::group([
             "prefix" => "comments"
@@ -230,6 +233,12 @@ Route::group([
             Route::post('/create', [BookDetailController::class, 'store']);
             Route::put('/update/{id}', [BookDetailController::class, 'update']);
             Route::delete('/delete/{id}', [BookDetailController::class, 'destroy']);
+        });
+
+        Route::group([
+            "prefix" => "book-reviews",
+        ], function () {
+            Route::get('/', [AdminBookReviewController::class, 'index']);
         });
 
         Route::group([

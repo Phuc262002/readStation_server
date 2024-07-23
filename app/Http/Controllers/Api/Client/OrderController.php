@@ -746,6 +746,7 @@ class OrderController extends Controller
                 'shippingMethod',
                 'loanOrderDetails',
                 'loanOrderDetails.bookDetails',
+                'loanOrderDetails.bookReviews',
                 'loanOrderDetails.returnHistories',
                 'loanOrderDetails.extensionsDetails',
                 'loanOrderDetails.bookDetails.publishingCompany',
