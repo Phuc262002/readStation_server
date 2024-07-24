@@ -466,7 +466,9 @@ class UserController extends Controller
                             return response()->json([
                                 "status" => false,
                                 "message" => "Validation error",
-                                "errors" => "CCCD/CMND đã tồn tại trong hệ thống."
+                                "errors" => [
+                                    "CCCD/CMND" => "Tên ứng với CCCD/CMND đang sai, vui lòng kiểm tra lại."
+                                ]
                             ], 400);
                         }
                     }
@@ -480,7 +482,9 @@ class UserController extends Controller
                     return response()->json([
                         "status" => false,
                         "message" => "Validation error",
-                        "errors" => "Tên ứng với CCCD/CMND đang sai, vui lòng kiểm tra lại."
+                        "errors" => [
+                            "CCCD/CMND" => "Tên ứng với CCCD/CMND đang sai, vui lòng kiểm tra lại."
+                        ]
                     ], 400);
                 }
             }
