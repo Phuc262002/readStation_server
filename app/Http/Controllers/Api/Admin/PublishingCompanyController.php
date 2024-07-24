@@ -449,9 +449,9 @@ class PublishingCompanyController extends Controller
 
             if ($publishingCompany->status == 'deleted') {
                 return response()->json([
-                    "status" => false,
+                    "status" => true,
                     "message" => "Nhau xuất bản đã được thêm vào thùng rác. Bạn có thể khôi phục lại sau này!",
-                ], 500);
+                ], 200);
             }
         } catch (\Throwable $th) {
             return response()->json([
