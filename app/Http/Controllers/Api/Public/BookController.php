@@ -248,11 +248,25 @@ class BookController extends Controller
     {
         $this->checkBookDetail();
         $slug = $request->route('slug');
+        // Tách chuỗi bằng dấu '-'
+        $parts = explode('-', $slug);
+        // Lấy phần cuối cùng
+        $book_detail_id = array_pop($parts);
+        // Ghép lại phần đầu tiên
+        $slug_book = implode('-', $parts);
 
-        $validator = Validator::make(['slug' => $slug], [
-            'slug' => 'required'
+        $validator = Validator::make([
+            'slug_book' => $slug_book,
+            'book_detail_id' => $book_detail_id
         ], [
-            'slug.required' => 'Slug không được để trống.'
+            'slug_book' => 'required|exists:books,slug',
+            'book_detail_id' => 'required|integer|exists:book_details,id'
+        ], [
+            'slug_book.required' => 'Slug của sách không được để trống.',
+            'slug_book.exists' => 'Slug của sách không tồn tại.',
+            'book_detail_id.required' => 'Id của book detail không được để trống.',
+            'book_detail_id.exists' => 'Id của book detail không tồn tại.',
+            'book_detail_id.integer' => 'Id của book detail phải là một số nguyên.',
         ]);
 
         if ($validator->fails()) {
@@ -263,6 +277,24 @@ class BookController extends Controller
             ], 400);
         }
 
+        $checkSlug = Book::with('bookDetail')->where('slug', $slug_book)->first();
+
+        foreach ($checkSlug->bookDetail as $bookDetail) {
+            if ($bookDetail->id == $book_detail_id) {
+                $checkSlug = true;
+                break;
+            } else {
+                $checkSlug = false;
+            }
+        }
+
+        if (!$checkSlug) {
+            return response()->json([
+                "status" => false,
+                "message" => "Book not found!"
+            ], 404);
+        }
+
         $book = BookDetail::with([
             'publishingCompany',
             'order_details',
@@ -271,14 +303,10 @@ class BookController extends Controller
             'book.shelve',
             'book.shelve.bookcase',
         ])
-            ->whereHas('book', function ($query) use ($slug) {
-                $query->where('status', 'active')
-                    ->where('slug', $slug);
-            })
-            ->where('status', 'active')
+            ->where('id', $book_detail_id)
             ->first();
 
-        $bookReviews = BookReviews::with('user')->where('book_details_id', $book->id);;
+        $bookReviews = BookReviews::with('user')->where('book_details_id', $book_detail_id);
         $averageRateRounded = round($bookReviews->avg('rating'), 1);
 
         $book->average_rate = $averageRateRounded;
