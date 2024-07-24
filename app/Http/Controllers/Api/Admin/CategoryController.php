@@ -300,8 +300,8 @@ class CategoryController extends Controller
             'image' => 'nullable|string',
             'type' => 'required|string|in:book,post'
         ],[
-            'name.required' => 'Trường name là bắt buộc.',
-            'name.string' => 'Name phải là một chuỗi.',
+            'name.required' => 'Trường tên danh mục là bắt buộc.',
+            'name.string' => 'Tên danh mục phải là một chuỗi.',
             'type.required' => 'Trường type là bắt buộc.',
             'type.string' => 'Type phải là một chuỗi.',
             'type.in' => 'Type phải là book hoặc post.',
@@ -318,12 +318,12 @@ class CategoryController extends Controller
         if ($request->is_featured == true && $request->image == null) {
             return response()->json([
                 "status" => false,
-                "message" => "Image is required when is_featured is true!"
+                "message" => "Ảnh là bắt buộc khi danh mục được chọn là nổi bật!"
             ], 400);
         } else if ($request->is_featured == true && Category::where('is_featured', true)->where('type', 'book')->count() >= 6) {
             return response()->json([
                 "status" => false,
-                "message" => "Only 6 categories can be featured!"
+                "message" => "Chỉ có thể chọn tối đa 6 danh mục nổi bật!"
             ], 400);
         } 
 
@@ -386,7 +386,7 @@ class CategoryController extends Controller
             'id.integer' => 'Id phải là một số nguyên.',
             'id.min' => 'Id phải lớn hơn hoặc bằng 1.',
             'id.exists' => 'Id không tồn tại.',
-            'name.string' => 'Name phải là một chuỗi.',
+            'name.string' => 'Tên nhà xuất bản phải là một chuỗi.',
             'type.string' => 'Type phải là một chuỗi.',
             'type.in' => 'Type phải là book hoặc post.',
             'status.in' => 'Status phải là active, inactive hoặc deleted',

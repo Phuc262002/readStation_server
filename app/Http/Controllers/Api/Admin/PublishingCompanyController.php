@@ -364,7 +364,7 @@ class PublishingCompanyController extends Controller
         ],[
             'id.integer' => 'Id phải là một số nguyên.',
             'id.min' => 'Id phải lớn hơn hoặc bằng 1.',
-            'name.string' => 'Name phải là một chuỗi.',
+            'name.string' => 'Tên nhà xuất bản phải là một chuỗi.',
             'logo_company.string' => 'Logo nhà xuất bản phải là chuỗi.',
             'description.string' => 'Mô tả nhà xuất bản phải là chuỗi.',
             'status.string' => 'Trạng thái nhà xuất bản phải là chuỗi.',
