@@ -610,12 +610,10 @@ class UserController extends Controller
             }
 
             if (($user->role_id == 4 || $user->role_id == 3)) {
-                if (auth()->user()->role_id != 4) {
-                    return response()->json([
-                        "status" => false,
-                        "message" => "Bạn không có quyền cập nhật thông tin tài khoản này."
-                    ], 400);
-                }
+                return response()->json([
+                    "status" => false,
+                    "message" => "Bạn không có quyền cập nhật thông tin tài khoản này."
+                ], 400);
             }
 
             if ($request->role_id == 2) {
