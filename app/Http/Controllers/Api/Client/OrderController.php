@@ -61,7 +61,7 @@ use PayOS\PayOS;
         ),
         new OA\Response(
             response: 400,
-            description: 'Validation error',
+            description: 'Dữ liệu không hợp lệ',
         ),
     ]
 )]
@@ -100,7 +100,7 @@ use PayOS\PayOS;
         ),
         new OA\Response(
             response: 400,
-            description: 'Validation error',
+            description: 'Dữ liệu không hợp lệ',
         ),
     ]
 )]
@@ -163,7 +163,7 @@ use PayOS\PayOS;
         ),
         new OA\Response(
             response: 400,
-            description: 'Validation error',
+            description: 'Dữ liệu không hợp lệ',
         ),
         new OA\Response(
             response: 500,
@@ -197,7 +197,7 @@ use PayOS\PayOS;
         ),
         new OA\Response(
             response: 400,
-            description: 'Validation error',
+            description: 'Dữ liệu không hợp lệ',
         ),
     ]
 )]
@@ -227,7 +227,7 @@ use PayOS\PayOS;
         ),
         new OA\Response(
             response: 400,
-            description: 'Validation error',
+            description: 'Dữ liệu không hợp lệ',
         ),
         new OA\Response(
             response: 500,
@@ -270,7 +270,7 @@ use PayOS\PayOS;
         ),
         new OA\Response(
             response: 400,
-            description: 'Validation error',
+            description: 'Dữ liệu không hợp lệ',
         ),
         new OA\Response(
             response: 500,
@@ -313,7 +313,7 @@ use PayOS\PayOS;
         ),
         new OA\Response(
             response: 400,
-            description: 'Validation error',
+            description: 'Dữ liệu không hợp lệ',
         ),
         new OA\Response(
             response: 500,
@@ -366,7 +366,7 @@ use PayOS\PayOS;
         ),
         new OA\Response(
             response: 400,
-            description: 'Validation error'
+            description: 'Dữ liệu không hợp lệ'
         ),
         new OA\Response(
             response: 500,
@@ -409,7 +409,7 @@ use PayOS\PayOS;
         ),
         new OA\Response(
             response: 400,
-            description: 'Validation error',
+            description: 'Dữ liệu không hợp lệ',
         ),
         new OA\Response(
             response: 500,
@@ -455,7 +455,7 @@ class OrderController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 "staus" => false,
-                "message" => "Validation error",
+                "message" => "Dữ liệu không hợp lệ",
                 "errors" => $validator->errors()
             ], 400);
         }
@@ -546,7 +546,7 @@ class OrderController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 "staus" => false,
-                "message" => "Validation error",
+                "message" => "Dữ liệu không hợp lệ",
                 "errors" => $validator->errors()
             ], 400);
         }
@@ -590,7 +590,7 @@ class OrderController extends Controller
                 if ($validator2->fails()) {
                     return response()->json([
                         "staus" => false,
-                        "message" => "Validation error",
+                        "message" => "Dữ liệu không hợp lệ",
                         "errors" => $validator2->errors()
                     ], 400);
                 }
@@ -639,7 +639,7 @@ class OrderController extends Controller
                 if ($validator3->fails()) {
                     return response()->json([
                         "staus" => false,
-                        "message" => "Validation error",
+                        "message" => "Dữ liệu không hợp lệ",
                         "errors" => $validator3->errors()
                     ], 400);
                 }
@@ -735,7 +735,7 @@ class OrderController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 "staus" => false,
-                "message" => "Validation error",
+                "message" => "Dữ liệu không hợp lệ",
                 "errors" => $validator->errors()
             ], 400);
         }
@@ -808,7 +808,7 @@ class OrderController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 "staus" => false,
-                "message" => "Validation error",
+                "message" => "Dữ liệu không hợp lệ",
                 "errors" => $validator->errors()
             ], 400);
         }
@@ -893,7 +893,7 @@ class OrderController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 "staus" => false,
-                "message" => "Validation error",
+                "message" => "Dữ liệu không hợp lệ",
                 "errors" => $validator->errors()
             ], 400);
         }
@@ -964,7 +964,7 @@ class OrderController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 "status" => false,
-                "message" => "Validation error",
+                "message" => "Dữ liệu không hợp lệ",
                 "errors" => $validator->errors()
             ], 400);
         }
@@ -1005,7 +1005,7 @@ class OrderController extends Controller
                 if ($validator2->fails()) {
                     return response()->json([
                         "status" => false,
-                        "message" => "Validation error",
+                        "message" => "Dữ liệu không hợp lệ",
                         "errors" => $validator2->errors()
                     ], 400);
                 }
@@ -1100,7 +1100,7 @@ class OrderController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 "status" => false,
-                "message" => "Validation error",
+                "message" => "Dữ liệu không hợp lệ",
                 "errors" => $validator->errors()
             ], 400);
         }
@@ -1171,7 +1171,7 @@ class OrderController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 "staus" => false,
-                "message" => "Validation error",
+                "message" => "Dữ liệu không hợp lệ",
                 "errors" => $validator->errors()
             ], 400);
         }
@@ -1372,7 +1372,7 @@ class OrderController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 "staus" => false,
-                "message" => "Validation error",
+                "message" => "Dữ liệu không hợp lệ",
                 "errors" => $validator->errors()
             ], 400);
         }

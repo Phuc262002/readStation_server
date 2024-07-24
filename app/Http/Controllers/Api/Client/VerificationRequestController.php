@@ -273,7 +273,7 @@ class VerificationRequestController extends Controller
             if ($validator2->fails()) {
                 return response()->json([
                     "status" => false,
-                    "message" => "Validation error",
+                    "message" => "Dữ liệu không hợp lệ",
                     "errors" => $validator2->errors()
                 ], 400);
             }
@@ -300,7 +300,7 @@ class VerificationRequestController extends Controller
             if ($validator3->fails()) {
                 return response()->json([
                     "status" => false,
-                    "message" => "Validation error",
+                    "message" => "Dữ liệu không hợp lệ",
                     "errors" => $validator3->errors()
                 ], 400);
             }
@@ -309,7 +309,7 @@ class VerificationRequestController extends Controller
 
             foreach ($users as $user) {
                 if ($user->citizen_identity_card) {
-                    if ($user->citizen_identity_card['citizen_code'] == $request->verification_card_type['citizen_code']) {
+                    if ($user->citizen_identity_card['citizen_code'] == $request->verification_card_info['citizen_code']) {
                         return response()->json([
                             "status" => false,
                             "message" => "CCCD/CMND đã tồn tại trong hệ thống.",

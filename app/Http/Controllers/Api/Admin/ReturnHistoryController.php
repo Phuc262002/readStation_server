@@ -43,7 +43,7 @@ use OpenApi\Attributes as OA;
         ),
         new OA\Response(
             response: 400,
-            description: 'Validation error',
+            description: 'Dữ liệu không hợp lệ',
         ),
     ],
 )]
@@ -73,7 +73,7 @@ use OpenApi\Attributes as OA;
         ),
         new OA\Response(
             response: 400,
-            description: 'Validation error',
+            description: 'Dữ liệu không hợp lệ',
         ),
         new OA\Response(
             response: 500,
@@ -118,7 +118,7 @@ use OpenApi\Attributes as OA;
         ),
         new OA\Response(
             response: 400,
-            description: 'Validation error',
+            description: 'Dữ liệu không hợp lệ',
         ),
         new OA\Response(
             response: 500,
@@ -145,7 +145,7 @@ class ReturnHistoryController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 "staus" => false,
-                "message" => "Validation error",
+                "message" => "Dữ liệu không hợp lệ",
                 "errors" => $validator->errors()
             ], 400);
         }
@@ -200,7 +200,7 @@ class ReturnHistoryController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 "staus" => false,
-                "message" => "Validation error",
+                "message" => "Dữ liệu không hợp lệ",
                 "errors" => $validator->errors()
             ], 400);
         }
@@ -253,7 +253,7 @@ class ReturnHistoryController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 "staus" => false,
-                "message" => "Validation error",
+                "message" => "Dữ liệu không hợp lệ",
                 "errors" => $validator->errors()
             ], 400);
         }

@@ -22,7 +22,7 @@ use OpenApi\Attributes as OA;
         ),
         new OA\Response(
             response: 400,
-            description: 'Validation error',
+            description: 'Dữ liệu không hợp lệ',
         ),
     ],
 )]
@@ -49,7 +49,7 @@ use OpenApi\Attributes as OA;
         ),
         new OA\Response(
             response: 400,
-            description: 'Validation error',
+            description: 'Dữ liệu không hợp lệ',
         ),
     ],
 )]
@@ -76,7 +76,7 @@ use OpenApi\Attributes as OA;
         ),
         new OA\Response(
             response: 400,
-            description: 'Validation error',
+            description: 'Dữ liệu không hợp lệ',
         ),
     ],
 )]

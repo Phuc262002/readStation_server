@@ -68,7 +68,7 @@ use OpenApi\Attributes as OA;
         ),
         new OA\Response(
             response: 400,
-            description: 'Validation error',
+            description: 'Dữ liệu không hợp lệ',
         ),
     ],
 )]
@@ -135,7 +135,7 @@ class PostController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 "staus" => false,
-                "message" => "Validation error",
+                "message" => "Dữ liệu không hợp lệ",
                 "errors" => $validator->errors()
             ], 400);
         }
@@ -198,7 +198,7 @@ class PostController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 "status" => false,
-                "message" => "Validation error",
+                "message" => "Dữ liệu không hợp lệ",
                 "errors" => $validator->errors()
             ], 400);
         }

@@ -41,7 +41,7 @@ use OpenApi\Attributes as OA;
         ),
         new OA\Response(
             response: 400,
-            description: 'Validation error'
+            description: 'Dữ liệu không hợp lệ'
         ),
         new OA\Response(
             response: 500,
@@ -111,7 +111,7 @@ class CloudinaryController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'status' => false,
-                'message' => 'Validation error',
+                'message' => 'Dữ liệu không hợp lệ',
                 'errors' => $validator->errors()
             ], 400);
         }

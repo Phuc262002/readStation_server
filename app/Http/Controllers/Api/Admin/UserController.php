@@ -83,7 +83,7 @@ use OpenApi\Attributes as OA;
         ),
         new OA\Response(
             response: 400,
-            description: 'Validation error',
+            description: 'Dữ liệu không hợp lệ',
         ),
     ],
 )]
@@ -113,7 +113,7 @@ use OpenApi\Attributes as OA;
         ),
         new OA\Response(
             response: 400,
-            description: 'Validation error',
+            description: 'Dữ liệu không hợp lệ',
         ),
     ],
 )]
@@ -177,7 +177,7 @@ use OpenApi\Attributes as OA;
         ),
         new OA\Response(
             response: 400,
-            description: 'Validation error',
+            description: 'Dữ liệu không hợp lệ',
         ),
         new OA\Response(
             response: 500,
@@ -254,7 +254,7 @@ use OpenApi\Attributes as OA;
         ),
         new OA\Response(
             response: 400,
-            description: 'Validation error',
+            description: 'Dữ liệu không hợp lệ',
         ),
         new OA\Response(
             response: 500,
@@ -310,7 +310,7 @@ class UserController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 "staus" => false,
-                "message" => "Validation error",
+                "message" => "Dữ liệu không hợp lệ",
                 "errors" => $validator->errors()
             ], 400);
         }
@@ -393,7 +393,7 @@ class UserController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 "staus" => false,
-                "message" => "Validation error",
+                "message" => "Dữ liệu không hợp lệ",
                 "errors" => $validator->errors()
             ], 400);
         }
@@ -424,7 +424,7 @@ class UserController extends Controller
                 if ($validator2->fails()) {
                     return response()->json([
                         "status" => false,
-                        "message" => "Validation error",
+                        "message" => "Dữ liệu không hợp lệ",
                         "errors" => $validator2->errors()
                     ], 400);
                 }
@@ -453,7 +453,7 @@ class UserController extends Controller
                 if ($validator3->fails()) {
                     return response()->json([
                         "status" => false,
-                        "message" => "Validation error",
+                        "message" => "Dữ liệu không hợp lệ",
                         "errors" => $validator3->errors()
                     ], 400);
                 }
@@ -465,7 +465,7 @@ class UserController extends Controller
                         if ($user->citizen_identity_card['citizen_code'] == $request->citizen_identity_card['citizen_code']) {
                             return response()->json([
                                 "status" => false,
-                                "message" => "Validation error",
+                                "message" => "Dữ liệu không hợp lệ",
                                 "errors" => [
                                     "CCCD/CMND" => "Tên ứng với CCCD/CMND đang sai, vui lòng kiểm tra lại."
                                 ]
@@ -481,7 +481,7 @@ class UserController extends Controller
                 if (!$response) {
                     return response()->json([
                         "status" => false,
-                        "message" => "Validation error",
+                        "message" => "Dữ liệu không hợp lệ",
                         "errors" => [
                             "CCCD/CMND" => "Tên ứng với CCCD/CMND đang sai, vui lòng kiểm tra lại."
                         ]
@@ -537,7 +537,7 @@ class UserController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 "staus" => false,
-                "message" => "Validation error",
+                "message" => "Dữ liệu không hợp lệ",
                 "errors" => $validator->errors()
             ], 400);
         }
@@ -594,7 +594,7 @@ class UserController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 "staus" => false,
-                "message" => "Validation error",
+                "message" => "Dữ liệu không hợp lệ",
                 "errors" => $validator->errors()
             ], 400);
         }
@@ -643,7 +643,7 @@ class UserController extends Controller
                 if ($validator2->fails()) {
                     return response()->json([
                         "status" => false,
-                        "message" => "Validation error",
+                        "message" => "Dữ liệu không hợp lệ",
                         "errors" => $validator2->errors()
                     ], 400);
                 }
@@ -672,7 +672,7 @@ class UserController extends Controller
                 if ($validator3->fails()) {
                     return response()->json([
                         "status" => false,
-                        "message" => "Validation error",
+                        "message" => "Dữ liệu không hợp lệ",
                         "errors" => $validator3->errors()
                     ], 400);
                 }
@@ -684,7 +684,7 @@ class UserController extends Controller
                 if (!$response) {
                     return response()->json([
                         "status" => false,
-                        "message" => "Validation error",
+                        "message" => "Dữ liệu không hợp lệ",
                         "errors" => "Tên ứng với CCCD/CMND đang sai, vui lòng kiểm tra lại."
                     ], 400);
                 }
