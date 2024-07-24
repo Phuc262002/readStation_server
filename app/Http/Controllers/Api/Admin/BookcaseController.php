@@ -288,23 +288,31 @@ class BookcaseController extends Controller
             'name.string' => 'Tên phải là chuỗi.',
         ]);
 
-        if ($validator->fails()) {
+        try {
+            if ($validator->fails()) {
+                return response()->json([
+                    "staus" => false,
+                    "message" => "Validation error",
+                    "errors" => $validator->errors()
+                ], 400);
+            }
+
+            $bookcase = Bookcase::create(array_merge(
+                $validator->validated(),
+            ));
+
             return response()->json([
-                "staus" => false,
-                "message" => "Validation error",
-                "errors" => $validator->errors()
-            ], 400);
+                "status" => true,
+                "message" => "Create bookcase successfully!",
+                "data" => $bookcase
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => false,
+                "message" => "Create bookcase failed!",
+                "errors" => $th->getMessage()
+            ], 500);
         }
-
-        $bookcase = Bookcase::create(array_merge(
-            $validator->validated(),
-        ));
-
-        return response()->json([
-            "status" => true,
-            "message" => "Create bookcase successfully!",
-            "data" => $bookcase
-        ], 200);
     }
 
     public function show($id)
@@ -396,7 +404,8 @@ class BookcaseController extends Controller
         } catch (\Throwable $th) {
             return response()->json([
                 "status" => false,
-                "message" => "Update bookcase failed!"
+                "message" => "Update bookcase failed!",
+                "errors" => $th->getMessage()
             ], 500);
         }
     }
@@ -441,7 +450,8 @@ class BookcaseController extends Controller
         } catch (\Throwable $th) {
             return response()->json([
                 "status" => false,
-                "message" => "Delete bookcase failed!"
+                "message" => "Delete bookcase failed!",
+                "errors" => $th->getMessage()
             ], 500);
         }
 

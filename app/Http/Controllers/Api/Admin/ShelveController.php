@@ -323,15 +323,23 @@ class ShelveController extends Controller
             ], 400);
         }
 
-        $shelve = Shelve::create(array_merge(
-            $validator->validated(),
-        ));
+        try {
+            $shelve = Shelve::create(array_merge(
+                $validator->validated(),
+            ));
 
-        return response()->json([
-            "status" => true,
-            "message" => "Create shelve successfully!",
-            "data" => $shelve
-        ], 200);
+            return response()->json([
+                "status" => true,
+                "message" => "Create shelve successfully!",
+                "data" => $shelve
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => false,
+                "message" => "Create shelve failed!",
+                "error" => $th->getMessage(),
+            ], 500);
+        }
     }
 
     public function show($id)
@@ -467,7 +475,8 @@ class ShelveController extends Controller
         } catch (\Throwable $th) {
             return response()->json([
                 "status" => false,
-                "message" => "Delete shelve failed!"
+                "message" => "Delete shelve failed!",
+                "errors" => $th->getMessage()
             ], 500);
         }
 
