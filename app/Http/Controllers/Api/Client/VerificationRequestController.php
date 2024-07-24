@@ -312,8 +312,7 @@ class VerificationRequestController extends Controller
                     if ($user->citizen_identity_card['citizen_code'] == $request->verification_card_type['citizen_code']) {
                         return response()->json([
                             "status" => false,
-                            "message" => "Validation error",
-                            "errors" => "CCCD/CMND đã tồn tại trong hệ thống."
+                            "message" => "CCCD/CMND đã tồn tại trong hệ thống.",
                         ], 400);
                     }
                 }
@@ -326,8 +325,7 @@ class VerificationRequestController extends Controller
             if (!$response) {
                 return response()->json([
                     "status" => false,
-                    "message" => "Validation error",
-                    "errors" => "Tên ứng với CCCD/CMND đang sai, vui lòng kiểm tra lại."
+                    "message" => "Tên ứng với CCCD/CMND đang sai, vui lòng kiểm tra lại.",
                 ], 400);
             }
         }
