@@ -44,7 +44,7 @@ use OpenApi\Attributes as OA;
             in: 'query',
             required: false,
             description: 'Trạng thái',
-            schema: new OA\Schema(type: 'string', enum: ['draft','active', 'canceled'])
+            schema: new OA\Schema(type: 'string', enum: ['draft', 'active', 'canceled'])
         ),
     ],
     responses: [
@@ -109,9 +109,9 @@ use OpenApi\Attributes as OA;
                 new OA\Property(property: 'invoice_date', type: 'string', format: 'date', description: 'Ngày hóa đơn'),
                 new OA\Property(property: 'status', type: 'string', enum: ['draft', 'active'], description: 'Trạng thái'),
                 new OA\Property(
-                    property: 'invoice_enter_detail', 
-                    type: 'array', 
-                    description: 'Chi tiết hóa đơn', 
+                    property: 'invoice_enter_detail',
+                    type: 'array',
+                    description: 'Chi tiết hóa đơn',
                     items: new OA\Items(
                         type: 'object',
                         required: ['book_detail_id', 'book_price', 'book_quantity'],
@@ -251,7 +251,7 @@ class InvoiceEnterController extends Controller
             'invoice_date' => "required|date",
             'status' => "required|string|in:draft,active",
             'invoice_enter_detail' => "required|array",
-            'invoice_enter_detail.*.book_detail_id' => "required",
+            'invoice_enter_detail.*.book_detail_id' => "required|exists:book_details,id",
             'invoice_enter_detail.*.book_price' => "required",
             'invoice_enter_detail.*.book_quantity' => "required",
 
@@ -269,6 +269,7 @@ class InvoiceEnterController extends Controller
             'invoice_enter_detail.required' => 'Chi tiết hóa đơn không được để trống.',
             'invoice_enter_detail.array' => 'Chi tiết hóa đơn phải là mảng.',
             'invoice_enter_detail.*.book_detail_id.required' => 'ID chi tiết sách không được để trống.',
+            'invoice_enter_detail.*.book_detail_id.exists' => 'ID chi tiết sách không tồn tại.',
             'invoice_enter_detail.*.book_price.required' => 'Giá sách không được để trống.',
             'invoice_enter_detail.*.book_quantity.required' => 'Số lượng sách không được để trống.',
         ]);
@@ -281,13 +282,13 @@ class InvoiceEnterController extends Controller
             ], 400);
         }
 
+        $validatedData = $validator->validated();
+
+        $invoiceEnter = InvoiceEnter::create(array_merge($validatedData, [
+            'user_id' => auth()->user()->id
+        ]));
+
         try {
-            $validatedData = $validator->validated();
-
-            $invoiceEnter = InvoiceEnter::create(array_merge($validatedData, [
-                'user_id' => auth()->user()->id
-            ]));
-
             $invoiceEnterDetails = $validatedData['invoice_enter_detail'];
             foreach ($invoiceEnterDetails as $detail) {
                 $detail['invoice_enter_id'] = $invoiceEnter->id;
@@ -310,6 +311,7 @@ class InvoiceEnterController extends Controller
                 "data" => InvoiceEnter::with('invoiceEnterDetails')->find($invoiceEnter->id)
             ], 200);
         } catch (\Throwable $th) {
+            dd($invoiceEnter);
             return response()->json([
                 "status" => false,
                 "message" => "Create invoice enter failed!",
