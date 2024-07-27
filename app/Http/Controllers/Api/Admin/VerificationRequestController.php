@@ -326,7 +326,6 @@ class VerificationRequestController extends Controller
 
                     $user->update([
                         'user_verified_at' => now(),
-                        'has_wallet' => true,
                         'citizen_identity_card' => [
                             'citizen_name' => $verification_request->verification_card_info['citizen_name'],
                             'citizen_code' => $verification_request->verification_card_info['citizen_code'],

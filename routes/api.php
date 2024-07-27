@@ -122,7 +122,7 @@ Route::group([
     // Admin routes
     Route::group([
         "prefix" => "admin",
-        "middleware" => ["auth:api"]
+        "middleware" => ["auth:api", 'is_admin']
     ], function () {
         Route::group([
             "prefix" => "roles"
@@ -392,7 +392,7 @@ Route::group([
     ], function () {
         Route::get('/remind-return-book', [RemindReturnBookController::class, 'remindReturnBook']);
     });
-    
+
     Route::group([
         "prefix" => "upload",
         "middleware" => ["auth:api"]

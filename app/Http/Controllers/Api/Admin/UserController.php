@@ -492,7 +492,6 @@ class UserController extends Controller
             $user = User::create(array_merge($validator->validated(), [
                 'password' => $password,
                 'user_verified_at' => $request->has('citizen_identity_card') ? now() : null,
-                'has_wallet' => $request->has('citizen_identity_card') ? true : false,
                 'email_verified_at' => now(),
             ]));
 
@@ -685,22 +684,19 @@ class UserController extends Controller
                     return response()->json([
                         "status" => false,
                         "message" => "Dữ liệu không hợp lệ",
-                        "errors" => "Tên ứng với CCCD/CMND đang sai, vui lòng kiểm tra lại."
+                        "errors" => [
+                            "CCCD/CMND" => "Tên ứng với CCCD/CMND đang sai, vui lòng kiểm tra lại."
+                        ]
                     ], 400);
                 }
             }
 
             $user->update(array_merge($validator->validated(), [
                 'user_verified_at' => $request->has('citizen_identity_card') ? now() : null,
-                'has_wallet' => $request->has('citizen_identity_card') ? true : false,
             ]));
 
             if ($user->email_verified_at == null && ($request->has('citizen_identity_card') || $request->has('student_id_card'))) {
                 $user->update(['email_verified_at' => now()]);
-            }
-
-            if ($request->has('citizen_identity_card') && !$user->wallet) {
-                $user->createWallet();
             }
 
             return response()->json([

@@ -398,7 +398,7 @@ class BookDetailController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'book_id' => "required",
-            'sku_origin' => 'required|string',
+            'sku_origin' => 'string',
             'poster' => "required",
             'images' => "required|array",
             'book_version' => "required",
@@ -415,7 +415,6 @@ class BookDetailController extends Controller
             'book_size' => "nullable",
         ], [
             'book_id.required' => 'Trường book_id là bắt buộc.',
-            'sku_origin.required' => 'Trường sku_origin là bắt buộc.',
             'poster.required' => 'Trường poster là bắt buộc.',
             'images.required' => 'Trường images là bắt buộc.',
             'book_version.required' => 'Trường book_version là bắt buộc.',
@@ -453,7 +452,9 @@ class BookDetailController extends Controller
             return response()->json([
                 "status" => false,
                 "message" => "Create book failed!",
-                "errors" => $th->getMessage()
+                "errors" => [
+                    "system" => $th->getMessage()
+                ]
             ], 500);
         }
     }
@@ -497,7 +498,6 @@ class BookDetailController extends Controller
     {
         $validator = Validator::make(array_merge(['id' => $id], $request->all()), [
             'id' => 'required|min:1|exists:book_details,id',
-            'book_id' => "required",
             'sku_origin' => 'required|string',
             'poster' => "required|string",
             'images' => "required|array",
@@ -517,7 +517,6 @@ class BookDetailController extends Controller
             'id.required' => 'Trường id là bắt buộc.',
             'id.min' => 'Id phải lớn hơn hoặc bằng 1.',
             'id.exists' => 'id không tồn tai.',
-            'book_id.required' => 'Trường book_id là bắt buộc.',
             'sku_origin.required' => 'Trường sku_origin là bắt buộc.',
             'poster.required' => 'Trường poster là bắt buộc.',
             'images.required' => 'Trường images là bắt buộc.',
@@ -565,7 +564,9 @@ class BookDetailController extends Controller
             return response()->json([
                 "status" => false,
                 "message" => "Update book detail failed!",
-                "errors" => $th->getMessage()
+                "errors" => [
+                    "system" => $th->getMessage()
+                ]
             ], 500);
         }
     }

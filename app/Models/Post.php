@@ -52,10 +52,12 @@ class Post extends Model
             $query->where('category_id', $category_id);
         }
 
-        if ($status) {
+        if ($status !== 'handle') {
             $query->where('status', $status);
+        } elseif ($status === 'handle') {
+            $query->whereIn('status', ['wating_approve', 'approve_canceled']);
         } else {
-            $query->where('status', '!=', 'deleted');
+            $query->whereIn('status', ['draft', 'published', 'hidden']);
         }
 
         if ($type === 'member') {

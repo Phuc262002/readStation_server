@@ -231,7 +231,6 @@ class DashboardController extends Controller
     {
 
         $user = User::count();
-        $userHasWallet = User::where('has_wallet', true)->count();
         $invoiceEnter = InvoiceEnter::count();
         $bookcase = Bookcase::count();
         $shelve = Shelve::count();
@@ -250,7 +249,6 @@ class DashboardController extends Controller
             'data' => [
                 'revenue' => $revenue,
                 'user' => $user,
-                'userActiveWallet' => $userHasWallet,
                 'invoiceEnter' => $invoiceEnter,
                 'bookcase' => $bookcase,
                 'shelve' => $shelve,

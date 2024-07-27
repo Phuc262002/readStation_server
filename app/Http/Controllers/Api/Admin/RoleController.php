@@ -33,7 +33,7 @@ class RoleController extends Controller
     public function index()
     {
         try {
-            $role = Role::all();
+            $role = Role::where('id', '!=', 3)->get();
 
             return response()->json([
                 'status' => true,

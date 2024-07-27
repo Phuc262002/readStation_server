@@ -64,7 +64,7 @@
                         "description": "Get all authors successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 },
                 "security": [
@@ -98,7 +98,7 @@
                         "description": "Get author successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "404": {
                         "description": "Author not found"
@@ -155,7 +155,7 @@
                         "description": "Create author successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 },
                 "security": [
@@ -220,7 +220,7 @@
                         "description": "Update author successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "404": {
                         "description": "Author not found"
@@ -257,7 +257,7 @@
                         "description": "Delete author successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "404": {
                         "description": "Author not found"
@@ -346,7 +346,7 @@
                         "description": "Get all books successfully!"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 },
                 "security": [
@@ -380,7 +380,7 @@
                         "description": "Get book detail successfully!"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "404": {
                         "description": "Book detail not found!"
@@ -454,7 +454,7 @@
                         "description": "Create book successfully!"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "500": {
                         "description": "Create book failed!"
@@ -601,7 +601,7 @@
                         "description": "Create book successfully!"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "500": {
                         "description": "Create book failed!"
@@ -697,7 +697,7 @@
                         "description": "Update book successfully!"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "500": {
                         "description": "Update book failed!"
@@ -734,7 +734,7 @@
                         "description": "Delete book successfully!"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "404": {
                         "description": "Book not found!"
@@ -813,7 +813,7 @@
                         "description": "Get all book details successfully!"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 },
                 "security": [
@@ -847,7 +847,7 @@
                         "description": "Get book detail successfully!"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "404": {
                         "description": "Book detail not found!"
@@ -953,7 +953,7 @@
                         "description": "Create book detail successfully!"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "500": {
                         "description": "Create book detail failed!"
@@ -1070,7 +1070,7 @@
                         "description": "Update book detail successfully!"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "404": {
                         "description": "Book detail not found!"
@@ -1177,7 +1177,7 @@
                         "description": "Get all bookReviews successfully!"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 },
                 "security": [
@@ -1244,7 +1244,7 @@
                         "description": "Get all bookcases successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 },
                 "security": [
@@ -1278,7 +1278,7 @@
                         "description": "Get bookcase successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "404": {
                         "description": "Bookcase not found"
@@ -1333,7 +1333,7 @@
                         "description": "Create bookcase successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 },
                 "security": [
@@ -1400,7 +1400,7 @@
                         "description": "Update bookcase successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "404": {
                         "description": "Bookcase not found"
@@ -1440,7 +1440,7 @@
                         "description": "Delete bookcase successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "404": {
                         "description": "Bookcase not found"
@@ -1526,7 +1526,7 @@
                         "description": "Get all categories successfully!"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 },
                 "security": [
@@ -1560,7 +1560,7 @@
                         "description": "Get category successfully!"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "404": {
                         "description": "Category not found!"
@@ -1622,7 +1622,7 @@
                         "description": "Create category successfully!"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 },
                 "security": [
@@ -1701,7 +1701,7 @@
                         "description": "Update category successfully!"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "404": {
                         "description": "Category not found!"
@@ -1741,7 +1741,7 @@
                         "description": "Delete category successfully!"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "404": {
                         "description": "Category not found!"
@@ -1806,7 +1806,7 @@
                         "description": "User profile fetched successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 },
                 "security": [
@@ -1979,7 +1979,7 @@
                         "description": "Get all suppliers successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 },
                 "security": [
@@ -2013,7 +2013,7 @@
                         "description": "Get invoice enter successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 },
                 "security": [
@@ -2119,7 +2119,7 @@
                         "description": "Create invoice enter successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 },
                 "security": [
@@ -2187,7 +2187,7 @@
                         "description": "Update invoice enter successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 },
                 "security": [
@@ -2210,7 +2210,7 @@
                         "description": "Thống kê đơn hàng"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "500": {
                         "description": "Lỗi không xác định"
@@ -2289,7 +2289,7 @@
                         "description": "Danh sách đơn hàng"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "500": {
                         "description": "Lỗi không xác định"
@@ -2326,7 +2326,7 @@
                         "description": "Chi tiết đơn hàng"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "500": {
                         "description": "Lỗi không xác định"
@@ -2394,7 +2394,7 @@
                         "description": "Cập nhật trạng thái đơn hàng"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "500": {
                         "description": "Lỗi không xác định"
@@ -2495,7 +2495,7 @@
                         "description": "Create order successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "500": {
                         "description": "Create order failed"
@@ -2561,7 +2561,7 @@
                         "description": "Trả từng sách"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "500": {
                         "description": "Lỗi không xác định"
@@ -2598,7 +2598,7 @@
                         "description": "Extension all order successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "500": {
                         "description": "Extension all order failed"
@@ -2635,7 +2635,7 @@
                         "description": "Extension all order successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "500": {
                         "description": "Extension all order failed"
@@ -2731,7 +2731,7 @@
                         "description": "Get all posts successfully!"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 },
                 "security": [
@@ -2861,7 +2861,7 @@
                         "description": "Get all publishing companies successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 },
                 "security": [
@@ -2895,7 +2895,7 @@
                         "description": "Get publishing company successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "404": {
                         "description": "Publishing company not found!"
@@ -2953,7 +2953,7 @@
                         "description": "Create publishing company successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 },
                 "security": [
@@ -3019,7 +3019,7 @@
                         "description": "Update category successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "404": {
                         "description": "Publishing company not found!"
@@ -3059,7 +3059,7 @@
                         "description": "Delete publishing company successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "404": {
                         "description": "Publishing company not found!"
@@ -3110,7 +3110,7 @@
                         "description": "Get all return histories successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 },
                 "security": [
@@ -3144,7 +3144,7 @@
                         "description": "Get return history successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "500": {
                         "description": "Failed to get return history"
@@ -3215,7 +3215,7 @@
                         "description": "Update return history successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "500": {
                         "description": "Failed to update return history"
@@ -3241,7 +3241,7 @@
                         "description": "Get all roles"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 },
                 "security": [
@@ -3326,7 +3326,7 @@
                         "description": "Get all shelve successfully!"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 },
                 "security": [
@@ -3360,7 +3360,7 @@
                         "description": "Get shelve successfully!"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "404": {
                         "description": "Shelve not found!"
@@ -3422,7 +3422,7 @@
                         "description": "Create shelve successfully!"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 },
                 "security": [
@@ -3495,7 +3495,7 @@
                         "description": "Update shelve successfully!"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "404": {
                         "description": "Shelve not found!"
@@ -3535,7 +3535,7 @@
                         "description": "Delete shelve successfully!"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "404": {
                         "description": "Shelve not found!"
@@ -3609,7 +3609,7 @@
                         "description": "Get all ShippingMethods successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 },
                 "security": [
@@ -3643,7 +3643,7 @@
                         "description": "Get ShippingMethod successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "404": {
                         "description": "ShippingMethod not found"
@@ -3702,7 +3702,7 @@
                         "description": "Create ShippingMethod successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 },
                 "security": [
@@ -3776,7 +3776,7 @@
                         "description": "Update ShippingMethod successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "404": {
                         "description": "ShippingMethod not found"
@@ -3813,7 +3813,7 @@
                         "description": "Delete ShippingMethod successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "404": {
                         "description": "ShippingMethod not found"
@@ -3884,7 +3884,7 @@
                         "description": "Get all authors successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 },
                 "security": [
@@ -3918,7 +3918,7 @@
                         "description": "Get supplier successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 },
                 "security": [
@@ -3971,7 +3971,7 @@
                         "description": "Create supplier successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 },
                 "security": [
@@ -4029,7 +4029,7 @@
                         "description": "Update supplier successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 },
                 "security": [
@@ -4063,7 +4063,7 @@
                         "description": "Delete supplier successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 },
                 "security": [
@@ -4122,7 +4122,7 @@
                         "description": "Get all order successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 },
                 "security": [
@@ -4218,7 +4218,7 @@
                         "description": "Get all authors successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 },
                 "security": [
@@ -4252,7 +4252,7 @@
                         "description": "Get user successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 },
                 "security": [
@@ -4407,7 +4407,7 @@
                         "description": "Create user successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "500": {
                         "description": "Create user failed"
@@ -4575,7 +4575,7 @@
                         "description": "Update user successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "500": {
                         "description": "Update user failed"
@@ -4801,7 +4801,7 @@
                         "description": "Successful login"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "401": {
                         "description": "Unauthorized"
@@ -4840,7 +4840,7 @@
                         "description": "Successful login with Google"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "401": {
                         "description": "Unauthorized"
@@ -4894,7 +4894,7 @@
                         "description": "User registered successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 }
             }
@@ -4987,7 +4987,7 @@
                         "description": "Send email successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 }
             }
@@ -5038,7 +5038,7 @@
                         "description": "Change password reset successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "401": {
                         "description": "Unauthorized"
@@ -5088,7 +5088,7 @@
                         "description": "User successfully changed password"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "401": {
                         "description": "Unauthorized"
@@ -5137,7 +5137,7 @@
                         "description": "Email verified successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "401": {
                         "description": "Unauthorized"
@@ -5177,7 +5177,7 @@
                         "description": "Re-register successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 }
             }
@@ -5282,7 +5282,7 @@
                         "description": "Update profile successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 },
                 "security": [
@@ -5334,7 +5334,7 @@
                         "description": "Đánh giá sách thành công"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 },
                 "security": [
@@ -5388,7 +5388,7 @@
                         "description": "User profile fetched successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 }
             }
@@ -5433,7 +5433,7 @@
                         "description": "Comment created successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "500": {
                         "description": "Comment created failed"
@@ -5492,7 +5492,7 @@
                         "description": "Comment updated successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "403": {
                         "description": "Bạn không có quyền cập nhật bình luận này"
@@ -5532,7 +5532,7 @@
                         "description": "Comment deleted successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "403": {
                         "description": "Bạn không có quyền xóa bình luận này"
@@ -5660,7 +5660,7 @@
                         "description": "Get comments successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 },
                 "security": [
@@ -5737,7 +5737,7 @@
                         "description": "Get all order successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 },
                 "security": [
@@ -5794,7 +5794,7 @@
                         "description": "Payment order successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 },
                 "security": [
@@ -5936,7 +5936,7 @@
                         "description": "Create order successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "500": {
                         "description": "Create order failed"
@@ -5973,7 +5973,7 @@
                         "description": "Get order successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 },
                 "security": [
@@ -6007,7 +6007,7 @@
                         "description": "Cancel order successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "500": {
                         "description": "Cancel order failed"
@@ -6064,7 +6064,7 @@
                         "description": "Extension all order successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "500": {
                         "description": "Extension all order failed"
@@ -6121,7 +6121,7 @@
                         "description": "Extension all order successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "500": {
                         "description": "Extension all order failed"
@@ -6197,7 +6197,7 @@
                         "description": "Trả từng sách"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "500": {
                         "description": "Lỗi không xác định"
@@ -6253,7 +6253,7 @@
                         "description": "Cancel payment order successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "500": {
                         "description": "Cancel payment order failed"
@@ -6336,7 +6336,7 @@
                         "description": "Get all posts successfully!"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 },
                 "security": [
@@ -6401,7 +6401,7 @@
                         "description": "Create post successfully!"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "500": {
                         "description": "Create post failed!"
@@ -6438,7 +6438,7 @@
                         "description": "Get post successfully!"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "404": {
                         "description": "Post not found"
@@ -6526,7 +6526,7 @@
                         "description": "Update post successfully!"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "404": {
                         "description": "Post not found"
@@ -6566,7 +6566,7 @@
                         "description": "Delete post successfully!"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "404": {
                         "description": "Post not found"
@@ -6631,7 +6631,7 @@
                         "description": "Get all order successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 },
                 "security": [
@@ -6903,7 +6903,7 @@
                         "description": "Get all authors successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 }
             }
@@ -7010,7 +7010,7 @@
                         "description": "Get all books successfully!"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 }
             }
@@ -7092,7 +7092,7 @@
                         "description": "Get all categories successfully!"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 }
             }
@@ -7246,7 +7246,7 @@
                         "description": "Get all posts successfully!"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 }
             }
@@ -7314,7 +7314,7 @@
                         "description": "Get all publish companies successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 }
             }
@@ -7332,7 +7332,7 @@
                         "description": "Get all ShippingMethods successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 }
             }
@@ -7350,7 +7350,7 @@
                         "description": "Get all province successfully!"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 }
             }
@@ -7379,7 +7379,7 @@
                         "description": "Get all district successfully!"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 }
             }
@@ -7408,7 +7408,7 @@
                         "description": "Get all ward successfully!"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 }
             }
@@ -7466,7 +7466,7 @@
                         "description": "Upload image successfully"
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Dữ liệu không hợp lệ"
                     },
                     "500": {
                         "description": "Upload error"

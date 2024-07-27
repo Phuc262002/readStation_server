@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Book;
+use App\Models\BookDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use OpenApi\Attributes as OA;
@@ -473,7 +474,17 @@ class BookController extends Controller
             ], 400);
         }
 
-        $bookdetail = Book::with('bookDetail', 'bookDetail.publishingCompany', 'category', 'author', 'shelve', 'shelve.bookcase', 'shelve.category')->find($id);
+        $bookdetail = Book::with([
+            'bookDetail' => function($query) {
+                $query->where('status', '!=', 'deleted');
+            },
+            'bookDetail.publishingCompany',
+            'category',
+            'author',
+            'shelve',
+            'shelve.bookcase',
+            'shelve.category'
+        ])->find($id);        
         if (!$bookdetail) {
             return response()->json([
                 "status" => false,
@@ -610,6 +621,12 @@ class BookController extends Controller
 
         try {
             $book->delete();
+
+            $bookDetails = BookDetail::where('book_id', $id)->get();
+
+            foreach ($bookDetails as $detail) {
+                $detail->delete();
+            }
         } catch (\Throwable $th) {
             return response()->json([
                 "status" => false,

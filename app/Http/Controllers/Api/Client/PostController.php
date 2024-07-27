@@ -415,7 +415,7 @@ class PostController extends Controller
             "summary" => "string",
             "image" => "string",
             "reason_cancel" => "string|nullable",
-            "status" => "string|in:wating_approve,draft,published,approve_canceled",
+            "status" => "string|in:wating_approve,draft,published,approve_canceled,hidden",
         ], [
             'id.required' => 'ID không được để trống.',
             'id.exists' => 'ID không tồn tại.',
@@ -425,7 +425,7 @@ class PostController extends Controller
             'content.string' => 'Content phải là một chuỗi.',
             'summary.string' => 'Summary phải là một chuỗi.',
             'image.string' => 'Image phải là một chuỗi.',
-            'status.in' => 'Status phải là published, draft, wating_approve, approve_canceled.',
+            'status.in' => 'Status phải là published, draft, wating_approve, approve_canceled, hidden.',
         ]);
 
         if ($validator->fails()) {
