@@ -52,7 +52,7 @@ class Post extends Model
             $query->where('category_id', $category_id);
         }
 
-        if ($status !== 'handle') {
+        if ($status && $status !== 'handle') {
             $query->where('status', $status);
         } elseif ($status === 'handle') {
             $query->whereIn('status', ['wating_approve', 'approve_canceled']);
