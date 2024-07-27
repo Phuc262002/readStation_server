@@ -52,10 +52,12 @@ class Post extends Model
             $query->where('category_id', $category_id);
         }
 
-        if ($status && $status !== 'handle') {
+        if ($status && $status !== 'handle' && $status !== 'client_post') {
             $query->where('status', $status);
         } elseif ($status === 'handle') {
             $query->whereIn('status', ['wating_approve', 'approve_canceled']);
+        } elseif ($status === 'client_post') {
+            $query->where('status', '!=' , 'deleted');
         } else {
             $query->whereIn('status', ['draft', 'published', 'hidden']);
         }

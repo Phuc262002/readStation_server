@@ -237,12 +237,12 @@ class PostController extends Controller
             'page' => 'integer|min:1',
             'pageSize' => 'integer|min:1',
             'search' => 'string',
-            'status' => 'string|in:wating_approve,approve_canceled,draft,published,hidden,deleted',
+            'status' => 'string|in:wating_approve,approve_canceled,draft,published,hidden,deleted,client_post',
             'category_id' => 'integer',
         ], [
             'page.integer' => 'Page phải là số nguyên.',
             'pageSize.integer' => 'PageSize phải là số nguyên.',
-            'status.in' => 'Trạng thái phải là wating_approve, approve_canceled, draft, published, hidden hoặc deleted.',
+            'status.in' => 'Trạng thái phải là wating_approve, approve_canceled, draft, published, hidden, client_post hoặc deleted.',
         ]);
 
         if ($validator->fails()) {
