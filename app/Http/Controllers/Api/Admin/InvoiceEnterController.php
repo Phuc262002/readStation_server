@@ -311,7 +311,6 @@ class InvoiceEnterController extends Controller
                 "data" => InvoiceEnter::with('invoiceEnterDetails')->find($invoiceEnter->id)
             ], 200);
         } catch (\Throwable $th) {
-            dd($invoiceEnter);
             return response()->json([
                 "status" => false,
                 "message" => "Create invoice enter failed!",
