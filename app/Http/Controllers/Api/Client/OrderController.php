@@ -8,6 +8,7 @@ use App\Models\BookDetail;
 use App\Models\Extensions;
 use App\Models\LoanOrderDetails;
 use App\Models\LoanOrders;
+use App\Models\ReturnHistory;
 use App\Models\ShippingMethod;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
@@ -323,6 +324,59 @@ use PayOS\PayOS;
 )]
 
 #[OA\Post(
+    path: '/api/v1/account/orders/return-all/{id}',
+    operationId: 'returnAllOrder',
+    tags: ['Account / Orders'],
+    summary: 'Return all order',
+    description: 'Return all order',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    parameters: [
+        new OA\Parameter(
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Id của order',
+            schema: new OA\Schema(type: 'integer')
+        ),
+    ],
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            required: ['return_method', 'pickup_info'],
+            properties: [
+                new OA\Property(property: 'return_method', type: 'string', description: 'Phương thức trả sách', default: 'enum => pickup | library'),
+                new OA\Property(
+                    property: 'pickup_info',
+                    type: 'object',
+                    description: 'Thông tin lấy sách',
+                    properties: [
+                        new OA\Property(property: 'fullname', type: 'string', description: 'Họ tên'),
+                        new OA\Property(property: 'phone', type: 'string', description: 'Số điện thoại'),
+                        new OA\Property(property: 'address', type: 'string', description: 'Địa chỉ'),
+                    ]
+                ),
+            ]
+        )
+    ),
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Return all order successfully'
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Dữ liệu không hợp lệ',
+        ),
+        new OA\Response(
+            response: 500,
+            description: 'Return all order failed',
+        ),
+    ]
+)]
+
+#[OA\Post(
     path: '/api/v1/account/orders/return-each-book/{id}',
     operationId: 'returnEachBook',
     tags: ['Account / Orders'],
@@ -376,11 +430,11 @@ use PayOS\PayOS;
 )]
 
 #[OA\Post(
-    path: '/api/v1/account/orders/cancel-payment/{id}',
-    operationId: 'cancelPaymentOrder',
+    path: '/api/v1/account/orders/update-payment/{id}',
+    operationId: 'updatePaymentOrder',
     tags: ['Account / Orders'],
-    summary: 'Cancel payment order',
-    description: 'Cancel payment order',
+    summary: 'Update payment order',
+    description: 'Update payment order',
     security: [
         ['bearerAuth' => []]
     ],
@@ -389,7 +443,8 @@ use PayOS\PayOS;
         content: new OA\JsonContent(
             required: ['body'],
             properties: [
-                new OA\Property(property: 'body', type: 'string', description: 'Lý do hủy đơn hàng'),
+                new OA\Property(property: 'body', type: 'string', description: 'Thông tin giao dịch'),
+                new OA\Property(property: 'status', type: 'string', default: 'enum => success | canceled', description: 'Trạng thái giao dịch'),
             ]
         )
     ),
@@ -904,8 +959,8 @@ class OrderController extends Controller
             if ($order->status !== 'pending' && $order->status !== 'wating_payment') {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Cancel order failed',
-                    'errors' => 'Không thể hủy đơn hàng'
+                    'message' => 'Update payment order failed',
+                    'errors' => 'Không thể cập nhật trạng thái đơn hàng'
                 ]);
             }
 
@@ -942,6 +997,153 @@ class OrderController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'Cancel order failed',
+                'errors' => $th->getMessage()
+            ]);
+        }
+    }
+
+    public function returnAllOrder(Request $request, $order_id)
+    {
+        $validator = Validator::make(array_merge(
+            $request->all(),
+            ['order_id' => $order_id]
+        ), [
+            'order_id' => 'required|integer|exists:loan_orders,id',
+            'return_method' => 'required|string|in:library,pickup',
+        ], [
+            'order_id.required' => 'Trường id đơn hàng là bắt buộc',
+            'order_id.integer' => 'Trường id đơn hàng phải là kiểu số',
+            'order_id.exists' => 'Id đơn hàng không tồn tại',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                "status" => false,
+                "message" => "Dữ liệu không hợp lệ",
+                "errors" => $validator->errors()
+            ], 400);
+        }
+        try {
+
+            $order = LoanOrders::find($order_id);
+            $orderDetails = LoanOrderDetails::where('loan_order_id', $order_id)->get();
+
+            if ($order->status != 'active' && $order->status != 'extended') {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Đơn hàng không ở trạng thái đang mượn',
+                ], 400);
+            }
+
+            if ($request->return_method == 'pickup') {
+                $validator2 = Validator::make($request->all(), [
+                    'shipping_method_id' => 'required|integer|exists:shipping_methods,id',
+                    'pickup_info' => 'required|array',
+                    'pickup_info.fullname' => 'required|string',
+                    'pickup_info.phone' => 'required|regex:/^(0[35789])[0-9]{8}$/',
+                    'pickup_info.address' => 'required|string',
+                ], [
+                    'shipping_method_id.required' => 'Trường phương thức vận chuyển là bắt buộc',
+                    'shipping_method_id.integer' => 'Trường phương thức vận chuyển phải là kiểu số',
+                    'shipping_method_id.exists' => 'Id phương thức vận chuyển không tồn tại',
+                    'pickup_info.required' => 'Trường thông tin nhận sách là bắt buộc',
+                    'pickup_info.array' => 'Trường thông tin nhận sách phải là kiểu mảng',
+                    'pickup_info.fullname.required' => 'Trường họ tên là bắt buộc',
+                    'pickup_info.phone.required' => 'Trường số điện thoại là bắt buộc',
+                    'pickup_info.address.required' => 'Trường địa chỉ là bắt buộc',
+                    'pickup_info.fullname.string' => 'Trường họ tên phải là kiểu chuỗi',
+                    'pickup_info.phone.regex' => 'Trường số điện thoại không hợp lệ',
+                    'pickup_info.address.string' => 'Trường địa chỉ phải là kiểu chuỗi',
+                ]);
+
+                if ($validator2->fails()) {
+                    return response()->json([
+                        "status" => false,
+                        "message" => "Dữ liệu không hợp lệ",
+                        "errors" => $validator2->errors()
+                    ], 400);
+                }
+
+                $transaction_code = intval(substr(strtotime(now()) . rand(1000, 9999), -9));
+                $shipping_fee = ShippingMethod::find($request->shipping_method_id)->fee;
+
+                $transaction = Transaction::create([
+                    'user_id' => auth()->user()->id,
+                    'transaction_code' => $transaction_code,
+                    'portal' => 'payos',
+                    'loan_order_id' => $order->id,
+                    'transaction_type' => 'payment',
+                    'transaction_method' => 'online',
+                    'amount' => $shipping_fee,
+                    'description' => 'Thanh toán tiền ship ' . $order->order_code,
+                ]);
+                $body = $request->input();
+                $body["amount"] = intval($shipping_fee);
+                $body["orderCode"] = intval($transaction->transaction_code);
+                $body["description"] =  $order->order_code;
+                $body["expiredAt"] = now()->addMinutes(30)->getTimestamp();
+                $body["returnUrl"] = env('CLIENT_URL') . "/payment/result?portal=payos&transaction_type=extended&description=" . $transaction->transaction_code;
+                $body["cancelUrl"] = env('CLIENT_URL') . "/payment/result?portal=payos&transaction_type=extended&description=" . $transaction->transaction_code;
+                $payOS = new PayOS($this->payOSClientId, $this->payOSApiKey, $this->payOSChecksumKey);
+
+                $response = $payOS->createPaymentLink($body);
+
+                $transaction->update([
+                    'status' => 'pending',
+                    'expired_at' => now()->addMinutes(30),
+                    'extra_info' => $response
+                ]);
+
+                $order->update([
+                    'status' => 'returning'
+                ]);
+
+                foreach ($orderDetails as $orderDetail) {
+                    $orderDetail->update([
+                        'status' => 'returning'
+                    ]);
+
+                    $orderDetail->createReturnHistory([
+                        'return_date' => now(),
+                        'status' => 'pending'
+                    ]);
+                }
+
+                $order->update([
+                    'status' => 'returning'
+                ]);
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Return all order successfully',
+                    'data' => $order
+                ]);
+            } else {
+                $order->update([
+                    'status' => 'returning'
+                ]);
+
+                foreach ($orderDetails as $orderDetail) {
+                    $orderDetail->update([
+                        'status' => 'returning'
+                    ]);
+
+                    $orderDetail->createReturnHistory([
+                        'return_date' => now(),
+                        'status' => 'pending'
+                    ]);
+                }
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Return all order successfully',
+                    'data' => $order
+                ]);
+            }
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Return all order failed',
                 'errors' => $th->getMessage()
             ]);
         }
@@ -1018,10 +1220,10 @@ class OrderController extends Controller
                     'transaction_code' => $transaction_code,
                     'portal' => 'payos',
                     'loan_order_id' => $orderDetail->loan_order_id,
-                    'transaction_type' => 'extend',
+                    'transaction_type' => 'payment',
                     'transaction_method' => 'online',
                     'amount' => $shipping_fee,
-                    'description' => 'Thanh toán gia hạn ' . $order->order_code,
+                    'description' => 'Thanh toán tiền ship ' . $order->order_code,
                 ]);
                 $body = $request->input();
                 $body["amount"] = intval($shipping_fee);
@@ -1084,17 +1286,22 @@ class OrderController extends Controller
         }
     }
 
-    public function cancelPayment(Request $request, $id)
+    public function updatePayment(Request $request, $id)
     {
         $validator = Validator::make(array_merge(
             $request->all(),
             ['transaction_code' => $id]
         ), [
             'transaction_code' => 'required|exists:transactions,transaction_code',
+            'status' => 'required|string|in:success,canceled',
             'body' => 'required|array',
         ], [
             'transaction_code.required' => 'Trường id là bắt buộc',
-            'body.required' => 'Trường lý do hủy đơn hàng là bắt buộc',
+            'body.required' => 'Trường nội dung hủy thanh toán là bắt buộc',
+            'transaction_code.exists' => 'Id không tồn tại',
+            'status.required' => 'Trường trạng thái thanh toán là bắt buộc',
+            'status.string' => 'Trường trạng thái thanh toán phải là kiểu chuỗi',
+            'status.in' => 'Trường trạng thái thanh toán phải là success hoặc canceled',
         ]);
 
         if ($validator->fails()) {
@@ -1111,42 +1318,64 @@ class OrderController extends Controller
             if ($transaction->status !== 'pending') {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Cancel payment order failed',
+                    'message' => 'Update payment failed',
                     'errors' => 'Không thể hủy thanh toán'
                 ]);
             }
-
-            $transaction->update([
-                'status' => 'canceled',
-                'extra_info' => [
-                    $transaction->extra_info,
-                    $request->body
-                ]
-            ]);
-
             $order = LoanOrders::find($transaction->loan_order_id);
 
-            if ($order) {
-                $order->update([
-                    'status' => 'canceled'
+            if ($request->status === 'canceled') {
+                $transaction->update([
+                    'status' => 'canceled',
+                    'extra_info' => [
+                        $transaction->extra_info,
+                        $request->body
+                    ]
                 ]);
 
-                foreach ($order->loanOrderDetails as $orderDetail) {
-                    $orderDetail->update([
+
+                if ($order) {
+                    $order->update([
                         'status' => 'canceled'
                     ]);
+
+                    foreach ($order->loanOrderDetails as $orderDetail) {
+                        $orderDetail->update([
+                            'status' => 'canceled'
+                        ]);
+                    }
+                }
+            } else {
+                $transaction->update([
+                    'status' => 'completed',
+                    'extra_info' => [
+                        $transaction->extra_info,
+                        $request->body
+                    ]
+                ]);
+
+                if ($order) {
+                    $order->update([
+                        'status' => 'active'
+                    ]);
+
+                    foreach ($order->loanOrderDetails as $orderDetail) {
+                        $orderDetail->update([
+                            'status' => 'active'
+                        ]);
+                    }
                 }
             }
 
             return response()->json([
                 'status' => true,
-                'message' => 'Cancel payment order successfully',
+                'message' => 'Update payment successfully',
                 'data' => $transaction
             ]);
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
-                'message' => 'Cancel payment order failed',
+                'message' => 'Update payment failed',
                 'errors' => $th->getMessage()
             ]);
         }

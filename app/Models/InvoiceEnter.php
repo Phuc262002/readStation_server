@@ -32,9 +32,8 @@ class InvoiceEnter extends Model
         parent::boot();
 
         static::creating(function ($model) {
-            if (empty($model->invoice_code)) {
-                $model->invoice_code = strtoupper(substr(md5(uniqid()), 0, 10));
-            }
+            $model->invoice_code = strtoupper(substr(md5(uniqid()), 0, 10));
+            $model->invoice_date = now();
         });
     }
 

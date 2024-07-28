@@ -312,17 +312,17 @@ class BookController extends Controller
         $book->average_rate = $averageRateRounded;
         $book->rating_total = $bookReviews->count();
 
-        $rating_comments = $bookReviews->get()->map(function ($review) {
-            return array_merge(
-                $review->only(
-                    ['id', 'rating', 'review_text', 'review_date'],
-                ),
-                ['user' => $review->user->only(['id', 'fullname', 'avatar'])]
-            );
-        });
+        // $rating_comments = $bookReviews->get()->map(function ($review) {
+        //     return array_merge(
+        //         $review->only(
+        //             ['id', 'rating', 'review_text', 'review_date'],
+        //         ),
+        //         ['user' => $review->user->only(['id', 'fullname', 'avatar'])]
+        //     );
+        // });
 
         $book->order_count = $book->order_details->where('status_od', 'completed')->count();
-        $book->rating_comments = $rating_comments;
+        // $book->rating_comments = $rating_comments;
 
         unset($book->order_details);
 

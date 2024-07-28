@@ -236,6 +236,7 @@ class DashboardController extends Controller
         $shelve = Shelve::count();
         $book = BookDetail::count();
         $post = Post::count();
+        $userVerified = User::where('email_verified_at', '!=', null)->count();
 
         $serviceFeeSum = LoanOrderDetails::where('status', 'completed')->sum('service_fee');
         $fineFeeSum = LoanOrderDetails::where('status', 'completed')->sum('fine_amount');
@@ -248,6 +249,7 @@ class DashboardController extends Controller
             'status' => true,
             'data' => [
                 'revenue' => $revenue,
+                'userVerified' => $userVerified,
                 'user' => $user,
                 'invoiceEnter' => $invoiceEnter,
                 'bookcase' => $bookcase,

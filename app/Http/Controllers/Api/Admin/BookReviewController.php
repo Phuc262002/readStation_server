@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\BookDetail;
 use App\Models\BookReview;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -44,6 +45,36 @@ use OpenApi\Attributes as OA;
         new OA\Response(
             response: 200,
             description: 'Get all bookReviews successfully!',
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Dữ liệu không hợp lệ',
+        ),
+    ],
+)]
+
+#[OA\Get(
+    path: '/api/v1/admin/book-reviews/{book_details_id}',
+    tags: ['Admin / Book Review'],
+    operationId: 'bookReviewShow',
+    summary: 'Get bookReview by book_details_id',
+    description: 'Get bookReview by book_details_id',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    parameters: [
+        new OA\Parameter(
+            name: 'book_details_id',
+            in: 'path',
+            required: true,
+            description: 'ID của book_details',
+            schema: new OA\Schema(type: 'integer')
+        ),
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Get bookReview successfully!',
         ),
         new OA\Response(
             response: 400,
@@ -119,51 +150,46 @@ class BookReviewController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function show(BookReview $bookReview, $book_details_id)
     {
-        //
-    }
+        $validator = Validator::make(['book_details_id' => $book_details_id], [
+            'book_details_id' => 'required|exists:book_details,id',
+        ], [
+            'book_details_id.required' => 'ID không được để trống.',
+            'book_details_id.exists' => 'ID không tồn tại.',
+        ]);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        if ($validator->fails()) {
+            return response()->json([
+                "status" => false,
+                "message" => "Dữ liệu không hợp lệ",
+                "errors" => $validator->errors()
+            ], 400);
+        }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(BookReview $bookReview)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(BookReview $bookReview)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, BookReview $bookReview)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(BookReview $bookReview)
-    {
-        //
+        try {
+            $bookReview = BookReview::with('user')->where('book_details_id', $book_details_id)->get();
+            $book_details_id = BookDetail::with([
+                'book',
+                'book.author',
+                'book.category',
+                'book.shelve',
+                'book.shelve.bookcase',
+            ])->find($book_details_id);
+            return response()->json([
+                "status" => true,
+                "message" => "Get bookReview successfully!",
+                "data" => [
+                    "bookReview" => $bookReview,
+                    "book_details" => $book_details_id
+                ]
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => false,
+                "message" => "Get bookReview failed!",
+                "errors" => $th->getMessage()
+            ], 400);
+        }
     }
 }

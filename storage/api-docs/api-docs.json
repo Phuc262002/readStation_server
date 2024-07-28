@@ -1187,6 +1187,40 @@
                 ]
             }
         },
+        "/api/v1/admin/book-reviews/{book_details_id}": {
+            "get": {
+                "tags": [
+                    "Admin / Book Review"
+                ],
+                "summary": "Get bookReview by book_details_id",
+                "description": "Get bookReview by book_details_id",
+                "operationId": "bookReviewShow",
+                "parameters": [
+                    {
+                        "name": "book_details_id",
+                        "in": "path",
+                        "description": "ID của book_details",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get bookReview successfully!"
+                    },
+                    "400": {
+                        "description": "Dữ liệu không hợp lệ"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/admin/bookcases": {
             "get": {
                 "tags": [
@@ -6134,6 +6168,82 @@
                 ]
             }
         },
+        "/api/v1/account/orders/return-all/{id}": {
+            "post": {
+                "tags": [
+                    "Account / Orders"
+                ],
+                "summary": "Return all order",
+                "description": "Return all order",
+                "operationId": "returnAllOrder",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id của order",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "return_method",
+                                    "pickup_info"
+                                ],
+                                "properties": {
+                                    "return_method": {
+                                        "description": "Phương thức trả sách",
+                                        "type": "string",
+                                        "default": "enum => pickup | library"
+                                    },
+                                    "pickup_info": {
+                                        "description": "Thông tin lấy sách",
+                                        "properties": {
+                                            "fullname": {
+                                                "description": "Họ tên",
+                                                "type": "string"
+                                            },
+                                            "phone": {
+                                                "description": "Số điện thoại",
+                                                "type": "string"
+                                            },
+                                            "address": {
+                                                "description": "Địa chỉ",
+                                                "type": "string"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Return all order successfully"
+                    },
+                    "400": {
+                        "description": "Dữ liệu không hợp lệ"
+                    },
+                    "500": {
+                        "description": "Return all order failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/account/orders/return-each-book/{id}": {
             "post": {
                 "tags": [
@@ -6210,14 +6320,14 @@
                 ]
             }
         },
-        "/api/v1/account/orders/cancel-payment/{id}": {
+        "/api/v1/account/orders/update-payment/{id}": {
             "post": {
                 "tags": [
                     "Account / Orders"
                 ],
-                "summary": "Cancel payment order",
-                "description": "Cancel payment order",
-                "operationId": "cancelPaymentOrder",
+                "summary": "Update payment order",
+                "description": "Update payment order",
+                "operationId": "updatePaymentOrder",
                 "parameters": [
                     {
                         "name": "id",
@@ -6239,8 +6349,13 @@
                                 ],
                                 "properties": {
                                     "body": {
-                                        "description": "Lý do hủy đơn hàng",
+                                        "description": "Thông tin giao dịch",
                                         "type": "string"
+                                    },
+                                    "status": {
+                                        "description": "Trạng thái giao dịch",
+                                        "type": "string",
+                                        "default": "enum => success | canceled"
                                     }
                                 },
                                 "type": "object"
@@ -7040,6 +7155,88 @@
                     },
                     "404": {
                         "description": "Book not found!"
+                    }
+                }
+            }
+        },
+        "/api/v1/public/book-reviews/{book_details_id}": {
+            "get": {
+                "tags": [
+                    "Public / Book Review"
+                ],
+                "summary": "Get all book reviews public",
+                "description": "Get all book reviews",
+                "operationId": "getAllBookReviewsPublic",
+                "parameters": [
+                    {
+                        "name": "book_details_id",
+                        "in": "path",
+                        "description": "ID của sách chi tiết",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Số trang hiện tại",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "pageSize",
+                        "in": "query",
+                        "description": "Số lượng mục trên mỗi trang",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "rating",
+                        "in": "query",
+                        "description": "Đánh giá",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "enum": [
+                                1,
+                                2,
+                                3,
+                                4,
+                                5
+                            ]
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sắp xếp",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "desc",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get all bookReviews successfully"
+                    },
+                    "400": {
+                        "description": "Lỗi truyền dữ liệu"
+                    },
+                    "500": {
+                        "description": "Có lỗi xảy ra, vui lòng thử lại sau"
                     }
                 }
             }

@@ -35,6 +35,7 @@ use App\Http\Controllers\Api\Client\VerificationRequestController as ClientVerif
 use App\Http\Controllers\Api\PayOS\CheckCCCDController;
 use App\Http\Controllers\Api\Public\AuthorController;
 use App\Http\Controllers\Api\Public\BookController;
+use App\Http\Controllers\Api\Public\BookReviewController as PublicBookReviewController;
 use App\Http\Controllers\Api\Public\CategoryController;
 use App\Http\Controllers\Api\Public\HomeController as PublicHomeController;
 use App\Http\Controllers\Api\Public\PostController as PublicPostController;
@@ -81,7 +82,12 @@ Route::group([
         Route::put('/update-profile', [AccountController::class, 'updateProfile']);
 
         Route::get('/get-posts', [PostController::class, 'getPostAccount']);
-        Route::post('/book-reviews/create', [BookReviewController::class, 'store']);
+
+        Route::group([
+            "prefix" => "book-reviews"
+        ], function () {
+            Route::post('/create', [BookReviewController::class, 'store']);
+        });
 
         Route::group([
             "prefix" => "comments"
@@ -98,9 +104,10 @@ Route::group([
             Route::post('/create', [OrderController::class, 'store']);
             Route::put('/cancel/{id}', [OrderController::class, 'cancelOrder']);
             Route::post('/payment/{id}', [OrderController::class, 'paymentOrder']);
-            Route::post('/cancel-payment/{id}', [OrderController::class, 'cancelPayment']);
+            Route::post('/update-payment/{id}', [OrderController::class, 'updatePayment']);
             Route::post('/extension-all/{id}', [OrderController::class, 'extensionAllOrder']);
             Route::post('/extension-each-book/{id}', [OrderController::class, 'extensionEachBook']);
+            Route::post('/return-all/{id}', [OrderController::class, 'returnAllOrder']);
             Route::post('/return-each-book/{id}', [OrderController::class, 'returnEachBook']);
         });
 
@@ -239,6 +246,7 @@ Route::group([
             "prefix" => "book-reviews",
         ], function () {
             Route::get('/', [AdminBookReviewController::class, 'index']);
+            Route::get('/{book_details_id}', [AdminBookReviewController::class, 'show']);
         });
 
         Route::group([
@@ -323,6 +331,12 @@ Route::group([
             Route::get('/get-recommend-book', [PublicHomeController::class, 'bookRecommend']);
             Route::get('/get-book-lastest', [PublicHomeController::class, 'bookLatest']);
             Route::get('/get-statistic', [PublicHomeController::class, 'statisticHome']);
+        });
+
+        Route::group([
+            "prefix" => "book-reviews"
+        ], function () {
+            Route::get('/{book_details_id}', [PublicBookReviewController::class, 'index']);
         });
 
         Route::group([

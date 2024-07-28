@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Public;
 
+use App\Http\Controllers\Api\Client\CommentController;
 use App\Http\Controllers\Controller;
 use App\Models\Post;
 use Illuminate\Http\Request;
@@ -140,6 +141,7 @@ class PostController extends Controller
             unset($post->content);
             return array_merge($post->toArray(), [
                 "user" => $post->user->only(['fullname', 'avatar', 'gender', 'job', 'story']),
+                "countComments" => $post->comments->count(),
             ]);
         });
 
@@ -179,7 +181,7 @@ class PostController extends Controller
                 "errors" => $validator->errors()
             ], 400);
         }
-        $post = Post::with('user', 'category')->where('slug', $slug)->where('status', 'published')->first();
+        $post = Post::with('user', 'category', 'comments')->where('slug', $slug)->where('status', 'published')->first();
 
         if (!$post) {
             return response()->json([
@@ -200,6 +202,7 @@ class PostController extends Controller
             "message" => "Get post successfully!",
             "data" => array_merge($post->toArray(), [
                 "user" => $post->user->only(['fullname', 'avatar', 'gender', 'job', 'story']),
+                "countComments" => $post->comments->count(),
             ])
         ], 200);
     }

@@ -243,12 +243,10 @@ class InvoiceEnterController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'invoice_code' => "nullable|string",
-            'invoice_name' => "required",
+            'invoice_name' => "required|string",
             'total' => "required",
             'invoice_description' => "required|string",
             'supplier_id' => "required",
-            'invoice_date' => "required|date",
             'status' => "required|string|in:draft,active",
             'invoice_enter_detail' => "required|array",
             'invoice_enter_detail.*.book_detail_id' => "required|exists:book_details,id",
