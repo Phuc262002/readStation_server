@@ -247,6 +247,7 @@ Route::group([
         ], function () {
             Route::get('/', [AdminBookReviewController::class, 'index']);
             Route::get('/{book_details_id}', [AdminBookReviewController::class, 'show']);
+            Route::put('/{id}', [AdminBookReviewController::class, 'update']);
         });
 
         Route::group([

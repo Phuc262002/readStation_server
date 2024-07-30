@@ -1351,12 +1351,12 @@ class OrderController extends Controller
 
                 if ($order) {
                     $order->update([
-                        'status' => 'active'
+                        'status' => 'approved'
                     ]);
 
                     foreach ($order->loanOrderDetails as $orderDetail) {
                         $orderDetail->update([
-                            'status' => 'active'
+                            'status' => 'pending'
                         ]);
                     }
                 }

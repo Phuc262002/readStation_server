@@ -40,6 +40,20 @@ use OpenApi\Attributes as OA;
             description: 'Đánh giá',
             schema: new OA\Schema(type: 'integer', enum: [1, 2, 3, 4, 5])
         ),
+        new OA\Parameter(
+            name: 'status',
+            in: 'query',
+            required: false,
+            description: 'Trạng thái',
+            schema: new OA\Schema(type: 'string', enum: ['active', 'inactive'])
+        ),
+        new OA\Parameter(
+            name: 'sort',
+            in: 'query',
+            required: false,
+            description: 'Sắp xếp',
+            schema: new OA\Schema(type: 'string', enum: ['asc', 'desc'], default: 'desc')
+        ),
     ],
     responses: [
         new OA\Response(
@@ -70,11 +84,86 @@ use OpenApi\Attributes as OA;
             description: 'ID của book_details',
             schema: new OA\Schema(type: 'integer')
         ),
+        new OA\Parameter(
+            name: 'page',
+            in: 'query',
+            required: false,
+            description: 'Số trang hiện tại',
+            schema: new OA\Schema(type: 'integer', default: 1)
+        ),
+        new OA\Parameter(
+            name: 'pageSize',
+            in: 'query',
+            required: false,
+            description: 'Số lượng mục trên mỗi trang',
+            schema: new OA\Schema(type: 'integer', default: 10)
+        ),
+        new OA\Parameter(
+            name: 'rating',
+            in: 'query',
+            required: false,
+            description: 'Đánh giá',
+            schema: new OA\Schema(type: 'integer', enum: [1, 2, 3, 4, 5])
+        ),
+        new OA\Parameter(
+            name: 'status',
+            in: 'query',
+            required: false,
+            description: 'Trạng thái',
+            schema: new OA\Schema(type: 'string', enum: ['active', 'inactive'])
+        ),
+        new OA\Parameter(
+            name: 'sort',
+            in: 'query',
+            required: false,
+            description: 'Sắp xếp',
+            schema: new OA\Schema(type: 'string', enum: ['asc', 'desc'], default: 'desc')
+        ),
     ],
     responses: [
         new OA\Response(
             response: 200,
             description: 'Get bookReview successfully!',
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Dữ liệu không hợp lệ',
+        ),
+    ],
+)]
+
+#[OA\Put(
+    path: '/api/v1/admin/book-reviews/{id}',
+    tags: ['Admin / Book Review'],
+    operationId: 'bookReviewUpdate',
+    summary: 'Update bookReview',
+    description: 'Update bookReview',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    parameters: [
+        new OA\Parameter(
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'ID của bookReview',
+            schema: new OA\Schema(type: 'integer')
+        ),
+
+    ],
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            required: ['status'],
+            properties: [
+                new OA\Property(property: 'status', type: 'string', enum: ['active', 'inactive'], description: 'Trạng thái', default: 'enum => active | inactive')
+            ]
+        )
+    ),
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Update bookReview successfully!',
         ),
         new OA\Response(
             response: 400,
@@ -94,6 +183,8 @@ class BookReviewController extends Controller
             'page' => 'integer|min:1',
             'pageSize' => 'integer|min:1',
             'rating' => 'integer|min:1|max:5',
+            'status' => 'in:active,inactive',
+            'sort' => 'in:asc,desc',
         ], [
             'page.integer' => 'Trang phải là số nguyên.',
             'page.min' => 'Trang phải lớn hơn hoặc bằng 1.',
@@ -101,6 +192,9 @@ class BookReviewController extends Controller
             'pageSize.min' => 'Kích thước trang phải lớn hơn hoặc bằng 1.',
             'rating.integer' => 'Đánh giá phải là số nguyên.',
             'rating.min' => 'Đánh giá phải lớn hơn hoặc bằng 1.',
+            'rating.max' => 'Đánh giá phải nhỏ hơn hoặc bằng 5.',
+            'status.in' => 'Trạng thái phải là active hoặc inactive.',
+            'sort.in' => 'Sắp xếp phải là asc hoặc desc.',
         ]);
 
         if ($validator->fails()) {
@@ -115,6 +209,8 @@ class BookReviewController extends Controller
         $page = $request->input('page', 1);
         $pageSize = $request->input('pageSize', 10);
         $rating = $request->input('rating');
+        $status = $request->input('status');
+        $sort = $request->input('sort', 'desc');
 
         // Tạo query ban đầu
         $query = BookReview::query()->with([
@@ -133,8 +229,13 @@ class BookReviewController extends Controller
             $query->where('rating', $rating);
         }
 
+        // Áp dụng bộ lọc theo status
+        if ($status) {
+            $query->where('status', $request->status);
+        }
+
         // Thực hiện phân trang
-        $bookReviews = $query->orderBy('created_at', 'desc')->paginate($pageSize, ['*'], 'page', $page);
+        $bookReviews = $query->orderBy('created_at', $sort)->paginate($pageSize, ['*'], 'page', $page);
 
         return response()->json([
             "status" => true,
@@ -150,13 +251,27 @@ class BookReviewController extends Controller
         ]);
     }
 
-    public function show(BookReview $bookReview, $book_details_id)
+    public function show(Request $request, $book_details_id)
     {
         $validator = Validator::make(['book_details_id' => $book_details_id], [
             'book_details_id' => 'required|exists:book_details,id',
+            'page' => 'integer|min:1',
+            'pageSize' => 'integer|min:1',
+            'rating' => 'integer|min:1|max:5',
+            'status' => 'in:active,inactive',
+            'sort' => 'in:asc,desc',
         ], [
             'book_details_id.required' => 'ID không được để trống.',
             'book_details_id.exists' => 'ID không tồn tại.',
+            'page.integer' => 'Trang phải là số nguyên.',
+            'page.min' => 'Trang phải lớn hơn hoặc bằng 1.',
+            'pageSize.integer' => 'Kích thước trang phải là số nguyên.',
+            'pageSize.min' => 'Kích thước trang phải lớn hơn hoặc bằng 1.',
+            'rating.integer' => 'Đánh giá phải là số nguyên.',
+            'rating.min' => 'Đánh giá phải lớn hơn hoặc bằng 1.',
+            'rating.max' => 'Đánh giá phải nhỏ hơn hoặc bằng 5.',
+            'status.in' => 'Trạng thái phải là active hoặc inactive.',
+            'sort.in' => 'Sắp xếp phải là asc hoặc desc.',
         ]);
 
         if ($validator->fails()) {
@@ -167,8 +282,35 @@ class BookReviewController extends Controller
             ], 400);
         }
 
+        $page = $request->input('page', 1);
+        $pageSize = $request->input('pageSize', 10);
+        $rating = $request->input('rating');
+        $status = $request->input('status');
+        $sort = $request->input('sort', 'desc');
+
         try {
-            $bookReview = BookReview::with('user')->where('book_details_id', $book_details_id)->get();
+            $query = BookReview::query()->with([
+                'bookDetail',
+                'bookDetail.book',
+                'loanOrderDetail',
+                'user'
+            ])->where('book_details_id', $book_details_id);
+
+            // Áp dụng bộ lọc theo type
+            $totalItems = $query->count();
+
+            if ($rating) {
+                $query->where('rating', $rating);
+            }
+
+            // Áp dụng bộ lọc theo status
+            if ($status) {
+                $query->where('status', $request->status);
+            }
+
+            // Thực hiện phân trang
+            $bookReviews = $query->orderBy('created_at', $sort)->paginate($pageSize, ['*'], 'page', $page);
+
             $book_details_id = BookDetail::with([
                 'book',
                 'book.author',
@@ -180,7 +322,12 @@ class BookReviewController extends Controller
                 "status" => true,
                 "message" => "Get bookReview successfully!",
                 "data" => [
-                    "bookReview" => $bookReview,
+                    "bookReviews" => $bookReviews->items(),
+                    "page" => $bookReviews->currentPage(),
+                    "pageSize" => $bookReviews->perPage(),
+                    "totalPages" => $bookReviews->lastPage(),
+                    "totalResults" => $bookReviews->total(),
+                    "total" => $totalItems,
                     "book_details" => $book_details_id
                 ]
             ]);
@@ -188,6 +335,47 @@ class BookReviewController extends Controller
             return response()->json([
                 "status" => false,
                 "message" => "Get bookReview failed!",
+                "errors" => $th->getMessage()
+            ], 400);
+        }
+    }
+
+    public function update(Request $request, $id)
+    {
+        $validator = Validator::make(array_merge(
+            $request->all(),
+            ['id' => $id]
+        ), [
+            'id' => 'required|exists:book_reviews,id',
+            'status' => 'required|in:active,inactive',
+        ], [
+            'id.required' => 'ID không được để trống.',
+            'id.exists' => 'ID không tồn tại.',
+            'status.required' => 'Trạng thái không được để trống.',
+            'status.in' => 'Trạng thái phải là active hoặc inactive.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                "status" => false,
+                "message" => "Dữ liệu không hợp lệ",
+                "errors" => $validator->errors()
+            ], 400);
+        }
+
+        try {
+            $bookReview = BookReview::find($id);
+            $bookReview->status = $request->status;
+            $bookReview->save();
+            return response()->json([
+                "status" => true,
+                "message" => "Update bookReview successfully!",
+                "data" => $bookReview
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => false,
+                "message" => "Update bookReview failed!",
                 "errors" => $th->getMessage()
             ], 400);
         }
