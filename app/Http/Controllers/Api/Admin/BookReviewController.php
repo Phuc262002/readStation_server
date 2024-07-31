@@ -311,13 +311,6 @@ class BookReviewController extends Controller
             // Thực hiện phân trang
             $bookReviews = $query->orderBy('created_at', $sort)->paginate($pageSize, ['*'], 'page', $page);
 
-            $book_details_id = BookDetail::with([
-                'book',
-                'book.author',
-                'book.category',
-                'book.shelve',
-                'book.shelve.bookcase',
-            ])->find($book_details_id);
             return response()->json([
                 "status" => true,
                 "message" => "Get bookReview successfully!",
@@ -328,7 +321,6 @@ class BookReviewController extends Controller
                     "totalPages" => $bookReviews->lastPage(),
                     "totalResults" => $bookReviews->total(),
                     "total" => $totalItems,
-                    "book_details" => $book_details_id
                 ]
             ]);
         } catch (\Throwable $th) {
