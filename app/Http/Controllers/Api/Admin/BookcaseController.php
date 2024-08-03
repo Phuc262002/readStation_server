@@ -231,7 +231,7 @@ class BookcaseController extends Controller
             'pageSize.integer' => 'Kích thước trang phải là số nguyên.',
             'pageSize.min' => 'Kích thước trang phải lớn hơn hoặc bằng 1.',
             'search.string' => 'Tìm kiếm phải là chuỗi.',
-            'status.in' => 'Status phải là active, inactive hoặc deleted'
+            'status.in' => 'Trạng thái phải là hoạt động, ẩn hoặc đã xóa.'
         ]);
 
         if ($validator->fails()) {
@@ -303,13 +303,13 @@ class BookcaseController extends Controller
 
             return response()->json([
                 "status" => true,
-                "message" => "Create bookcase successfully!",
+                "message" => "Thêm kệ sách thành công!",
                 "data" => $bookcase
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
                 "status" => false,
-                "message" => "Create bookcase failed!",
+                "message" => "Thêm kệ sách thất bại",
                 "errors" => $th->getMessage()
             ], 500);
         }
@@ -364,7 +364,7 @@ class BookcaseController extends Controller
             'id.min' => 'Id phải lớn hơn hoặc bằng 1.',
             'bookcase_code.string' => 'Mã kệ sách phải là chuỗi.',
             'description.string' => 'Mô tả phải là chuỗi.',
-            'status.in' => 'Status phải là active, inactive hoặc deleted'
+            'status.in' => 'Trạng thái phải là hoạt động, ẩn hoặc đã xóa.'
         ]);
 
         if ($validator->fails()) {
