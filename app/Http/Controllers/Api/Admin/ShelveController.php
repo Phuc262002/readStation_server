@@ -309,9 +309,9 @@ class ShelveController extends Controller
             'name' => 'required|string',
             'description' => 'nullable|string',
         ], [
-            'bookcase_id.required' => 'Bookcase_id không được để trống.',
-            'bookshelf_code.string' => 'Bookshelf_code phải là chuỗi.',
-            'category_id.required' => 'Category_id không được để trống.',
+            'bookcase_id.required' => 'Tủ sách không được để trống.',
+            'bookshelf_code.string' => 'Mã kệ phải là chuỗi.',
+            'category_id.required' => 'Danh mục không được để trống.',
             'name.required' => 'Tên kệ không được để trống.',
         ]);
 
