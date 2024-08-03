@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Client;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\VerificationRequest;
 use Illuminate\Support\Facades\Validator;
 use OpenApi\Attributes as OA;
 
@@ -71,8 +72,12 @@ class AccountController extends Controller
 {
     public function userProfile()
     {
+        $isCheckCCCD = VerificationRequest::where('user_request_id', auth()->user()->id)->where('verification_card_type', 'citizen_card')->where('status', 'pending')->first();
+        $isCheckStudent = VerificationRequest::where('user_request_id', auth()->user()->id)->where('verification_card_type', 'student_card')->where('status', 'pending')->first();
         $user = array_merge(User::with(['role', 'province', 'district', 'ward'])->find(auth()->user()->id)->toArray(), [
             'google_id' => auth()->user()->google_id ? true : false,
+            'isCheckCCCD' => $isCheckCCCD ? true : false,
+            'isCheckStudent' => $isCheckStudent ? true : false,
         ]);
 
         // Trả về dữ liệu đã được định dạng lại thông qua Accessor

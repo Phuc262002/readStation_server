@@ -391,6 +391,8 @@ class ShelveController extends Controller
             'id.min' => 'Id phải lớn hơn hoặc bằng 1.',
             'bookshelf_code.string' => 'Tên kệ sách phải là chuỗi.',
             'status.in' => 'Status phải là active, inactive hoặc deleted',
+            'name.string' => 'Tên kệ sách phải là chuỗi.',
+            'description.string' => 'Mô tả phải là chuỗi.',
         ]);
 
         if ($validator->fails()) {

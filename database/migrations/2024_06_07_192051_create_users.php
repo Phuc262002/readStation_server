@@ -25,7 +25,6 @@ return new class extends Migration
             $table->string('google_id')->unique()->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->timestamp('user_verified_at')->nullable();
-            $table->boolean('has_wallet')->default(false);
             $table->json('citizen_identity_card')->nullable();
             $table->json('student_id_card')->nullable();
             $table->foreignId('province_id')->nullable();

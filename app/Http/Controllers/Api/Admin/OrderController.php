@@ -7,7 +7,6 @@ use App\Models\BookDetail;
 use App\Models\Extensions;
 use App\Models\LoanOrderDetails;
 use App\Models\LoanOrders;
-use App\Models\Wallet;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -427,10 +426,10 @@ class OrderController extends Controller
         $query = LoanOrders::query()->with(['user', 'loanOrderDetails']);
 
         if ($status) {
-            $query->where('status', $status);
+            $query->whereHas('loanOrderDetails', function ($q) use ($status) {
+                $q->where('status', $status);
+            });
         }
-
-
 
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -445,21 +444,20 @@ class OrderController extends Controller
 
         $total = $query->count();
 
-
         $orders = $query->orderBy('id', $sort)->paginate($pageSize, ['*'], 'page', $page);
 
         return response()->json([
-
             'data' => [
                 'orders' => $orders->items(),
                 'page' => $orders->currentPage(),
                 'pageSize' => $orders->perPage(),
                 'lastPage' => $orders->lastPage(),
                 'totalResults' => $orders->total(),
-                'total' =>  $total
+                'total' => $total
             ]
         ]);
     }
+
 
     public function store(Request $request)
     {
@@ -591,8 +589,8 @@ class OrderController extends Controller
                 $body["orderCode"] = intval($transaction->transaction_code);
                 $body["description"] =  $order->order_code;
                 $body["expiredAt"] = now()->addMinutes(30)->getTimestamp();
-                $body["returnUrl"] = env('CLIENT_URL')."/payment/result?portal=payos&amount=" . $transaction->amount."&description=".$transaction->transaction_code;
-                $body["cancelUrl"] = env('CLIENT_URL')."/payment/result?portal=payos&amount=" . $transaction->amount."&description=".$transaction->transaction_code;
+                $body["returnUrl"] = env('CLIENT_URL') . "/payment/result?portal=payos&amount=" . $transaction->amount . "&description=" . $transaction->transaction_code;
+                $body["cancelUrl"] = env('CLIENT_URL') . "/payment/result?portal=payos&amount=" . $transaction->amount . "&description=" . $transaction->transaction_code;
                 $payOS = new PayOS($this->payOSClientId, $this->payOSApiKey, $this->payOSChecksumKey);
 
                 $response = $payOS->createPaymentLink($body);

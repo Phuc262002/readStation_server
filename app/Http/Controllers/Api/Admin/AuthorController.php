@@ -470,6 +470,13 @@ class AuthorController extends Controller
             ], 400);
         }
 
+        if ($author->is_featured) {
+            return response()->json([
+                "status" => false,
+                "message" => "Không thể xóa tác giả nổi bật!"
+            ], 400);
+        }
+
         try {
             $author->delete();
 

@@ -310,6 +310,7 @@ class ReturnHistoryController extends Controller
                 ]);
             }
 
+            $loanOrderDetail = LoanOrderDetails::find($returnHistory->loan_order_details_id);
             $allActiveOrExtended = true;
 
             foreach ($order->loanOrderDetails as $orderDetail) {
@@ -319,15 +320,8 @@ class ReturnHistoryController extends Controller
                 }
             }
 
-            if ($allActiveOrExtended) {
+            if (!$allActiveOrExtended) {
                 $order->update(['status' => 'completed']);
-            } else {
-                foreach ($order->loanOrderDetails as $orderDetail) {
-                    if ($orderDetail->status == 'pending') {
-                        $order->update(['status' => 'pending']);
-                        break;
-                    }
-                }
             }
 
 

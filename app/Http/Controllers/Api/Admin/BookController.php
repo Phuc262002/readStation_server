@@ -379,12 +379,29 @@ class BookController extends Controller
     public function checkBookDetail()
     {
         // Find books without a bookDetail or with an inactive bookDetail
-        $booksWithoutDetail = Book::doesntHave('bookDetail')->get();
+        $booksWithoutDetail = Book::doesntHave('bookDetail')
+            ->orWhereHas('bookDetail', function ($q) {
+                $q->where('status', '!=', 'active');
+            })
+            ->get();
 
         // Update the status of these books to 'needUpdateDetail'
         $booksWithoutDetail->each(function ($book) {
-            if ($book->status != 'needUpdateDetail') {
+            if ($book->status == 'active') {
                 $book->update(['status' => 'needUpdateDetail']);
+            }
+        });
+
+        // Find books having an active bookDetail
+
+        $booksWithDetail = Book::whereHas('bookDetail', function ($q) {
+            $q->where('status', 'active');
+        })->get();
+
+        // Update the status of these books to 'active'
+        $booksWithDetail->each(function ($book) {
+            if ($book->status == 'needUpdateDetail') {
+                $book->update(['status' => 'active']);
             }
         });
     }

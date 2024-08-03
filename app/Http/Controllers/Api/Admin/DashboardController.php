@@ -189,7 +189,9 @@ class DashboardController extends Controller
             $totalOrders = $orders->count();
             $completedOrders = $orders->where('status', 'completed')->count();
             $canceledOrders = $orders->where('status', 'canceled')->count();
-            $revenue = $orders->where('status', 'completed')->sum('amount')/1000;
+            $serviceFeeSum = LoanOrderDetails::where('status', 'completed')->sum('service_fee');
+            $fineFeeSum = LoanOrderDetails::where('status', 'completed')->sum('fine_amount');
+            $revenue = ($serviceFeeSum + $fineFeeSum)/1000;
 
             $result[] = [
                 'date' => $formattedDate,
@@ -210,15 +212,15 @@ class DashboardController extends Controller
                     'total' => $orderDetails->count(),
                     'completed' => $orderDetails->where('status', 'completed')->count(),
                     'pending' => $orderDetails->where('status', 'wating_payment')->count() +
-                                    $orderDetails->where('status', 'pending')->count() +
-                                    $orderDetails->where('status', 'approved')->count() +
-                                    $orderDetails->where('status', 'ready_for_pickup')->count() +
-                                    $orderDetails->where('status', 'preparing_shipment')->count() +
-                                    $orderDetails->where('status', 'returning')->count() +
-                                    $orderDetails->where('status', 'in_transit')->count(),
+                        $orderDetails->where('status', 'pending')->count() +
+                        $orderDetails->where('status', 'approved')->count() +
+                        $orderDetails->where('status', 'ready_for_pickup')->count() +
+                        $orderDetails->where('status', 'preparing_shipment')->count() +
+                        $orderDetails->where('status', 'returning')->count() +
+                        $orderDetails->where('status', 'in_transit')->count(),
                     'canceled' => $orderDetails->where('status', 'canceled')->count(),
-                    'active' => $orderDetails->where('status', 'active')->count() + 
-                                $orderDetails->where('status', 'extended')->count(),
+                    'active' => $orderDetails->where('status', 'active')->count() +
+                        $orderDetails->where('status', 'extended')->count(),
                     'overdue' => $orderDetails->where('status', 'overdue')->count()
                 ]
             ]

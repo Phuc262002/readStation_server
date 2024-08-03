@@ -331,7 +331,7 @@ class SupplierController extends Controller
             'id' => 'required|integer|exists:suppliers,id|min:1',
             'name' => 'string',
             'address' => 'string',
-            'phone' => 'string',
+            'phone' => 'string|regex:/^(0[35789])[0-9]{8}$/',
             'email' => 'email',
         ], [
             'id.required' => 'Trường id là bắt buộc.',
@@ -341,6 +341,7 @@ class SupplierController extends Controller
             'name.string' => 'Tên nhà cung cấp phải là chuỗi',
             'address.string' => 'Địa chỉ nhà cung cấp phải là chuỗi',
             'phone.string' => 'Số điện thoại nhà cung cấp phải là chuỗi',
+            'phone.regex' => 'Số điện thoại nhà cung cấp không đúng định dạng', 
             'email.email' => 'Email nhà cung cấp không đúng định dạng',
         ]);
 
