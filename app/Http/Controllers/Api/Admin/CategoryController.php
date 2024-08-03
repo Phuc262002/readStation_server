@@ -241,10 +241,10 @@ class CategoryController extends Controller
             'pageSize.integer' => 'Kích thước trang phải là số nguyên.',
             'pageSize.min' => 'Kích thước trang phải lớn hơn hoặc bằng 1.',
             'search.string' => 'Tìm kiếm phải là chuỗi.',
-            'type.required' => 'Trường type là bắt buộc.',
-            'type.string' => 'Type phải là một chuỗi.',
-            'type.in' => 'Type phải là book hoặc post.',
-            'status.in' => 'Status phải là active, inactive hoặc deleted'
+            'type.required' => 'Tên loại là bắt buộc.',
+            'type.string' => 'Loại phải là một chuỗi.',
+            'type.in' => 'Loại phải là book hoặc post.',
+            'status.in' => 'Trạng thái  phải là hoạt động, ẩn hoặc đã xóa',
         ]);
 
         if ($validator->fails()) {
@@ -300,11 +300,11 @@ class CategoryController extends Controller
             'image' => 'nullable|string',
             'type' => 'required|string|in:book,post'
         ],[
-            'name.required' => 'Trường tên danh mục là bắt buộc.',
+            'name.required' => 'Tên danh mục là bắt buộc.',
             'name.string' => 'Tên danh mục phải là một chuỗi.',
-            'type.required' => 'Trường type là bắt buộc.',
-            'type.string' => 'Type phải là một chuỗi.',
-            'type.in' => 'Type phải là book hoặc post.',
+            'type.required' => 'Tên loại là bắt buộc.',
+            'type.string' => 'Loại phải là một chuỗi.',
+            'type.in' => 'Loại phải là book hoặc post.',
         ]);
 
         if ($validator->fails()) {
@@ -325,7 +325,7 @@ class CategoryController extends Controller
                 "status" => false,
                 "message" => "Chỉ có thể chọn tối đa 6 danh mục nổi bật!"
             ], 400);
-        } 
+        }
 
         $category = Category::create(array_merge(
             $validator->validated(),
@@ -387,11 +387,11 @@ class CategoryController extends Controller
             'id.min' => 'Id phải lớn hơn hoặc bằng 1.',
             'id.exists' => 'Id không tồn tại.',
             'name.string' => 'Tên nhà xuất bản phải là một chuỗi.',
-            'type.string' => 'Type phải là một chuỗi.',
-            'type.in' => 'Type phải là book hoặc post.',
-            'status.in' => 'Status phải là active, inactive hoặc deleted',
-            'status.string' => 'Status phải là một chuỗi.',
-            'description.string' => 'Description phải là một chuỗi.'
+            'type.string' => 'Loại phải là một chuỗi.',
+            'type.in' => 'Loại phải là book hoặc post.',
+            'status.in' => 'Trạng thái phải là hoạt động, ẩn hoặc đã xóa',
+            'status.string' => 'Trạng thái phải là một chuỗi.',
+            'description.string' => 'Nội dung phải là một chuỗi.'
         ]);
 
         if ($validator->fails()) {
@@ -421,7 +421,7 @@ class CategoryController extends Controller
                 "status" => false,
                 "message" => "Only 6 categories can be featured!"
             ], 400);
-        } 
+        }
 
 
         if ($validator->fails()) {
