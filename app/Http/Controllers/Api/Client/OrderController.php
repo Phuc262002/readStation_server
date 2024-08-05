@@ -118,13 +118,12 @@ use PayOS\PayOS;
     requestBody: new OA\RequestBody(
         required: true,
         content: new OA\JsonContent(
-            required: ['payment_method', 'payment_portal', 'discount', 'delivery_method', 'total_deposit_fee', 'total_service_fee', 'total_shipping_fee', 'total_all_fee', 'order_details'],
+            required: ['payment_method', 'payment_portal', 'delivery_method', 'total_deposit_fee', 'total_service_fee', 'total_shipping_fee', 'total_all_fee', 'order_details'],
             properties: [
                 new OA\Property(property: 'payment_method', type: 'string', description: 'Phương thức thanh toán', enum: ['online', 'cash']),
                 new OA\Property(property: 'payment_portal', type: 'string', description: 'Cổng thanh toán', enum: ['payos', 'vnpay']),
                 new OA\Property(property: 'delivery_method', type: 'string', description: 'Phương thức vận chuyển', enum: ['library', 'shipper']),
                 new OA\Property(property: 'user_note', type: 'string', description: 'Ghi chú'),
-                new OA\Property(property: 'discount', type: 'number', description: 'Giảm giá'),
                 new OA\Property(
                     property: 'delivery_info',
                     type: 'object',
@@ -555,13 +554,13 @@ class OrderController extends Controller
             'payment_method' => 'required|string|in:online,cash',
             'delivery_method' => 'required|string|in:pickup,shipper',
             'user_note' => 'nullable|string',
-            'discount' => 'nullable|numeric|min:0',
             'total_deposit_fee' => 'required|numeric|min:0',
             'total_service_fee' => 'required|integer|min:1',
             'total_shipping_fee' => 'required|numeric|min:0',
             'total_all_fee' => 'required|numeric|min:0',
             'delivery_info' => 'nullable|array',
             'shipping_method_id' => 'nullable|integer|exists:shipping_methods,id',
+            'number_of_days' => 'required|integer|min:1',
 
             'order_details' => 'required|array',
             'order_details.*.book_details_id' => 'required|integer',
@@ -578,6 +577,9 @@ class OrderController extends Controller
             'total_deposit_fee.required' => 'Trường tiền đặt cọc là bắt buộc',
             'total_deposit_fee.numeric' => 'Trường tiền đặt cọc phải là kiểu số',
             'total_deposit_fee.min' => 'Trường tiền đặt cọc không được nhỏ hơn 0',
+            'number_of_days.required' => 'Trường số ngày thuê là bắt buộc',
+            'number_of_days.integer' => 'Trường số ngày thuê phải là kiểu số',
+            'number_of_days.min' => 'Trường số ngày thuê không được nhỏ hơn 1',
 
             'total_service_fee.required' => 'Trường tổng phí dịch vụ là bắt buộc',
             'total_service_fee.integer' => 'Trường tổng phí dịch vụ phải là kiểu số',
@@ -727,12 +729,12 @@ class OrderController extends Controller
             } else {
                 $order = LoanOrders::create(array_merge($request->all(), [
                     'user_id' => auth()->user()->id,
-                    'expired_date' => $request->has('expired_date') ? date('Y-m-d', strtotime($request->expired_date)) : date('Y-m-d', strtotime('+4 days')),
+                    'expired_date' => $request->has('expired_date') ? date('Y-m-d', strtotime($request->expired_date)) : date('Y-m-d', strtotime('+' . $request->number_of_days . ' days')),
                 ]));
 
                 $orderDetails = $request->order_details;
                 foreach ($orderDetails as $key => $detail) {
-                    $orderDetails[$key]['expired_date'] = $request->has('expired_date') ? date('Y-m-d', strtotime($request->expired_date)) : date('Y-m-d', strtotime('+4 days'));
+                    $orderDetails[$key]['expired_date'] = $request->has('expired_date') ? date('Y-m-d', strtotime($request->expired_date)) : date('Y-m-d', strtotime('+' . $request->number_of_days . ' days'));
                 }
 
                 $order->loanOrderDetails()->createMany($orderDetails);
@@ -1427,11 +1429,7 @@ class OrderController extends Controller
                 ]);
             }
 
-            if ($order->discount != 0) {
-                $extension_fee = $order->discount / 100 * (count($order->loanOrderDetails) * 10000);
-            } else {
-                $extension_fee = count($order->loanOrderDetails) * 10000;
-            }
+            $extension_fee = count($order->loanOrderDetails) * 10000;
 
             if ($request->extended_method == 'online') {
                 $extension = Extensions::create([
@@ -1629,11 +1627,7 @@ class OrderController extends Controller
                 ]);
             }
 
-            if ($order->discount != 0) {
-                $extension_fee = $order->discount / 100 * (count($order->loanOrderDetails) * 10000);
-            } else {
-                $extension_fee = count($order->loanOrderDetails) * 10000;
-            }
+            $extension_fee = count($order->loanOrderDetails) * 10000;
 
             if ($request->extended_method == 'online') {
                 $extension = Extensions::create([

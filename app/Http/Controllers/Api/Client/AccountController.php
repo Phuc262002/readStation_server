@@ -102,7 +102,7 @@ class AccountController extends Controller
             'district_id' => 'nullable|exists:districts,id',
             'ward_id' => 'nullable|exists:wards,id',
             'address_detail' => 'nullable|string',
-            'phone' => 'required|regex:/^(0[35789])[0-9]{8}$/',
+            'phone' => 'nullable|regex:/^(0[35789])[0-9]{8}$/',
         ], [
             'gender.in' => 'Giới tính phải là male hoặc female.',
             'dob.date' => 'Ngày sinh phải là một ngày.',

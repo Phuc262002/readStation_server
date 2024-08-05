@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Book;
 use App\Models\Shelve;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -103,6 +104,57 @@ use OpenApi\Attributes as OA;
         new OA\Response(
             response: 404,
             description: 'Shelve not found!',
+        ),
+    ],
+)]
+
+#[OA\Get(
+    path: '/api/v1/admin/shelves/{id}/books',
+    tags: ['Admin / Shelve'],
+    operationId: 'getBooksOfShelve',
+    summary: 'Danh sách sách trong kệ',
+    description: 'Lấy danh sách sách trong kệ sách',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    parameters: [
+        new OA\Parameter(
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'ID kệ sách',
+            schema: new OA\Schema(type: 'integer')
+        ),
+        new OA\Parameter(
+            name: 'page',
+            in: 'query',
+            required: false,
+            description: 'Số trang hiện tại',
+            schema: new OA\Schema(type: 'integer', default: 1)
+        ),
+        new OA\Parameter(
+            name: 'pageSize',
+            in: 'query',
+            required: false,
+            description: 'Số lượng mục trên mỗi trang',
+            schema: new OA\Schema(type: 'integer', default: 10)
+        ),
+        new OA\Parameter(
+            name: 'search',
+            in: 'query',
+            required: false,
+            description: 'Từ khóa tìm kiếm',
+            schema: new OA\Schema(type: 'string')
+        ),
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Get shelve of bookcase successfully!',
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Dữ liệu không hợp lệ',
         ),
     ],
 )]
@@ -372,6 +424,58 @@ class ShelveController extends Controller
             "status" => true,
             "message" => "Get shelve successfully!",
             "data" => $shelve
+        ], 200);
+    }
+
+    public function bookOfShelve(Request $request, $id) {
+        $validator = Validator::make(['id' => $id], [
+            'id' => 'required|exists:shelves,id',
+            'page' => 'integer|min:1',
+            'pageSize' => 'integer|min:1',
+            'search' => 'string',
+        ], [
+            'id.required' => 'Trường id là bắt buộc.',
+            'id.integer' => 'Id phải là một số nguyên.',
+            'id.min' => 'Id phải lớn hơn hoặc bằng 1.',
+            'page.integer' => 'Trang phải là số nguyên.',
+            'page.min' => 'Trang phải lớn hơn hoặc bằng 1.',
+            'pageSize.integer' => 'Kích thước trang phải là số nguyên.',
+            'pageSize.min' => 'Kích thước trang phải lớn hơn hoặc bằng 1.',
+            'search.string' => 'Tìm kiếm phải là chuỗi.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                "staus" => false,
+                "message" => "Dữ liệu không hợp lệ",
+                "errors" => $validator->errors()
+            ], 400);
+        }
+
+        $page = $request->input('page', 1);
+        $pageSize = $request->input('pageSize', 10);
+        $search = $request->input('search');
+
+        $query = Book::query()->with(['bookDetail', 'author', 'category'])->where('shelve_id', $id);
+        $totalItems = $query->count();
+
+        if ($search) {
+            $query = $query->where('title', 'like', "%$search%")->orWhere('original_title', 'like', "%$search%");
+        }
+
+        $books = $query->orderBy('created_at', 'desc')->paginate($pageSize, ['*'], 'page', $page);
+
+        return response()->json([
+            "status" => true,
+            "message" => "Get shelve of bookcase successfully!",
+            "data" => [
+                "books" => $books->items(),
+                "page" => $books->currentPage(),
+                "pageSize" => $books->perPage(),
+                "totalPages" => $books->lastPage(),
+                "totalResults" => $books->total(),
+                "total" => $totalItems
+            ]
         ], 200);
     }
 

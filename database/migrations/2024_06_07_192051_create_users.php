@@ -37,7 +37,6 @@ return new class extends Migration
             $table->dateTime('confirmation_code_expired_in')->nullable()->default(NULL);
             $table->string('refresh_token')->nullable();
             $table->string('remember_token')->nullable();
-            $table->unsignedBigInteger('discount')->default(0);
             $table->string('banned_reason')->nullable();
             $table->enum('status', ['active', 'banned'])->default('active');
             $table->timestamps();

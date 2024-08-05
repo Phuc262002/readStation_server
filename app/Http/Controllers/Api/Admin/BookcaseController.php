@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Bookcase;
+use App\Models\Shelve;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use OpenApi\Attributes as OA;
@@ -89,6 +90,57 @@ use OpenApi\Attributes as OA;
         new OA\Response(
             response: 404,
             description: 'Bookcase not found',
+        ),
+    ],
+)]
+
+#[OA\Get(
+    path: '/api/v1/admin/bookcases/{id}/shelves',
+    tags: ['Admin / Bookcase'],
+    operationId: 'getShelveOfBookcase',
+    summary: 'Get shelve of bookcase by id',
+    description: 'Get shelve of bookcase by id',
+    security: [
+        ['bearerAuth' => []]
+    ],
+    parameters: [
+        new OA\Parameter(
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Id của bookcase',
+            schema: new OA\Schema(type: 'integer')
+        ),
+        new OA\Parameter(
+            name: 'page',
+            in: 'query',
+            required: false,
+            description: 'Số trang hiện tại',
+            schema: new OA\Schema(type: 'integer', default: 1)
+        ),
+        new OA\Parameter(
+            name: 'pageSize',
+            in: 'query',
+            required: false,
+            description: 'Số lượng mục trên mỗi trang',
+            schema: new OA\Schema(type: 'integer', default: 10)
+        ),
+        new OA\Parameter(
+            name: 'search',
+            in: 'query',
+            required: false,
+            description: 'Từ khóa tìm kiếm',
+            schema: new OA\Schema(type: 'string')
+        ),
+    ],
+    responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Get shelve of bookcase successfully',
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Dữ liệu không hợp lệ',
         ),
     ],
 )]
@@ -346,6 +398,58 @@ class BookcaseController extends Controller
             "status" => true,
             "message" => "Get bookcase successfully!",
             "data" => $bookcase
+        ], 200);
+    }
+
+    public function shelveOfBookcase(Request $request, $id) {
+        $validator = Validator::make(['id' => $id], [
+            'id' => 'required|exists:bookcases,id',
+            'page' => 'integer|min:1',
+            'pageSize' => 'integer|min:1',
+            'search' => 'string',
+        ], [
+            'id.required' => 'Trường id là bắt buộc.',
+            'id.integer' => 'Id phải là một số nguyên.',
+            'id.min' => 'Id phải lớn hơn hoặc bằng 1.',
+            'page.integer' => 'Trang phải là số nguyên.',
+            'page.min' => 'Trang phải lớn hơn hoặc bằng 1.',
+            'pageSize.integer' => 'Kích thước trang phải là số nguyên.',
+            'pageSize.min' => 'Kích thước trang phải lớn hơn hoặc bằng 1.',
+            'search.string' => 'Tìm kiếm phải là chuỗi.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                "staus" => false,
+                "message" => "Dữ liệu không hợp lệ",
+                "errors" => $validator->errors()
+            ], 400);
+        }
+
+        $page = $request->input('page', 1);
+        $pageSize = $request->input('pageSize', 10);
+        $search = $request->input('search');
+
+        $query = Shelve::query()->with(['books'])->where('bookcase_id', $id);
+        $totalItems = $query->count();
+
+        if ($search) {
+            $query = $query->where('name', 'like', "%$search%");
+        }
+
+        $shelves = $query->orderBy('created_at', 'desc')->paginate($pageSize, ['*'], 'page', $page);
+
+        return response()->json([
+            "status" => true,
+            "message" => "Get shelve of bookcase successfully!",
+            "data" => [
+                "shelves" => $shelves->items(),
+                "page" => $shelves->currentPage(),
+                "pageSize" => $shelves->perPage(),
+                "totalPages" => $shelves->lastPage(),
+                "totalResults" => $shelves->total(),
+                "total" => $totalItems
+            ]
         ], 200);
     }
 

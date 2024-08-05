@@ -18,6 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('service_fee')->default(0);
             $table->unsignedBigInteger('deposit_fee')->default(0);
             $table->unsignedBigInteger('fine_amount')->default(0);
+            $table->unsignedTinyInteger('number_of_days')->default(1);
             $table->datetime('original_due_date')->nullable();
             $table->datetime('current_due_date')->nullable();
             $table->datetime('return_date')->nullable();

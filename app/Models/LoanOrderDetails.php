@@ -14,6 +14,7 @@ class LoanOrderDetails extends Model
     protected $fillable = [
         'loan_order_id',
         'book_details_id',
+        'number_of_days',
         'deposit_fee',
         'service_fee',
         'fine_amount',

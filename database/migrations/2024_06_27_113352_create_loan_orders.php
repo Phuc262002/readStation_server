@@ -23,12 +23,12 @@ return new class extends Migration
             $table->unsignedTinyInteger('max_extensions')->default(3);
             $table->unsignedTinyInteger('current_extensions')->default(0);
 
+            $table->unsignedTinyInteger('number_of_days')->default(1);
             $table->datetime ('loan_date')->nullable();
             $table->datetime ('original_due_date')->nullable();
             $table->datetime ('current_due_date')->nullable();
             $table->datetime ('completed_date')->nullable();
 
-            $table->unsignedBigInteger('discount')->default(0);
             $table->unsignedBigInteger('total_deposit_fee')->default(0);
             $table->unsignedBigInteger('total_service_fee')->default(0);
             $table->unsignedBigInteger('total_fine_fee')->default(0);

@@ -196,6 +196,7 @@ Route::group([
         ], function () {
             Route::get('/', [BookcaseController::class, 'index']);
             Route::get('/{id}', [BookcaseController::class, 'show']);
+            Route::get('/{id}/shelves', [BookcaseController::class, 'shelveOfBookcase']);
             Route::post('/create', [BookcaseController::class, 'store']);
             Route::put('/update/{id}', [BookcaseController::class, 'update']);
             Route::delete('/delete/{id}', [BookcaseController::class, 'destroy']);
@@ -206,6 +207,7 @@ Route::group([
         ], function () {
             Route::get('/', [ShelveController::class, 'index']);
             Route::get('/{id}', [ShelveController::class, 'show']);
+            Route::get('/{id}/books', [ShelveController::class, 'bookOfShelve']);
             Route::post('/create', [ShelveController::class, 'store']);
             Route::put('/update/{id}', [ShelveController::class, 'update']);
             Route::delete('/delete/{id}', [ShelveController::class, 'destroy']);

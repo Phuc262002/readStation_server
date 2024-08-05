@@ -1473,6 +1473,69 @@
                 ]
             }
         },
+        "/api/v1/admin/bookcases/{id}/shelves": {
+            "get": {
+                "tags": [
+                    "Admin / Bookcase"
+                ],
+                "summary": "Get shelve of bookcase by id",
+                "description": "Get shelve of bookcase by id",
+                "operationId": "getShelveOfBookcase",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id của bookcase",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Số trang hiện tại",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "pageSize",
+                        "in": "query",
+                        "description": "Số lượng mục trên mỗi trang",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Từ khóa tìm kiếm",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get shelve of bookcase successfully"
+                    },
+                    "400": {
+                        "description": "Dữ liệu không hợp lệ"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/admin/bookcases/create": {
             "post": {
                 "tags": [
@@ -2605,7 +2668,6 @@
                                 "required": [
                                     "user_id",
                                     "payment_method",
-                                    "discount",
                                     "total_service_fee",
                                     "total_deposit_fee",
                                     "total_all_fee",
@@ -2623,10 +2685,6 @@
                                             "online",
                                             "cash"
                                         ]
-                                    },
-                                    "discount": {
-                                        "description": "Giảm giá",
-                                        "type": "number"
                                     },
                                     "total_service_fee": {
                                         "description": "Tổng phí dịch vụ",
@@ -3546,6 +3604,69 @@
                     },
                     "404": {
                         "description": "Shelve not found!"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/shelves/{id}/books": {
+            "get": {
+                "tags": [
+                    "Admin / Shelve"
+                ],
+                "summary": "Danh sách sách trong kệ",
+                "description": "Lấy danh sách sách trong kệ sách",
+                "operationId": "getBooksOfShelve",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID kệ sách",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Số trang hiện tại",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "pageSize",
+                        "in": "query",
+                        "description": "Số lượng mục trên mỗi trang",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Từ khóa tìm kiếm",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get shelve of bookcase successfully!"
+                    },
+                    "400": {
+                        "description": "Dữ liệu không hợp lệ"
                     }
                 },
                 "security": [
@@ -6002,7 +6123,6 @@
                                 "required": [
                                     "payment_method",
                                     "payment_portal",
-                                    "discount",
                                     "delivery_method",
                                     "total_deposit_fee",
                                     "total_service_fee",
@@ -6038,10 +6158,6 @@
                                     "user_note": {
                                         "description": "Ghi chú",
                                         "type": "string"
-                                    },
-                                    "discount": {
-                                        "description": "Giảm giá",
-                                        "type": "number"
                                     },
                                     "delivery_info": {
                                         "description": "Thông tin giao hàng",

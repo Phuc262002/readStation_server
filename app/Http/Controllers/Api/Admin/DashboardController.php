@@ -189,10 +189,13 @@ class DashboardController extends Controller
             $totalOrders = $orders->count();
             $completedOrders = $orders->where('status', 'completed')->count();
             $canceledOrders = $orders->where('status', 'canceled')->count();
-            $serviceFeeSum = LoanOrderDetails::where('status', 'completed')->sum('service_fee');
-            $fineFeeSum = LoanOrderDetails::where('status', 'completed')->sum('fine_amount');
-            $revenue = ($serviceFeeSum + $fineFeeSum)/1000;
-
+        
+            // Giả định rằng $orders là một collection của các đối tượng Order và mỗi Order có quan hệ với LoanOrderDetails
+            $orderIds = $orders->pluck('id');
+            $serviceFeeSum = LoanOrderDetails::whereIn('loan_order_id', $orderIds)->where('status', 'completed')->sum('service_fee');
+            $fineFeeSum = LoanOrderDetails::whereIn('loan_order_id', $orderIds)->where('status', 'completed')->sum('fine_amount');
+            $revenue = ($serviceFeeSum + $fineFeeSum);
+        
             $result[] = [
                 'date' => $formattedDate,
                 'total_orders' => $totalOrders,
@@ -200,8 +203,7 @@ class DashboardController extends Controller
                 'canceled_orders' => $canceledOrders,
                 'revenue' => $revenue
             ];
-        }
-
+        }        
         // return $orderDetails;
 
         return response()->json([

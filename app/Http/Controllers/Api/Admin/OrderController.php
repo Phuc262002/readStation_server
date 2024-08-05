@@ -193,11 +193,10 @@ use OpenApi\Attributes as OA;
     requestBody: new OA\RequestBody(
         required: true,
         content: new OA\JsonContent(
-            required: ['user_id', 'payment_method', 'discount', 'total_service_fee', 'total_deposit_fee', 'total_all_fee', 'order_details'],
+            required: ['user_id', 'payment_method', 'total_service_fee', 'total_deposit_fee', 'total_all_fee', 'order_details'],
             properties: [
                 new OA\Property(property: 'user_id', type: 'string', description: 'Id người dùng'),
                 new OA\Property(property: 'payment_method', type: 'string', description: 'Phương thức thanh toán', enum: ['online', 'cash']),
-                new OA\Property(property: 'discount', type: 'number', description: 'Giảm giá'),
                 new OA\Property(property: 'total_service_fee', type: 'integer', description: 'Tổng phí dịch vụ'),
                 new OA\Property(property: 'total_deposit_fee', type: 'number', description: 'Tiền đặt cọc'),
                 new OA\Property(property: 'total_all_fee', type: 'number', description: 'Tổng tiền'),
@@ -465,7 +464,7 @@ class OrderController extends Controller
             'user_id' => 'required|exists:users,id',
             'payment_method' => 'required|string|in:online,cash',
             'user_note' => 'nullable|string',
-            'discount' => 'nullable|numeric|min:0',
+            'number_of_days' => 'required|integer|min:1',
             'total_deposit_fee' => 'required|numeric|min:0',
             'total_service_fee' => 'required|integer|min:0',
             'total_all_fee' => 'required|numeric|min:10000',
@@ -488,6 +487,9 @@ class OrderController extends Controller
             'total_service_fee.required' => 'Trường tổng phí dịch vụ là bắt buộc',
             'total_service_fee.integer' => 'Trường tổng phí dịch vụ phải là kiểu số',
             'total_service_fee.min' => 'Trường tổng phí dịch vụ không được nhỏ hơn 0',
+            'number_of_days.required' => 'Trường số ngày là bắt buộc',
+            'number_of_days.integer' => 'Trường số ngày phải là kiểu số',
+            'number_of_days.min' => 'Trường số ngày không được nhỏ hơn 1',
             'total_all_fee.required' => 'Trường tổng tiền là bắt buộc',
             'total_all_fee.numeric' => 'Trường tổng tiền phải là kiểu số',
             'total_all_fee.min' => 'Trường tổng tiền không được nhỏ hơn 10,000',
@@ -520,8 +522,7 @@ class OrderController extends Controller
                 if (in_array($order->status, ['wating_payment', 'pending', 'approved', 'ready_for_pickup', 'preparing_shipment', 'in_transit', 'active', 'extended', 'returning', 'overdue'])) {
                     return response()->json([
                         'status' => false,
-                        'message' => 'Create order failed',
-                        'errors' => 'Bạn hiện đang có đơn hàng đang chờ xử lý, vui lòng chờ đơn hàng hiện tại được xử lý xong'
+                        'message' => 'Bạn hiện đang có đơn hàng đang chờ xử lý, vui lòng chờ đơn hàng hiện tại được xử lý xong',
                     ]);
                 }
             }
@@ -534,24 +535,21 @@ class OrderController extends Controller
                 if (!$bookDetail) {
                     return response()->json([
                         'status' => false,
-                        'message' => 'Create order failed',
-                        'errors' => 'Id chi tiết sách không tồn tại'
+                        'message' => 'Id chi tiết sách không tồn tại',
                     ]);
                 }
 
                 if ($bookDetail->status !== 'active') {
                     return response()->json([
                         'status' => false,
-                        'message' => 'Create order failed',
-                        'errors' => 'Sách không còn trạng thái cho thuê'
+                        'message' => 'Sách không còn trạng thái cho thuê',
                     ]);
                 }
 
                 if ($bookDetail->stock < 1) {
                     return response()->json([
                         'status' => false,
-                        'message' => 'Create order failed',
-                        'errors' => 'Sách đã hết hàng'
+                        'message' => 'Sách đã hết hàng',
                     ]);
                 }
             }
@@ -568,6 +566,16 @@ class OrderController extends Controller
                 $orderDetails = $request->order_details;
 
                 $order->loanOrderDetails()->createMany($orderDetails);
+
+                $orderDetails = $order->loanOrderDetails;
+
+                foreach ($orderDetails as $key => $detail) {
+                    $orderDetails[$key]->update([
+                        'original_due_date' => date('Y-m-d', strtotime('+'.$request->number_of_days.' days')),
+                        'current_due_date' => date('Y-m-d', strtotime('+'.$request->number_of_days.' days')),
+                        'status' => 'active',
+                    ]);
+                }
 
                 $transaction = Transaction::create([
                     'user_id' => $request->user_id,
@@ -605,18 +613,27 @@ class OrderController extends Controller
                     'user_id' => $request->user_id,
                     'delivery_method' => 'pickup',
                     'loan_date' => now(),
-                    'original_due_date' => date('Y-m-d', strtotime('+5 days')),
-                    'current_due_date' => date('Y-m-d', strtotime('+5 days')),
+                    'original_due_date' => date('Y-m-d', strtotime('+'.$request->number_of_days.' days')),
+                        'current_due_date' => date('Y-m-d', strtotime('+'.$request->number_of_days.' days')),
                     'status' => 'active',
                 ]));
 
                 $orderDetails = $request->order_details;
                 foreach ($orderDetails as $key => $detail) {
-                    $orderDetails[$key]['original_due_date'] = date('Y-m-d', strtotime('+5 days'));
-                    $orderDetails[$key]['current_due_date'] = date('Y-m-d', strtotime('+5 days'));
+                    $orderDetails[$key]['original_due_date'] = date('Y-m-d', strtotime('+'.$request->number_of_days.' days'));
+                    $orderDetails[$key]['current_due_date'] = date('Y-m-d', strtotime('+'.$request->number_of_days.' days'));
                 }
 
                 $order->loanOrderDetails()->createMany($orderDetails);
+                $orderDetails = $order->loanOrderDetails;
+
+                foreach ($orderDetails as $key => $detail) {
+                    $orderDetails[$key]->update([
+                        'original_due_date' => date('Y-m-d', strtotime('+'.$request->number_of_days.' days')),
+                        'current_due_date' => date('Y-m-d', strtotime('+'.$request->number_of_days.' days')),
+                        'status' => 'active',
+                    ]);
+                }
 
                 $transaction_code = intval(substr(strtotime(now()) . rand(1000, 9999), -9));
 
@@ -683,6 +700,7 @@ class OrderController extends Controller
         try {
             $order = LoanOrders::with([
                 'user',
+                'user.role',
                 'shippingMethod',
                 'loanOrderDetails',
                 'loanOrderDetails.bookDetails',
@@ -1214,11 +1232,7 @@ class OrderController extends Controller
                 ]);
             }
 
-            if ($order->discount != 0) {
-                $extension_fee = $order->discount / 100 * (count($order->loanOrderDetails) * 10000);
-            } else {
-                $extension_fee = count($order->loanOrderDetails) * 10000;
-            }
+            $extension_fee = count($order->loanOrderDetails) * 10000;
 
             $extension = Extensions::create([
                 'loan_order_id' => $order->id,
@@ -1335,11 +1349,7 @@ class OrderController extends Controller
                 ]);
             }
 
-            if ($order->discount != 0) {
-                $extension_fee = $order->discount / 100 * (count($order->loanOrderDetails) * 10000);
-            } else {
-                $extension_fee = count($order->loanOrderDetails) * 10000;
-            }
+            $extension_fee = count($order->loanOrderDetails) * 10000;
 
             $extension = Extensions::create([
                 'loan_order_id' => $order->id,
