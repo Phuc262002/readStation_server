@@ -14,9 +14,7 @@ return new class extends Migration
         Schema::create('extensions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('loan_order_id');
-            $table->unsignedTinyInteger('number_of_days')->default(1);
             $table->datetime('extension_date');
-            $table->datetime('new_due_date');
             $table->unsignedBigInteger('extension_fee')->default(0);
             $table->foreignUuid('approved_by')->nullable();
             $table->foreignUuid('fee_transaction_id')->nullable();

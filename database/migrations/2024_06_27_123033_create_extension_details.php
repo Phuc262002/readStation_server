@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('extension_id');
             $table->foreignId('loan_order_detail_id');
+            $table->unsignedTinyInteger('number_of_days')->default(1);
             $table->date('new_due_date');
             $table->unsignedBigInteger('extension_fee')->default(0);
             $table->timestamps();

@@ -464,7 +464,6 @@ class OrderController extends Controller
             'user_id' => 'required|exists:users,id',
             'payment_method' => 'required|string|in:online,cash',
             'user_note' => 'nullable|string',
-            'number_of_days' => 'required|integer|min:1',
             'total_deposit_fee' => 'required|numeric|min:0',
             'total_service_fee' => 'required|integer|min:0',
             'total_all_fee' => 'required|numeric|min:10000',
@@ -473,6 +472,7 @@ class OrderController extends Controller
             'order_details.*.book_details_id' => 'required|integer',
             'order_details.*.service_fee' => 'required|integer|min:1',
             'order_details.*.deposit_fee' => 'required|numeric|min:0',
+            'order_details.*.number_of_days' => 'required|integer|min:1',
         ], [
             'user_id.required' => 'Trường id người dùng là bắt buộc',
             'user_id.exists' => 'Id người dùng không tồn tại',
@@ -487,9 +487,6 @@ class OrderController extends Controller
             'total_service_fee.required' => 'Trường tổng phí dịch vụ là bắt buộc',
             'total_service_fee.integer' => 'Trường tổng phí dịch vụ phải là kiểu số',
             'total_service_fee.min' => 'Trường tổng phí dịch vụ không được nhỏ hơn 0',
-            'number_of_days.required' => 'Trường số ngày là bắt buộc',
-            'number_of_days.integer' => 'Trường số ngày phải là kiểu số',
-            'number_of_days.min' => 'Trường số ngày không được nhỏ hơn 1',
             'total_all_fee.required' => 'Trường tổng tiền là bắt buộc',
             'total_all_fee.numeric' => 'Trường tổng tiền phải là kiểu số',
             'total_all_fee.min' => 'Trường tổng tiền không được nhỏ hơn 10,000',
@@ -504,6 +501,9 @@ class OrderController extends Controller
             'order_details.*.deposit.required' => 'Trường tiền đặt cọc là bắt buộc',
             'order_details.*.deposit.numeric' => 'Trường tiền đặt cọc phải là kiểu số',
             'order_details.*.deposit.min' => 'Trường tiền đặt cọc không được nhỏ hơn 0',
+            'order_details.*.number_of_days.required' => 'Trường số ngày là bắt buộc',
+            'order_details.*.number_of_days.integer' => 'Trường số ngày phải là kiểu số',
+            'order_details.*.number_of_days.min' => 'Trường số ngày không được nhỏ hơn 1',
         ]);
 
         if ($validator->fails()) {
@@ -516,16 +516,16 @@ class OrderController extends Controller
 
         try {
 
-            $allOrder = LoanOrders::where('user_id', $request->user_id)->get();
+            // $allOrder = LoanOrders::where('user_id', $request->user_id)->get();
 
-            foreach ($allOrder as $order) {
-                if (in_array($order->status, ['wating_payment', 'pending', 'approved', 'ready_for_pickup', 'preparing_shipment', 'in_transit', 'active', 'extended', 'returning', 'overdue'])) {
-                    return response()->json([
-                        'status' => false,
-                        'message' => 'Bạn hiện đang có đơn hàng đang chờ xử lý, vui lòng chờ đơn hàng hiện tại được xử lý xong',
-                    ]);
-                }
-            }
+            // foreach ($allOrder as $order) {
+            //     if (in_array($order->status, ['wating_payment', 'pending', 'approved', 'ready_for_pickup', 'preparing_shipment', 'in_transit', 'active', 'extended', 'returning', 'overdue'])) {
+            //         return response()->json([
+            //             'status' => false,
+            //             'message' => 'Bạn hiện đang có đơn hàng đang chờ xử lý, vui lòng chờ đơn hàng hiện tại được xử lý xong',
+            //         ]);
+            //     }
+            // }
 
             $bookDetailsIds = collect($request->order_details)->pluck('book_details_id')->toArray();
 
@@ -558,6 +558,7 @@ class OrderController extends Controller
                 $transaction_code = intval(substr(strtotime(now()) . rand(1000, 9999), -9));
 
                 $order = LoanOrders::create(array_merge($request->all(), [
+                    'pickup_date' => now(),
                     'user_id' => $request->user_id,
                     'status' => 'wating_payment',
                     'delivery_method' => 'pickup',
@@ -571,8 +572,8 @@ class OrderController extends Controller
 
                 foreach ($orderDetails as $key => $detail) {
                     $orderDetails[$key]->update([
-                        'original_due_date' => date('Y-m-d', strtotime('+'.$request->number_of_days.' days')),
-                        'current_due_date' => date('Y-m-d', strtotime('+'.$request->number_of_days.' days')),
+                        'original_due_date' => date('Y-m-d', strtotime('+'.$detail->number_of_days.' days')),
+                        'current_due_date' => date('Y-m-d', strtotime('+'.$detail->number_of_days.' days')),
                         'status' => 'active',
                     ]);
                 }
@@ -611,24 +612,21 @@ class OrderController extends Controller
             } else {
                 $order = LoanOrders::create(array_merge($request->all(), [
                     'user_id' => $request->user_id,
+                    'pickup_date' => now(),
                     'delivery_method' => 'pickup',
                     'loan_date' => now(),
                     'status' => 'active',
                 ]));
 
                 $orderDetails = $request->order_details;
-                foreach ($orderDetails as $key => $detail) {
-                    $orderDetails[$key]['original_due_date'] = date('Y-m-d', strtotime('+'.$request->number_of_days.' days'));
-                    $orderDetails[$key]['current_due_date'] = date('Y-m-d', strtotime('+'.$request->number_of_days.' days'));
-                }
 
                 $order->loanOrderDetails()->createMany($orderDetails);
                 $orderDetails = $order->loanOrderDetails;
 
                 foreach ($orderDetails as $key => $detail) {
                     $orderDetails[$key]->update([
-                        'original_due_date' => date('Y-m-d', strtotime('+'.$request->number_of_days.' days')),
-                        'current_due_date' => date('Y-m-d', strtotime('+'.$request->number_of_days.' days')),
+                        'original_due_date' => date('Y-m-d', strtotime('+'.$detail->number_of_days.' days')),
+                        'current_due_date' => date('Y-m-d', strtotime('+'.$detail->number_of_days.' days')),
                         'status' => 'active',
                     ]);
                 }
@@ -660,7 +658,7 @@ class OrderController extends Controller
                 ]);
             }
 
-            $order = LoanOrders::with(['transactions'])->find($order->id);
+            $order = LoanOrders::with(['transactions', 'loanOrderDetails'])->find($order->id);
 
             return response()->json([
                 'status' => true,

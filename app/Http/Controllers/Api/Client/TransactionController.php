@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Client;
 
 use App\Http\Controllers\Controller;
+use App\Models\LoanOrders;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -78,7 +79,7 @@ class TransactionController extends Controller
     public function getBalanceHolding()
     {
         try {
-            $balanceHolding = Transaction::where('user_id', auth()->user()->id)->where('status', 'holding')->sum('amount');
+            $balanceHolding = LoanOrders::where('user_id', auth()->user()->id)->where('status', 'active')->sum('total_deposit_fee');
 
             return response()->json([
                 'status' => true,
