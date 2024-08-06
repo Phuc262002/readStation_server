@@ -136,39 +136,36 @@ class HomeController extends Controller
 
     public function getFeaturedBook()
     {
-        $books = Book::with(['category', 'author', 'bookDetail' => function ($query) {
-            $query->where('status', 'active');
-        }])
-        ->where('is_featured', true)
-        ->whereHas('bookDetail', function ($q) {
-            $q->whereNotNull('id')
-                ->whereNotNull('status')
-                ->where('status', 'active');
-        })
-        ->limit(7)->get();
-
-        // Format response to ensure bookDetail is an array with data
-        $books->each(function ($book) {
-            $book->book_detail = $book->bookDetail ? $book->bookDetail->toArray() : [];
-        });
+        $books = BookDetail::with(['book.category', 'book.author', 'book.shelve', 'book.shelve.bookcase', 'book' => function ($query) {
+            $query->where('status', 'active')->where('is_featured', true);
+        }])->where('status', 'active')->limit(7)->get();
 
         return response()->json([
             'status' => true,
             'message' => 'Featured books',
-            'data' => $books
+            'data' => [
+                'bookBanner' => $books[0],
+                'books' => $books->slice(1)
+            ]
         ]);
     }
 
     public function getFeaturedAuthor()
     {
-        $authors = Author::with(['books' => function ($query) {
-            $query->whereHas('bookDetail')->with(['category', 'bookDetail'])->limit(4);
-        }])->where('is_featured', true)->get();
+        $authors = Author::where('is_featured', true)->get();
+        $books = BookDetail::with(['book.category', 'book.author', 'book.shelve', 'book.shelve.bookcase', 'book' => function ($query) {
+            $query->where('status', 'active');
+        }])->whereHas('book.author', function ($q) use ($authors) {
+            $q->whereIn('id', $authors->pluck('id'));
+        })->limit(2)->get();
 
         return response()->json([
             'status' => true,
             'message' => 'Featured authors and their books',
-            'data' => $authors
+            'data' => [
+                'author' => $authors[0],
+                'books' => $books
+            ]
         ]);
     }
 

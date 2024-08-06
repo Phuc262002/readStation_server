@@ -1186,6 +1186,7 @@ class OrderController extends Controller
             ['id' => $id]
         ), [
             'id' => 'required|exists:loan_orders,id',
+            'number_of_days' => 'required|integer|min:1',
         ], [
             'id.required' => 'Trường id là bắt buộc',
             'id.exists' => 'Id không tồn tại',
@@ -1231,16 +1232,16 @@ class OrderController extends Controller
             $extension = Extensions::create([
                 'loan_order_id' => $order->id,
                 'extension_date' => now(),
-                'new_due_date' => date('Y-m-d', strtotime($order->current_due_date . ' + 5 days')),
                 'extension_fee' => $extension_fee,
                 'status' => 'approved'
             ]);
 
-            $extensionDetails = $order->loanOrderDetails->map(function ($orderDetail) use ($extension) {
+            $extensionDetails = $order->loanOrderDetails->map(function ($orderDetail) use ($extension, $request) {
                 return [
                     'extension_id' => $extension->id,
                     'loan_order_detail_id' => $orderDetail->id,
-                    'new_due_date' => date('Y-m-d', strtotime($orderDetail->current_due_date . ' + 4 days')),
+                    'number_of_days' => $request->number_of_days,
+                    'new_due_date' => date('Y-m-d', strtotime($request->number_of_days . ' + 4 days')),
                     'extension_fee' => 10000
                 ];
             });
