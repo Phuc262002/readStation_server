@@ -21,8 +21,6 @@ class LoanOrders extends Model
         'current_extensions',
         'loan_date',
         'number_of_days',
-        'original_due_date',
-        'current_due_date',
         'completed_date',
         'total_deposit_fee',
         'total_service_fee',

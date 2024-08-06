@@ -15,7 +15,6 @@ class Extensions extends Model
         'loan_order_id',
         'extension_date',
         'number_of_days',
-        'new_due_date',
         'extension_fee',
         'approved_by',
         'fee_transaction_id',
