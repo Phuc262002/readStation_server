@@ -613,8 +613,6 @@ class OrderController extends Controller
                     'user_id' => $request->user_id,
                     'delivery_method' => 'pickup',
                     'loan_date' => now(),
-                    'original_due_date' => date('Y-m-d', strtotime('+'.$request->number_of_days.' days')),
-                        'current_due_date' => date('Y-m-d', strtotime('+'.$request->number_of_days.' days')),
                     'status' => 'active',
                 ]));
 
@@ -1039,8 +1037,6 @@ class OrderController extends Controller
                 'loan_date' => now(),
                 'pickup_date' => now(),
                 'delivered_date' => now(),
-                'original_due_date' => date('Y-m-d', strtotime($order->current_due_date . ' + 7 days')),
-                'current_due_date' => date('Y-m-d', strtotime($order->current_due_date . ' + 7 days')),
             ]);
 
             return response()->json([
