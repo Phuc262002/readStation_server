@@ -470,7 +470,7 @@ class OrderController extends Controller
 
             'order_details' => 'required|array',
             'order_details.*.book_details_id' => 'required|integer',
-            'order_details.*.service_fee' => 'required|integer|min:1',
+            'order_details.*.service_fee' => 'required|integer|min:0',
             'order_details.*.deposit_fee' => 'required|numeric|min:0',
             'order_details.*.number_of_days' => 'required|integer|min:1',
         ], [

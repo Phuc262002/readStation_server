@@ -555,17 +555,17 @@ class OrderController extends Controller
             'delivery_method' => 'required|string|in:pickup,shipper',
             'user_note' => 'nullable|string',
             'total_deposit_fee' => 'required|numeric|min:0',
-            'total_service_fee' => 'required|integer|min:1',
+            'total_service_fee' => 'required|integer|min:0',
             'total_shipping_fee' => 'required|numeric|min:0',
             'total_all_fee' => 'required|numeric|min:0',
             'delivery_info' => 'nullable|array',
             'shipping_method_id' => 'nullable|integer|exists:shipping_methods,id',
-            'number_of_days' => 'required|integer|min:1',
 
             'order_details' => 'required|array',
             'order_details.*.book_details_id' => 'required|integer',
-            'order_details.*.service_fee' => 'required|integer|min:1',
+            'order_details.*.service_fee' => 'required|integer|min:0',
             'order_details.*.deposit_fee' => 'required|numeric|min:0',
+            'order_details.*.number_of_days' => 'required|integer|min:1',
         ], [
             'payment_method.required' => 'Trường phương thức thanh toán là bắt buộc',
             'payment_method.string' => 'Trường phương thức thanh toán phải là kiểu chuỗi',
@@ -577,9 +577,6 @@ class OrderController extends Controller
             'total_deposit_fee.required' => 'Trường tiền đặt cọc là bắt buộc',
             'total_deposit_fee.numeric' => 'Trường tiền đặt cọc phải là kiểu số',
             'total_deposit_fee.min' => 'Trường tiền đặt cọc không được nhỏ hơn 0',
-            'number_of_days.required' => 'Trường số ngày thuê là bắt buộc',
-            'number_of_days.integer' => 'Trường số ngày thuê phải là kiểu số',
-            'number_of_days.min' => 'Trường số ngày thuê không được nhỏ hơn 1',
 
             'total_service_fee.required' => 'Trường tổng phí dịch vụ là bắt buộc',
             'total_service_fee.integer' => 'Trường tổng phí dịch vụ phải là kiểu số',
@@ -598,6 +595,9 @@ class OrderController extends Controller
             'order_details.*.deposit.required' => 'Trường tiền đặt cọc là bắt buộc',
             'order_details.*.deposit.numeric' => 'Trường tiền đặt cọc phải là kiểu số',
             'order_details.*.deposit.min' => 'Trường tiền đặt cọc không được nhỏ hơn 0',
+            'order_details.*.number_of_days.required' => 'Trường số ngày thuê là bắt buộc',
+            'order_details.*.number_of_days.integer' => 'Trường số ngày thuê phải là kiểu số',
+            'order_details.*.number_of_days.min' => 'Trường số ngày thuê không được nhỏ hơn 1',
         ]);
 
         if ($validator->fails()) {
