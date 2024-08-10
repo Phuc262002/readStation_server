@@ -489,6 +489,21 @@ class UserController extends Controller
                 }
             }
 
+            if ($request->dob) {
+                $sevenYearsAgo = strtotime('-7 years', strtotime(date('Y-m-d')));
+                $checkDOB = strtotime($request->dob) <= $sevenYearsAgo;
+
+                if (!$checkDOB) {
+                    return response()->json([
+                        "status" => false,
+                        "message" => "Dữ liệu không hợp lệ",
+                        "errors" => [
+                            "dob" => "Người dùng phải từ 7 tuổi trở lên."
+                        ]
+                    ], 400);
+                }
+            }
+
             $user = User::create(array_merge($validator->validated(), [
                 'password' => $password,
                 'user_verified_at' => $request->has('citizen_identity_card') ? now() : null,
@@ -611,6 +626,24 @@ class UserController extends Controller
                     ], 400);
                 }
             }
+
+            
+
+            if ($request->dob) {
+                $sevenYearsAgo = strtotime('-7 years', strtotime(date('Y-m-d')));
+                $checkDOB = strtotime($request->dob) <= $sevenYearsAgo;
+
+                if (!$checkDOB) {
+                    return response()->json([
+                        "status" => false,
+                        "message" => "Dữ liệu không hợp lệ",
+                        "errors" => [
+                            "dob" => "Người dùng phải từ 7 tuổi trở lên."
+                        ]
+                    ], 400);
+                }
+            }
+
 
             // if (($user->role_id == 4 || $user->role_id == 3)) {
             //     return response()->json([

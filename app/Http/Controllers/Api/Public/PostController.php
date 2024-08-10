@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Public;
 
 use App\Http\Controllers\Api\Client\CommentController;
 use App\Http\Controllers\Controller;
+use App\Models\Comment;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -141,7 +142,7 @@ class PostController extends Controller
             unset($post->content);
             return array_merge($post->toArray(), [
                 "user" => $post->user->only(['fullname', 'avatar', 'gender', 'job', 'story']),
-                "countComments" => $post->comments->count(),
+                "countComments" => Comment::where('post_id', $post->id)->where('status', 'published')->count(),
             ]);
         });
 
@@ -202,7 +203,7 @@ class PostController extends Controller
             "message" => "Get post successfully!",
             "data" => array_merge($post->toArray(), [
                 "user" => $post->user->only(['fullname', 'avatar', 'gender', 'job', 'story']),
-                "countComments" => $post->comments->count(),
+                "countComments" => Comment::where('post_id', $post->id)->where('status', 'published')->count(),
             ])
         ], 200);
     }

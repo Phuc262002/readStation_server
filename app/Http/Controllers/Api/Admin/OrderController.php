@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Admin;
 
+use App\Http\Controllers\Api\VNPay\VnpayCreatePayment;
 use App\Http\Controllers\Controller;
 use App\Mail\Order;
 use App\Models\BookDetail;
@@ -585,7 +586,7 @@ class OrderController extends Controller
                     'transaction_code' => $transaction_code,
                     'transaction_type' => 'payment',
                     'loan_order_id' => $order->id,
-                    'portal' => 'payos',
+                    'portal' => 'vnpay',
                     'transaction_method' => 'online',
                     'amount' => $request->total_all_fee,
                     'description' => 'Thanh toán đơn thuê ' . $order->order_code,
@@ -595,21 +596,27 @@ class OrderController extends Controller
                     $order->delete();
                 }
 
-                $body = $request->input();
-                $body["amount"] = intval($transaction->amount);
-                $body["orderCode"] = intval($transaction->transaction_code);
-                $body["description"] =  $order->order_code;
-                $body["expiredAt"] = now()->addMinutes(30)->getTimestamp();
-                $body["returnUrl"] = env('CLIENT_URL') . "/payment/result?portal=payos&amount=" . $transaction->amount . "&description=" . $transaction->transaction_code;
-                $body["cancelUrl"] = env('CLIENT_URL') . "/payment/result?portal=payos&amount=" . $transaction->amount . "&description=" . $transaction->transaction_code;
-                $payOS = new PayOS($this->payOSClientId, $this->payOSApiKey, $this->payOSChecksumKey);
+                // $body = $request->input();
+                // $body["amount"] = intval($transaction->amount);
+                // $body["orderCode"] = intval($transaction->transaction_code);
+                // $body["description"] =  $order->order_code;
+                // $body["expiredAt"] = now()->addMinutes(30)->getTimestamp();
+                // $body["returnUrl"] = env('CLIENT_URL') . "/payment/result?portal=payos&amount=" . $transaction->amount . "&description=" . $transaction->transaction_code;
+                // $body["cancelUrl"] = env('CLIENT_URL') . "/payment/result?portal=payos&amount=" . $transaction->amount . "&description=" . $transaction->transaction_code;
+                // $payOS = new PayOS($this->payOSClientId, $this->payOSApiKey, $this->payOSChecksumKey);
 
-                $response = $payOS->createPaymentLink($body);
+                // $response = $payOS->createPaymentLink($body);
+
+                $vnpay = new VnpayCreatePayment();
+
+                $response = $vnpay->createPaymentLink($transaction->amount, $transaction->transaction_code, "Thanh toán đơn hàng " . $transaction->transaction_code);
 
                 $transaction->update([
                     'status' => 'pending',
                     'expired_at' => now()->addMinutes(30),
-                    'extra_info' => $response
+                    'extra_info' => [
+                        'checkoutUrl' => $response
+                    ]
                 ]);
             } else {
                 $order = LoanOrders::create(array_merge($request->all(), [
