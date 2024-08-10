@@ -27,7 +27,7 @@ class VnpayCreatePayment extends Controller
         $this->apiUrl = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
     }
 
-    public function createPaymentLink($amount, $transaction_code, $description)
+    public function createPaymentLink($amount, $transaction_code, $description, $isLibrary = false)
     {
         $validator = Validator::make([
             'amount' => $amount
@@ -67,7 +67,7 @@ class VnpayCreatePayment extends Controller
             "vnp_Locale" => $vnp_Locale,
             "vnp_OrderInfo" => $description,
             "vnp_OrderType" => "other",
-            "vnp_ReturnUrl" => $this->vnp_Returnurl,
+            "vnp_ReturnUrl" => $isLibrary ? $this->vnp_Returnurl."&isLibrary=true" : $this->vnp_Returnurl."&isLibrary=false",
             "vnp_TxnRef" => $transaction_code,
             "vnp_ExpireDate" => $expire
         );

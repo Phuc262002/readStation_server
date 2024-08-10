@@ -14,7 +14,6 @@ class Extensions extends Model
     protected $fillable = [
         'loan_order_id',
         'extension_date',
-        'number_of_days',
         'extension_fee',
         'approved_by',
         'fee_transaction_id',

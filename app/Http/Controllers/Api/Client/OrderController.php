@@ -1292,6 +1292,7 @@ class OrderController extends Controller
             'transaction_code' => 'required|exists:transactions,transaction_code',
             'status' => 'required|string|in:success,canceled',
             'body' => 'required|array',
+            'isLibrary' => 'required|boolean',
         ], [
             'transaction_code.required' => 'Trường id là bắt buộc',
             'body.required' => 'Trường nội dung hủy thanh toán là bắt buộc',
@@ -1299,6 +1300,10 @@ class OrderController extends Controller
             'status.required' => 'Trường trạng thái thanh toán là bắt buộc',
             'status.string' => 'Trường trạng thái thanh toán phải là kiểu chuỗi',
             'status.in' => 'Trường trạng thái thanh toán phải là success hoặc canceled',
+            'body.required' => 'Trường nội dung hủy thanh toán là bắt buộc',
+            'body.array' => 'Trường nội dung hủy thanh toán phải là kiểu mảng',
+            'isLibrary.required' => 'Trường phương thức trả sách là bắt buộc',
+            'isLibrary.boolean' => 'Trường phương thức trả sách phải là kiểu boolean',
         ]);
 
         if ($validator->fails()) {
@@ -1352,14 +1357,29 @@ class OrderController extends Controller
                 ]);
 
                 if ($order) {
-                    $order->update([
-                        'status' => 'approved'
-                    ]);
-
-                    foreach ($order->loanOrderDetails as $orderDetail) {
-                        $orderDetail->update([
-                            'status' => 'pending'
+                    if ($request->isLibrary) {
+                        $order->update([
+                            'status' => 'active',
+                            'loan_date' => now(),
                         ]);
+
+                        foreach ($order->loanOrderDetails as $orderDetail) {
+                            $orderDetail->update([
+                                'original_due_date' => now()->addDays($orderDetail->number_of_days),
+                                'current_due_date' => now()->addDays($orderDetail->number_of_days),
+                                'status' => 'active'
+                            ]);
+                        }
+                    } else {
+                        $order->update([
+                            'status' => 'approved'
+                        ]);
+    
+                        foreach ($order->loanOrderDetails as $orderDetail) {
+                            $orderDetail->update([
+                                'status' => 'pending'
+                            ]);
+                        }
                     }
                 }
             }

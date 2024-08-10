@@ -609,7 +609,7 @@ class OrderController extends Controller
 
                 $vnpay = new VnpayCreatePayment();
 
-                $response = $vnpay->createPaymentLink($transaction->amount, $transaction->transaction_code, "Thanh toán đơn hàng " . $transaction->transaction_code);
+                $response = $vnpay->createPaymentLink($transaction->amount, $transaction->transaction_code, "Thanh toán đơn hàng " . $transaction->transaction_code, true);
 
                 $transaction->update([
                     'status' => 'pending',
@@ -1314,9 +1314,13 @@ class OrderController extends Controller
             ['id' => $id]
         ), [
             'id' => "required|exists:loan_order_details,id",
+            'number_of_days' => 'required|integer|min:1',
         ], [
             'id.required' => 'Trường id là bắt buộc',
             'id.exists' => 'Id không tồn tại',
+            'number_of_days.required' => 'Trường số ngày là bắt buộc',
+            'number_of_days.integer' => 'Trường số ngày phải là kiểu số',
+            'number_of_days.min' => 'Trường số ngày không được nhỏ hơn 1',
         ]);
 
         if ($validator->fails()) {
@@ -1347,7 +1351,7 @@ class OrderController extends Controller
                 ]);
             }
 
-            if ($order->current_due_date < now()) {
+            if ($orderDetail->current_due_date < now()) {
                 return response()->json([
                     'status' => false,
                     'message' => 'Extension order failed',
@@ -1360,15 +1364,16 @@ class OrderController extends Controller
             $extension = Extensions::create([
                 'loan_order_id' => $order->id,
                 'extension_date' => now(),
-                'new_due_date' => date('Y-m-d', strtotime($order->current_due_date . ' + 5 days')),
+                'new_due_date' => date('Y-m-d', strtotime($order->current_due_date . ' + '.$request->number_of_days.' days')),
                 'extension_fee' => $extension_fee,
                 'status' => 'approved'
             ]);
 
             $extension->extensionDetails()->create([
                 'extension_id' => $extension->id,
-                'loan_order_detail_id' => $request->loan_order_detail_id,
-                'new_due_date' => date('Y-m-d', strtotime($orderDetail->current_due_date . ' + 5 days')),
+                'number_of_days' => $request->number_of_days,
+                'loan_order_detail_id' => $orderDetail->id,
+                'new_due_date' => date('Y-m-d', strtotime($orderDetail->current_due_date . ' + '.$request->number_of_days.' days')),
                 'extension_fee' => 10000
             ]);
 
@@ -1390,14 +1395,12 @@ class OrderController extends Controller
             ]);
 
             $orderDetail->update([
-                'current_due_date' => date('Y-m-d', strtotime($orderDetail->current_due_date . ' + 4 days')),
+                'current_due_date' => date('Y-m-d', strtotime($orderDetail->current_due_date . ' + '.$request->number_of_days.' days')),
                 'status' => 'extended'
             ]);
 
             $order->update([
                 'status' => 'extended',
-                'current_extensions' => $order->current_extensions + 1,
-                'current_due_date' => date('Y-m-d', strtotime($order->current_due_date . ' + 5 days'))
             ]);
 
             return response()->json([
