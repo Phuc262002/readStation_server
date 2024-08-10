@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\Order;
 use App\Models\BookDetail;
 use App\Models\Extensions;
 use App\Models\LoanOrderDetails;
 use App\Models\LoanOrders;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use PayOS\PayOS;
 use OpenApi\Attributes as OA;
@@ -658,7 +660,9 @@ class OrderController extends Controller
                 ]);
             }
 
-            $order = LoanOrders::with(['transactions', 'loanOrderDetails'])->find($order->id);
+            $order = LoanOrders::with(['transactions', 'loanOrderDetails', 'loanOrderDetails.bookDetails', 'loanOrderDetails.bookDetails.book'])->find($order->id);
+
+            Mail::to($order->user->email)->send(new Order($order));
 
             return response()->json([
                 'status' => true,

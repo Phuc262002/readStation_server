@@ -407,7 +407,7 @@ Route::group([
     Route::group([
         "prefix" => "check-schedule"
     ], function () {
-        Route::get('/remind-return-book', [RemindReturnBookController::class, 'remindReturnBook']);
+        Route::get('/check-overdue-book', [RemindReturnBookController::class, 'remindReturnBook']);
     });
 
     Route::group([
@@ -430,6 +430,4 @@ Route::group([
         Route::post('/create-district', [ShiipController::class, 'createDistrict']);
         Route::post('/create-ward', [ShiipController::class, 'createWard']);
     });
-
-    Route::get('/test', [TransactionController::class, 'index']);
 });

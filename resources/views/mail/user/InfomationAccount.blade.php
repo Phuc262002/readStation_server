@@ -38,7 +38,7 @@ Dưới đây là thông tin tài khoản của bạn:
 
 Tài khoản này đã được kích hoạt và có thể sử dụng ngay. <br>
 
-Bạn có thể đăng nhập vào hệ thống tại địa chỉ: [Đăng nhập](https://warriorcode.online/login) <br>
+Bạn có thể đăng nhập vào hệ thống tại địa chỉ: [Đăng nhập](https://readstation.store/login) <br>
 
 **Lưu ý:**
 - Mật khẩu của bạn đã được tạo mặc định, vui lòng đổi mật khẩu sau khi đăng nhập để bảo mật tài khoản.
