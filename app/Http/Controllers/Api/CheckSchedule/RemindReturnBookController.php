@@ -27,8 +27,10 @@ class RemindReturnBookController extends Controller
                     $loanOrderDetail->status = 'overdue';
                     $loanOrderDetail->save();
 
-                    LoanOrders::where('id', $loanOrderDetail->loan_order_id)
+                    $loanOrder = LoanOrders::where('id', $loanOrderDetail->loan_order_id)
                         ->update(['status' => 'overdue']);
+
+                    Mail::to($loanOrder->user->email)->send(new RemindOrderOverdue($loanOrderDetail->loanOrder));
                 }
             }
 

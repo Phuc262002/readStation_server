@@ -33,6 +33,6 @@ Bấm vào đường link sau để xem chi tiết đơn hàng: [Xem đơn hàng
 
 Lưu ý: Vui lòng trả sách đúng hạn để tránh phát sinh phí phạt. Nếu bạn có bất kỳ thắc mắc nào, xin vui lòng liên hệ với chúng tôi qua email hoặc số điện thoại hỗ trợ.
 
-Regards,<br>
+Thân gửi,<br>
 {{ config('app.name') }}
 </x-mail::message>
