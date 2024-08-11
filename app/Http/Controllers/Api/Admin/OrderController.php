@@ -1197,10 +1197,24 @@ class OrderController extends Controller
             ['id' => $id]
         ), [
             'id' => 'required|exists:loan_orders,id',
-            'number_of_days' => 'required|integer|min:1',
+            'extended_method' => 'required|string|in:online,cash',
+            'extension' => 'required|array',
+            'extension.*.number_of_days' => 'required|integer|min:1',
+            'extension.*.loan_order_details_id' => 'required|integer|exists:loan_order_details,id',
         ], [
             'id.required' => 'Trường id là bắt buộc',
             'id.exists' => 'Id không tồn tại',
+            'extended_method.required' => 'Trường phương thức gia hạn là bắt buộc',
+            'extended_method.string' => 'Trường phương thức gia hạn phải là kiểu chuỗi',
+            'extended_method.in' => 'Trường phương thức gia hạn phải là online hoặc cash',
+            'extension.required' => 'Trường thông tin gia hạn là bắt buộc',
+            'extension.array' => 'Trường thông tin gia hạn phải là kiểu mảng',
+            'extension.*.number_of_days.required' => 'Trường số ngày gia hạn là bắt buộc',
+            'extension.*.number_of_days.integer' => 'Trường số ngày gia hạn phải là kiểu số',
+            'extension.*.number_of_days.min' => 'Trường số ngày gia hạn phải lớn hơn hoặc bằng 1',
+            'extension.*.loan_order_details_id.required' => 'Trường id chi tiết đơn hàng là bắt buộc',
+            'extension.*.loan_order_details_id.integer' => 'Trường id chi tiết đơn hàng phải là kiểu số',
+            'extension.*.loan_order_details_id.exists' => 'Id chi tiết đơn hàng không tồn tại',
         ]);
 
         if ($validator->fails()) {
@@ -1333,7 +1347,7 @@ class OrderController extends Controller
 
         try {
             $orderDetail = LoanOrderDetails::find($request->id);
-            $order = LoanOrders::with('loanOrderDetails')->find($orderDetail->loan_order_id);
+            $order = LoanOrders::with('loanOrderDetails', 'user')->find($orderDetail->loan_order_id);
 
             if ($order->status !== 'active' && $order->status !== 'extended') {
                 return response()->json([
@@ -1359,13 +1373,25 @@ class OrderController extends Controller
                 ]);
             }
 
-            $extension_fee = count($order->loanOrderDetails) * 10000;
+            $extension_fee = 0;
+
+            if ($orderDetail->bookDetails->book->category->name == 'Sách giáo khoa' && $order->user->role->name == 'student') {
+                $extension_fee = 0;
+            } else {
+                if ($orderDetail->bookDetails->price < 50000) {
+                    $extension_fee = 1000;
+                } elseif ($orderDetail->bookDetails->price < 100000) {
+                    $extension_fee = 2000;
+                } else {
+                    $extension_fee = 4000;
+                }
+            }
 
             $extension = Extensions::create([
                 'loan_order_id' => $order->id,
                 'extension_date' => now(),
                 'new_due_date' => date('Y-m-d', strtotime($order->current_due_date . ' + '.$request->number_of_days.' days')),
-                'extension_fee' => $extension_fee,
+                'extension_fee' => 0,
                 'status' => 'approved'
             ]);
 
@@ -1374,7 +1400,7 @@ class OrderController extends Controller
                 'number_of_days' => $request->number_of_days,
                 'loan_order_detail_id' => $orderDetail->id,
                 'new_due_date' => date('Y-m-d', strtotime($orderDetail->current_due_date . ' + '.$request->number_of_days.' days')),
-                'extension_fee' => 10000
+                'extension_fee' => $extension_fee * $request->number_of_days
             ]);
 
             $transaction_code = intval(substr(strtotime(now()) . rand(1000, 9999), -9));
@@ -1401,6 +1427,7 @@ class OrderController extends Controller
 
             $order->update([
                 'status' => 'extended',
+                'current_extensions' => $order->current_extensions + 1,
             ]);
 
             return response()->json([

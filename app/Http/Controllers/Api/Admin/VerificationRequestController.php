@@ -175,6 +175,7 @@ class VerificationRequestController extends Controller
         $pageSize = $request->input('pageSize', 10);
         $verification_card_type = $request->input('verification_card_type');
         $status = $request->input('status');
+        $search = $request->input('search');
 
         $query = VerificationRequest::query()->with('userRequest', 'userHandle');
 
@@ -188,15 +189,14 @@ class VerificationRequestController extends Controller
             $query->where('status', $status);
         }
 
-        if ($request->has('search')) {
-            $search = $request->input('search');
+        if ($search) {
             $query->where(function ($query) use ($search) {
                 $query->where('id', 'like', '%' . $search . '%')
                     ->orWhere('status', 'like', '%' . $search . '%')
                     ->orWhereHas('userRequest', function ($query) use ($search) {
                         $query->where('email', 'like', '%' . $search . '%')
                             ->orWhere('phone', 'like', '%' . $search . '%')
-                            ->orWhere('full_name', 'like', '%' . $search . '%');
+                            ->orWhere('fullname', 'like', '%' . $search . '%');
                     });
             });
         }

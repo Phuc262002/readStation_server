@@ -120,8 +120,10 @@ class User extends Authenticatable implements JWTSubject
 
     public function scopeSearch($query, $search)
     {
-        return $query->where('fullname', 'like', '%' . $search . '%')->orWhere('email', 'like', '%' . $search . '%');
-    } 
+        return $query->where('fullname', 'like', '%' . $search . '%')
+            ->orWhere('email', 'like', '%' . $search . '%')
+            ->orWhere('phone', 'like', '%' . $search . '%');
+    }
 
     public function scopeFilter($query, $status, $role)
     {
@@ -141,7 +143,8 @@ class User extends Authenticatable implements JWTSubject
         return $this->belongsTo(Role::class);
     }
 
-    public function post() {
+    public function post()
+    {
         return $this->hasMany(Post::class);
     }
 

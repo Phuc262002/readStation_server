@@ -65,6 +65,20 @@ use OpenApi\Attributes as OA;
             description: 'Id của return history',
             schema: new OA\Schema(type: 'integer')
         ),
+        new OA\Parameter(
+            name: 'search',
+            in: 'query',
+            required: true,
+            description: 'Từ khóa tìm kiếm',
+            schema: new OA\Schema(type: 'string')
+        ),
+        new OA\Parameter(
+            name: 'status',
+            in: 'query',
+            required: true,
+            description: 'Trạng thái của return history',
+            schema: new OA\Schema(type: 'string', enum: ['pending', 'completed', 'lost'])
+        ),
     ],
     responses: [
         new OA\Response(
@@ -137,9 +151,16 @@ class ReturnHistoryController extends Controller
         $validator = Validator::make($request->all(), [
             'page' => 'integer|min:1',
             'pageSize' => 'integer|min:1',
+            'search' => 'string',
+            'status' => 'string|in:pending,completed,lost',
         ], [
             'page.integer' => 'Page phải là số nguyên.',
             'pageSize.integer' => 'PageSize phải là số nguyên.',
+            'page.min' => 'Page phải lớn hơn hoặc bằng 1.',
+            'pageSize.min' => 'PageSize phải lớn hơn hoặc bằng 1.',
+            'search.string' => 'Search phải là chuỗi.',
+            'status.string' => 'Status phải là chuỗi.',
+            'status.in' => 'Status phải là pending, completed hoặc lost.',
         ]);
 
         if ($validator->fails()) {
@@ -152,6 +173,8 @@ class ReturnHistoryController extends Controller
 
         $page = $request->input('page', 1);
         $pageSize = $request->input('pageSize', 10);
+        $search = $request->input('search');
+        $status = $request->input('status');
 
         try {
             $query = ReturnHistory::query()->with([
@@ -164,6 +187,14 @@ class ReturnHistoryController extends Controller
                 'shippingMethod'
             ]);
             $totalItems = $query->count();
+
+            if ($search) {
+                $query->where('id', 'like', '%' . $search . '%');
+            }
+
+            if ($status) {
+                $query->where('status', $status);
+            }
 
             $returnHistory = $query->orderBy('created_at', 'desc')->paginate($pageSize, ['*'], 'page', $page);
 

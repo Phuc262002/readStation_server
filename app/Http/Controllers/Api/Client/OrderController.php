@@ -1406,16 +1406,23 @@ class OrderController extends Controller
         ), [
             'id' => 'required|exists:loan_orders,id',
             'extended_method' => 'required|string|in:online,cash',
-            'number_of_days' => 'required|integer|min:1',
+            'extension' => 'required|array',
+            'extension.*.number_of_days' => 'required|integer|min:1',
+            'extension.*.loan_order_details_id' => 'required|integer|exists:loan_order_details,id',
         ], [
             'id.required' => 'Trường id là bắt buộc',
             'id.exists' => 'Id không tồn tại',
             'extended_method.required' => 'Trường phương thức gia hạn là bắt buộc',
             'extended_method.string' => 'Trường phương thức gia hạn phải là kiểu chuỗi',
             'extended_method.in' => 'Trường phương thức gia hạn phải là online hoặc cash',
-            'number_of_days.required' => 'Trường số ngày gia hạn là bắt buộc',
-            'number_of_days.integer' => 'Trường số ngày gia hạn phải là kiểu số',
-            'number_of_days.min' => 'Trường số ngày gia hạn phải lớn hơn hoặc bằng 1',
+            'extension.required' => 'Trường thông tin gia hạn là bắt buộc',
+            'extension.array' => 'Trường thông tin gia hạn phải là kiểu mảng',
+            'extension.*.number_of_days.required' => 'Trường số ngày gia hạn là bắt buộc',
+            'extension.*.number_of_days.integer' => 'Trường số ngày gia hạn phải là kiểu số',
+            'extension.*.number_of_days.min' => 'Trường số ngày gia hạn phải lớn hơn hoặc bằng 1',
+            'extension.*.loan_order_details_id.required' => 'Trường id chi tiết đơn hàng là bắt buộc',
+            'extension.*.loan_order_details_id.integer' => 'Trường id chi tiết đơn hàng phải là kiểu số',
+            'extension.*.loan_order_details_id.exists' => 'Id chi tiết đơn hàng không tồn tại',
         ]);
 
         if ($validator->fails()) {
