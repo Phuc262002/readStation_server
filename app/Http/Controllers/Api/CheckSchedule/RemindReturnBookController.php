@@ -16,29 +16,34 @@ class RemindReturnBookController extends Controller
     {
         try {
             $loanOrderDetailRemind = LoanOrderDetails::where('current_due_date', '<=', now())
-                ->where(function ($query) {
-                    $query->where('status', '=', 'active')
-                        ->orWhere('status', '=', 'extended');
-                })
+                ->whereIn('status', ['active', 'extended'])
                 ->get();
 
-            if (!$loanOrderDetailRemind->isEmpty()) {
+            if ($loanOrderDetailRemind->isNotEmpty()) {
                 foreach ($loanOrderDetailRemind as $loanOrderDetail) {
-                    $loanOrderDetail->status = 'overdue';
-                    $loanOrderDetail->save();
+                    $loanOrderDetail->update(['status' => 'overdue']);
 
-                    $loanOrder = LoanOrders::where('id', $loanOrderDetail->loan_order_id)
-                        ->update(['status' => 'overdue']);
+                    $loanOrder = LoanOrders::find($loanOrderDetail->loan_order_id);
+                    if ($loanOrder) {
+                        $loanOrder->update(['status' => 'overdue']);
 
-                    Mail::to($loanOrder->user->email)->send(new RemindOrderOverdue($loanOrderDetail->loanOrder));
+                        // Ensure that the loanOrder relationship exists before attempting to send an email
+                        if ($loanOrder->user && $loanOrder->user->email) {
+                            Mail::to($loanOrder->user->email)->send(new RemindOrderOverdue($loanOrderDetail->loanOrder));
+                        }
+                    }
                 }
             }
 
-            $loanOrderOverdue = LoanOrders::where('status', 'overdue')->get();
+            $loanOrderOverdue = LoanOrders::with(['user'])
+                ->where('status', 'overdue')
+                ->get();
 
-            if (!$loanOrderOverdue->isEmpty()) {
+            if ($loanOrderOverdue->isNotEmpty()) {
                 foreach ($loanOrderOverdue as $loanOrder) {
-                    Mail::to($loanOrder->user->email)->send(new RemindOrderOverdued($loanOrder));
+                    if ($loanOrder->user && $loanOrder->user->email) {
+                        Mail::to($loanOrder->user->email)->send(new RemindOrderOverdued($loanOrder));
+                    }
                 }
             }
 
@@ -49,7 +54,7 @@ class RemindReturnBookController extends Controller
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
-                'message' => 'Check schedule remind return book fail',
+                'message' => 'Check schedule remind return book failed',
                 'errors' => $th->getMessage()
             ], 500);
         }

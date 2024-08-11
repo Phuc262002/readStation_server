@@ -17,7 +17,7 @@ class RemindOrderOverdued extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct(public LoanOrders $loanOrders)
+    public function __construct(public $loanOrders)
     {
         //
     }
