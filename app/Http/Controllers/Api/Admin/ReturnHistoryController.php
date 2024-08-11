@@ -35,6 +35,20 @@ use OpenApi\Attributes as OA;
             description: 'Số lượng mục trên mỗi trang',
             schema: new OA\Schema(type: 'integer', default: 10)
         ),
+        new OA\Parameter(
+            name: 'search',
+            in: 'query',
+            required: false,
+            description: 'Từ khóa tìm kiếm',
+            schema: new OA\Schema(type: 'string')
+        ),
+        new OA\Parameter(
+            name: 'status',
+            in: 'query',
+            required: false,
+            description: 'Trạng thái của return history',
+            schema: new OA\Schema(type: 'string', enum: ['pending', 'completed', 'lost'])
+        )
     ],
     responses: [
         new OA\Response(
@@ -64,20 +78,6 @@ use OpenApi\Attributes as OA;
             required: true,
             description: 'Id của return history',
             schema: new OA\Schema(type: 'integer')
-        ),
-        new OA\Parameter(
-            name: 'search',
-            in: 'query',
-            required: true,
-            description: 'Từ khóa tìm kiếm',
-            schema: new OA\Schema(type: 'string')
-        ),
-        new OA\Parameter(
-            name: 'status',
-            in: 'query',
-            required: true,
-            description: 'Trạng thái của return history',
-            schema: new OA\Schema(type: 'string', enum: ['pending', 'completed', 'lost'])
         ),
     ],
     responses: [
@@ -186,10 +186,20 @@ class ReturnHistoryController extends Controller
                 'processedBy',
                 'shippingMethod'
             ]);
+
             $totalItems = $query->count();
 
             if ($search) {
-                $query->where('id', 'like', '%' . $search . '%');
+                $query->where(function ($q) use ($search) {
+                    $q->whereHas('loanOrderDetail.loanOrder', function ($q) use ($search) {
+                        $q->where('order_code', 'like', '%' . $search . '%')
+                            ->orWhereHas('user', function ($q) use ($search) {
+                                $q->where('fullname', 'like', '%' . $search . '%')
+                                    ->orWhere('email', 'like', '%' . $search . '%')
+                                    ->orWhere('phone', 'like', '%' . $search . '%');
+                            });
+                    });
+                });
             }
 
             if ($status) {
@@ -239,12 +249,14 @@ class ReturnHistoryController extends Controller
         try {
             $returnHistory = ReturnHistory::with([
                 'loanOrderDetail',
+                'loanOrderDetail.extensionsDetails',
                 'loanOrderDetail.loanOrder',
                 'loanOrderDetail.loanOrder.user',
                 'loanOrderDetail.bookDetails',
                 'loanOrderDetail.bookDetails.book',
                 'processedBy',
-                'shippingMethod'
+                'shippingMethod',
+
             ])->find($id);
 
             return response()->json([

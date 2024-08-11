@@ -185,6 +185,7 @@ class BookReviewController extends Controller
             'rating' => 'integer|min:1|max:5',
             'status' => 'in:active,inactive',
             'sort' => 'in:asc,desc',
+            'search' => 'string',
         ], [
             'page.integer' => 'Trang phải là số nguyên.',
             'page.min' => 'Trang phải lớn hơn hoặc bằng 1.',
@@ -195,6 +196,7 @@ class BookReviewController extends Controller
             'rating.max' => 'Đánh giá phải nhỏ hơn hoặc bằng 5.',
             'status.in' => 'Trạng thái phải là active hoặc inactive.',
             'sort.in' => 'Sắp xếp phải là asc hoặc desc.',
+            'search.string' => 'Tìm kiếm phải là chuỗi ký tự.',
         ]);
 
         if ($validator->fails()) {
@@ -211,6 +213,7 @@ class BookReviewController extends Controller
         $rating = $request->input('rating');
         $status = $request->input('status');
         $sort = $request->input('sort', 'desc');
+        $search = $request->input('search');
 
         // Tạo query ban đầu
         $query = BookReview::query()->with([
@@ -232,6 +235,24 @@ class BookReviewController extends Controller
         // Áp dụng bộ lọc theo status
         if ($status) {
             $query->where('status', $request->status);
+        }
+
+        // Áp dụng bộ lọc theo search
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('content', 'like', "%$search%")
+                    ->orWhereHas('bookDetail', function ($q) use ($search) {
+                        $q->whereHas('book', function ($q) use ($search) {
+                            $q->where('title', 'like', "%$search%");
+                        });
+                    })
+                    ->orWhereHas('user', function ($q) use ($search) {
+                        $q->where('fullname', 'like', "%$search%")
+                            ->orWhere('email', 'like', "%$search%")
+                            ->orWhere('phone', 'like', "%$search%");
+                    });
+            });
         }
 
         // Thực hiện phân trang
