@@ -1297,7 +1297,7 @@ class OrderController extends Controller
             $transaction = Transaction::create([
                 'user_id' => auth()->user()->id,
                 'transaction_code' => $transaction_code,
-                'portal' => 'payos',
+                'portal' => null,
                 'loan_order_id' => $order->id,
                 'transaction_type' => 'extend',
                 'transaction_method' => 'offline',
@@ -1429,7 +1429,7 @@ class OrderController extends Controller
             $transaction = Transaction::create([
                 'user_id' => auth()->user()->id,
                 'transaction_code' => $transaction_code,
-                'portal' => 'payos',
+                'portal' => null,
                 'loan_order_id' => $order->id,
                 'transaction_type' => 'extend',
                 'transaction_method' => 'offline',

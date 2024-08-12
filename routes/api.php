@@ -24,6 +24,7 @@ use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Auth\PasswordController;
 use App\Http\Controllers\Api\Auth\VerifyEmailController;
 use App\Http\Controllers\Api\BotTelegram\GithubActionController;
+use App\Http\Controllers\Api\CheckSchedule\CheckPaymentOrder;
 use App\Http\Controllers\Api\CheckSchedule\FeeOverdueOrder;
 use App\Http\Controllers\Api\CheckSchedule\RemindReturnBookController;
 use App\Http\Controllers\Api\Client\AccountController;
@@ -431,5 +432,6 @@ Route::group([
     ], function () {
         Route::get('/check-overdue-book', [RemindReturnBookController::class, 'remindReturnBook']);
         Route::get('/fine-fee-overdue', [FeeOverdueOrder::class, 'IncreaseFineFeeOverdue']);
+        Route::get('/check-payment', [CheckPaymentOrder::class, 'checkPaymentOrder']);
     });
 });
