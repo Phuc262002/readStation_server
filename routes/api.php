@@ -24,6 +24,7 @@ use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Auth\PasswordController;
 use App\Http\Controllers\Api\Auth\VerifyEmailController;
 use App\Http\Controllers\Api\BotTelegram\GithubActionController;
+use App\Http\Controllers\Api\CheckSchedule\FeeOverdueOrder;
 use App\Http\Controllers\Api\CheckSchedule\RemindReturnBookController;
 use App\Http\Controllers\Api\Client\AccountController;
 use App\Http\Controllers\Api\Client\BookReviewController;
@@ -405,12 +406,6 @@ Route::group([
     });
 
     Route::group([
-        "prefix" => "check-schedule"
-    ], function () {
-        Route::get('/check-overdue-book', [RemindReturnBookController::class, 'remindReturnBook']);
-    });
-
-    Route::group([
         "prefix" => "upload",
         "middleware" => ["auth:api"]
     ], function () {
@@ -429,5 +424,12 @@ Route::group([
         Route::post('/create-province', [ShiipController::class, 'createProvince']);
         Route::post('/create-district', [ShiipController::class, 'createDistrict']);
         Route::post('/create-ward', [ShiipController::class, 'createWard']);
+    });
+
+    Route::group([
+        "prefix" => "check-schedule"
+    ], function () {
+        Route::get('/check-overdue-book', [RemindReturnBookController::class, 'remindReturnBook']);
+        Route::get('/fine-fee-overdue', [FeeOverdueOrder::class, 'IncreaseFineFeeOverdue']);
     });
 });
