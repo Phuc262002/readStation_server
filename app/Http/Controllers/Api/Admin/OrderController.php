@@ -1303,6 +1303,8 @@ class OrderController extends Controller
                 'transaction_method' => 'offline',
                 'amount' => ExtensionDetails::where('extension_id', $extensionCreate->id)->sum('extension_fee'),
                 'description' => 'Thanh toán gia hạn ' . $order->order_code,
+                'status' => 'completed',
+                'completed_at' => now()
             ]);
 
             $extensionCreate->update([
@@ -1435,6 +1437,8 @@ class OrderController extends Controller
                 'transaction_method' => 'offline',
                 'amount' => $extension_fee * $request->number_of_days,
                 'description' => 'Thanh toán gia hạn ' . $order->order_code,
+                'status' => 'completed',
+                'completed_at' => now()
             ]);
 
             $extension->update([
