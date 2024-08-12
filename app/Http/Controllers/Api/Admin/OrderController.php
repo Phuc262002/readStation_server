@@ -626,6 +626,7 @@ class OrderController extends Controller
                     'delivery_method' => 'pickup',
                     'loan_date' => now(),
                     'status' => 'active',
+                    'total_return_fee' => $request->total_deposit_fee
                 ]));
 
                 $orderDetails = $request->order_details;
@@ -804,7 +805,7 @@ class OrderController extends Controller
     public function paymentDoneOrder($id)
     {
         try {
-            $order = LoanOrders::find($id);
+            $order = LoanOrders::with('loanOrderDetails')->find($id);
 
             if ($order->status != 'wating_payment') {
                 return response()->json([
@@ -814,7 +815,7 @@ class OrderController extends Controller
             }
 
             $order->update([
-                'status' => 'pending'
+                'status' => 'approved'
             ]);
 
             return response()->json([
@@ -991,13 +992,6 @@ class OrderController extends Controller
                 ], 400);
             }
 
-            if ($order->status != 'approved') {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Đơn hàng không ở trạng thái đã duyệt',
-                ], 400);
-            }
-
             $order->update([
                 'status' => 'in_transit'
             ]);
@@ -1037,8 +1031,8 @@ class OrderController extends Controller
             foreach ($order->loanOrderDetails as $orderDetail) {
                 $orderDetail->update([
                     'status' => 'active',
-                    'original_due_date' => date('Y-m-d', strtotime($order->current_due_date . ' + 7 days')),
-                    'current_due_date' => date('Y-m-d', strtotime($order->current_due_date . ' + 7 days')),
+                    'original_due_date' => now()->addDays($orderDetail->number_of_days)->format('Y-m-d'),
+                    'current_due_date' => now()->addDays($orderDetail->number_of_days)->format('Y-m-d'),
                 ]);
             }
 
@@ -1047,6 +1041,7 @@ class OrderController extends Controller
                 'loan_date' => now(),
                 'pickup_date' => now(),
                 'delivered_date' => now(),
+                'total_return_fee' => $order->total_deposit_fee
             ]);
 
             return response()->json([

@@ -730,13 +730,9 @@ class OrderController extends Controller
             } else {
                 $order = LoanOrders::create(array_merge($request->all(), [
                     'user_id' => auth()->user()->id,
-                    'expired_date' => $request->has('expired_date') ? date('Y-m-d', strtotime($request->expired_date)) : date('Y-m-d', strtotime('+' . $request->number_of_days . ' days')),
                 ]));
 
                 $orderDetails = $request->order_details;
-                foreach ($orderDetails as $key => $detail) {
-                    $orderDetails[$key]['expired_date'] = $request->has('expired_date') ? date('Y-m-d', strtotime($request->expired_date)) : date('Y-m-d', strtotime('+' . $request->number_of_days . ' days'));
-                }
 
                 $order->loanOrderDetails()->createMany($orderDetails);
 
@@ -1362,6 +1358,7 @@ class OrderController extends Controller
                         $order->update([
                             'status' => 'active',
                             'loan_date' => now(),
+                            'total_return_fee' => $order->total_deposit_fee,
                         ]);
 
                         foreach ($order->loanOrderDetails as $orderDetail) {
