@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Api\PayOS\CheckCCCDController;
 use App\Http\Controllers\Controller;
 use App\Mail\InfomationAccount;
+use App\Models\LoanOrders;
 use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -338,7 +339,7 @@ class UserController extends Controller
         $users->getCollection()->transform(function ($user) {
             return array_merge($user->toArray(), [
                 'id' => $user->id,
-                'balance_holding' => Transaction::where('user_id', $user->id)->where('status', 'holding')->sum('amount'),
+                'balance_holding' => LoanOrders::where('user_id', $user->id)->whereIn('status', ['approved', 'ready_for_pickup', 'preparing_shipment', 'in_transit', 'active', 'extended', 'returning'])->sum('total_deposit_fee'),
             ]);
         });
 

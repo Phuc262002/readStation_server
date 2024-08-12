@@ -9,14 +9,17 @@ use Illuminate\Http\Request;
 
 class FeeOverdueOrder extends Controller
 {
-    public function IncreaseFineFeeOverdue() {
+    public function IncreaseFineFeeOverdue()
+    {
         try {
             $orderOverdue = LoanOrders::with('loanOrderDetails')->where('status', 'overdue')->get();
 
             foreach ($orderOverdue as $order) {
                 foreach ($order->loanOrderDetails as $orderDetail) {
-                    $orderDetail->fine_amount = $orderDetail->fine_amount + 5000;
-                    $orderDetail->save();
+                    if ($orderDetail->status == 'overdue') {
+                        $orderDetail->fine_amount = $orderDetail->fine_amount + 5000;
+                        $orderDetail->save();
+                    }
                 }
 
                 $order = LoanOrders::find($order->id);
