@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Client;
 
 use App\Http\Controllers\Api\VNPay\VnpayCreatePayment;
 use App\Http\Controllers\Controller;
+use App\Mail\Order;
 use App\Models\BookDetail;
 use App\Models\ExtensionDetails;
 use App\Models\Extensions;
@@ -13,6 +14,7 @@ use App\Models\ReturnHistory;
 use App\Models\ShippingMethod;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use OpenApi\Attributes as OA;
 use PayOS\PayOS;
@@ -761,7 +763,8 @@ class OrderController extends Controller
                 ]);
             }
 
-            $order = LoanOrders::with('transactions')->find($order->id);
+            $order = LoanOrders::with(['transactions', 'loanOrderDetails', 'loanOrderDetails.bookDetails', 'loanOrderDetails.bookDetails.book'])->find($order->id);
+            Mail::to($order->user->email)->send(new Order($order));
 
             return response()->json([
                 'status' => true,
