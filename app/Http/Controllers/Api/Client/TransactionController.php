@@ -79,7 +79,7 @@ class TransactionController extends Controller
     public function getBalanceHolding()
     {
         try {
-            $balanceHolding = LoanOrders::where('user_id', auth()->user()->id)->where('status', 'active')->sum('total_deposit_fee');
+            $balanceHolding = LoanOrders::where('user_id', auth()->user()->id)->whereIn('status', ['approved', 'ready_for_pickup', 'preparing_shipment', 'in_transit', 'active', 'extended', 'returning'])->sum('total_deposit_fee');
 
             return response()->json([
                 'status' => true,
