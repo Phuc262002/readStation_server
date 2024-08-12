@@ -4441,6 +4441,56 @@
                                 "allTime"
                             ]
                         }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Trạng thái giao dịch",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "pending",
+                                "completed",
+                                "cancelled"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "transaction_type",
+                        "in": "query",
+                        "description": "Loại giao dịch",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "payment",
+                                "refund",
+                                "extend"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "transaction_method",
+                        "in": "query",
+                        "description": "Phương thức giao dịch",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "online",
+                                "offline"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Tìm kiếm theo mã giao dịch",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {

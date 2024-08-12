@@ -39,6 +39,34 @@ use OpenApi\Attributes as OA;
             description: 'Sắp xếp theo tháng hoặc tất cả thời gian',
             schema: new OA\Schema(type: 'string', enum: ['inMonth', 'allTime'], default: 'allTime')
         ),
+        new OA\Parameter(
+            name: 'status',
+            in: 'query',
+            required: false,
+            description: 'Trạng thái giao dịch',
+            schema: new OA\Schema(type: 'string', enum: ['pending', 'completed', 'cancelled'])
+        ),
+        new OA\Parameter(
+            name: 'transaction_type',
+            in: 'query',
+            required: false,
+            description: 'Loại giao dịch',
+            schema: new OA\Schema(type: 'string', enum: ['payment', 'refund', 'extend'])
+        ),
+        new OA\Parameter(
+            name: 'transaction_method',
+            in: 'query',
+            required: false,
+            description: 'Phương thức giao dịch',
+            schema: new OA\Schema(type: 'string', enum: ['online', 'offline'])
+        ),
+        new OA\Parameter(
+            name: 'search',
+            in: 'query',
+            required: false,
+            description: 'Tìm kiếm theo mã giao dịch',
+            schema: new OA\Schema(type: 'string')
+        ),
     ],
     responses: [
         new OA\Response(
@@ -60,6 +88,11 @@ class TransactionController extends Controller
             'page' => 'integer|min:1',
             'pageSize' => 'integer|min:1',
             'sort' => 'string|in:inMonth,allTime',
+            'status' => 'string|in:pending,completed,cancelled',
+            'transaction_type' => 'string|in:payment,refund,extend',
+            'transaction_method' => 'string|in:online,offline',
+            'search' => 'string',
+
         ], [
             'page.integer' => 'Trường trang phải là kiểu số',
             'page.min' => 'Trường trang không được nhỏ hơn 1',
@@ -67,6 +100,13 @@ class TransactionController extends Controller
             'pageSize.min' => 'Trường pageSize không được nhỏ hơn 1',
             'sort.string' => 'Trường sort phải là kiểu chuỗi',
             'sort.in' => 'Trường sort phải thuộc các giá trị: inMonth, allTime',
+            'status.string' => 'Trường status phải là kiểu chuỗi',
+            'status.in' => 'Trường status phải thuộc các giá trị: pending, completed, cancelled',
+            'transaction_type.string' => 'Trường transaction_type phải là kiểu chuỗi',
+            'transaction_type.in' => 'Trường transaction_type phải thuộc các giá trị: payment, refund, extend',
+            'transaction_method.string' => 'Trường transaction_method phải là kiểu chuỗi',
+            'transaction_method.in' => 'Trường transaction_method phải thuộc các giá trị: online, offline',
+            'search.string' => 'Trường search phải là kiểu chuỗi',
         ]);
 
         if ($validator->fails()) {
@@ -80,6 +120,10 @@ class TransactionController extends Controller
         $page = $request->input('page', 1);
         $pageSize = $request->input('pageSize', 10);
         $sort = $request->input('sort', 'allTime');
+        $status = $request->input('status');
+        $transactionType = $request->input('transaction_type');
+        $transactionMethod = $request->input('transaction_method');
+        $search = $request->input('search');
 
         $query = Transaction::query()->with('user');
 
@@ -88,6 +132,22 @@ class TransactionController extends Controller
         }
 
         $totalItems = $query->count();
+
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        if ($transactionType) {
+            $query->where('transaction_type', $transactionType);
+        }
+
+        if ($transactionMethod) {
+            $query->where('transaction_method', $transactionMethod);
+        }
+
+        if ($search) {
+            $query->where('transaction_code', 'like', "%$search%");
+        }
 
         $transactions = $query->orderBy('created_at', 'desc')->paginate($pageSize, ['*'], 'page', $page);
 
