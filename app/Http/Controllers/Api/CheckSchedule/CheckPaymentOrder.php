@@ -13,22 +13,40 @@ class CheckPaymentOrder extends Controller
     {
         try {
             $transactions = Transaction::where('transaction_method', 'online')
-                           ->where('status', 'pending')
-                           ->where('expired_at', '<=', now()->subMinutes(30))
-                           ->get();
+                                        ->where('status', 'pending')
+                                        ->where('expired_at', '<=', now()->subMinutes(30))
+                                        ->get();
 
             foreach ($transactions as $transaction) {
-                $transaction->status = 'canceled';
-                $transaction->save();
+                if ($transaction->transaction_type == 'payment') {
+                    $transaction->status = 'canceled';
+                    $transaction->save();
 
-                $order = LoanOrders::with('loanOrderDetails')->where('id', $transaction->loan_order_id)->first();
-                foreach ($order->loanOrderDetails as $orderDetail) {
-                    if ($orderDetail->status == 'canceled') {
-                        $orderDetail->save();
+                    $order = LoanOrders::with('loanOrderDetails')->where('id', $transaction->loan_order_id)->first();
+                    foreach ($order->loanOrderDetails as $orderDetail) {
+                        if ($orderDetail->status == 'canceled') {
+                            $orderDetail->save();
+                        }
+                    }
+                    $order->status = 'canceled';
+                    $order->save();
+                } else if ($transaction->transaction_type == 'extend') {
+                    $transaction->status = 'canceled';
+                    $transaction->save();
+
+                    $order = LoanOrders::with('loanOrderDetails')->where('id', $transaction->loan_order_id)->first();
+                    $checkOrderdue = false;
+                    foreach ($order->loanOrderDetails as $orderDetail) {
+                        if ($orderDetail->current_due_date <= now()) {
+                            $orderDetail->status = 'overdue';
+                            $orderDetail->save();
+                            $checkOrderdue = true;
+                        }
+                    }
+                    if ($checkOrderdue) {
+                        $order->status = 'overdue';
                     }
                 }
-                $order->status = 'canceled';
-                $order->save();
             }
 
             return response()->json([
