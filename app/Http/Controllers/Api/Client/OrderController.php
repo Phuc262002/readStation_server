@@ -765,7 +765,7 @@ class OrderController extends Controller
                 ]);
             }
 
-            $order = LoanOrders::find($order->id);
+            $order = LoanOrders::with('transactions')->find($order->id);
 
             return response()->json([
                 'status' => true,
