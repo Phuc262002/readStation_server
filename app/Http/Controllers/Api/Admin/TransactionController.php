@@ -44,7 +44,7 @@ use OpenApi\Attributes as OA;
             in: 'query',
             required: false,
             description: 'Trạng thái giao dịch',
-            schema: new OA\Schema(type: 'string', enum: ['pending', 'completed', 'cancelled'])
+            schema: new OA\Schema(type: 'string', enum: ['pending', 'completed', 'canceled'])
         ),
         new OA\Parameter(
             name: 'transaction_type',
@@ -88,7 +88,7 @@ class TransactionController extends Controller
             'page' => 'integer|min:1',
             'pageSize' => 'integer|min:1',
             'sort' => 'string|in:inMonth,allTime',
-            'status' => 'string|in:pending,completed,cancelled',
+            'status' => 'string|in:pending,completed,canceled',
             'transaction_type' => 'string|in:payment,refund,extend',
             'transaction_method' => 'string|in:online,offline',
             'search' => 'string',
@@ -101,7 +101,7 @@ class TransactionController extends Controller
             'sort.string' => 'Trường sort phải là kiểu chuỗi',
             'sort.in' => 'Trường sort phải thuộc các giá trị: inMonth, allTime',
             'status.string' => 'Trường status phải là kiểu chuỗi',
-            'status.in' => 'Trường status phải thuộc các giá trị: pending, completed, cancelled',
+            'status.in' => 'Trường status phải thuộc các giá trị: pending, completed, canceled',
             'transaction_type.string' => 'Trường transaction_type phải là kiểu chuỗi',
             'transaction_type.in' => 'Trường transaction_type phải thuộc các giá trị: payment, refund, extend',
             'transaction_method.string' => 'Trường transaction_method phải là kiểu chuỗi',
