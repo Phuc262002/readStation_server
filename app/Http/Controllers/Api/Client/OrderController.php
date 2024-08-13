@@ -1509,11 +1509,11 @@ class OrderController extends Controller
             $transaction = Transaction::create([
                 'user_id' => auth()->user()->id,
                 'transaction_code' => $transaction_code,
-                'portal' => 'payos',
+                'portal' => $request->extended_method === 'online' ? 'vnpay' : 'cash',
                 'loan_order_id' => $order->id,
                 'expired_at' => now(),
                 'transaction_type' => 'extend',
-                'transaction_method' => 'offline',
+                'transaction_method' => $request->extended_method,
                 'amount' => ExtensionDetails::where('extension_id', $extensionCreate->id)->sum('extension_fee'),
                 'description' => 'Thanh toán gia hạn ' . $order->order_code,
             ]);
@@ -1522,6 +1522,20 @@ class OrderController extends Controller
                 'fee_transaction_id' => $transaction->id,
                 'extension_fee' => ExtensionDetails::where('extension_id', $extensionCreate->id)->sum('extension_fee')
             ]);
+
+            if ($request->extended_method === 'online') {
+                $vnpay = new VnpayCreatePayment();
+
+                $response = $vnpay->createPaymentLink($transaction->amount, $transaction->transaction_code, "Thanh toán gia hạn đơn hàng " . $order->order_code);
+
+                $transaction->update([
+                    'status' => 'pending',
+                    'expired_at' => now()->addMinutes(30),
+                    'extra_info' => [
+                        'checkoutUrl' => $response
+                    ]
+                ]);
+            }
 
             foreach ($request->extension as $extension) {
                 $orderDetail = LoanOrderDetails::find($extension['loan_order_details_id']);
@@ -1563,12 +1577,16 @@ class OrderController extends Controller
         ), [
             'id' => "required|exists:loan_order_details,id",
             'number_of_days' => 'required|integer|min:1',
+            'extended_method' => 'required|string|in:online,cash',
         ], [
             'id.required' => 'Trường id là bắt buộc',
             'id.exists' => 'Id không tồn tại',
             'number_of_days.required' => 'Trường số ngày là bắt buộc',
             'number_of_days.integer' => 'Trường số ngày phải là kiểu số',
             'number_of_days.min' => 'Trường số ngày không được nhỏ hơn 1',
+            'extended_method.required' => 'Trường phương thức gia hạn là bắt buộc',
+            'extended_method.string' => 'Trường phương thức gia hạn phải là kiểu chuỗi',
+            'extended_method.in' => 'Trường phương thức gia hạn phải là online hoặc cash',
         ]);
 
         if ($validator->fails()) {
@@ -1642,18 +1660,33 @@ class OrderController extends Controller
             $transaction = Transaction::create([
                 'user_id' => auth()->user()->id,
                 'transaction_code' => $transaction_code,
-                'portal' => 'payos',
+                'portal' => $request->extended_method === 'online' ? 'vnpay' : 'cash',
                 'loan_order_id' => $order->id,
-                'transaction_type' => 'extend',
                 'expired_at' => now(),
-                'transaction_method' => 'offline',
-                'amount' => $extension_fee,
+                'transaction_type' => 'extend',
+                'transaction_method' => $request->extended_method,
+                'amount' => ExtensionDetails::where('extension_id', $extension->id)->sum('extension_fee'),
                 'description' => 'Thanh toán gia hạn ' . $order->order_code,
             ]);
 
             $extension->update([
-                'fee_transaction_id' => $transaction->id
+                'fee_transaction_id' => $transaction->id,
+                'extension_fee' => ExtensionDetails::where('extension_id', $extension->id)->sum('extension_fee')
             ]);
+
+            if ($request->extended_method === 'online') {
+                $vnpay = new VnpayCreatePayment();
+
+                $response = $vnpay->createPaymentLink($transaction->amount, $transaction->transaction_code, "Thanh toán gia hạn đơn hàng " . $order->order_code);
+
+                $transaction->update([
+                    'status' => 'pending',
+                    'expired_at' => now()->addMinutes(30),
+                    'extra_info' => [
+                        'checkoutUrl' => $response
+                    ]
+                ]);
+            }
 
             $orderDetail->update([
                 'current_due_date' => date('Y-m-d', strtotime($orderDetail->current_due_date . ' + ' . $request->number_of_days . ' days')),
