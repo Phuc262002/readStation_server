@@ -1509,11 +1509,11 @@ class OrderController extends Controller
             $transaction = Transaction::create([
                 'user_id' => auth()->user()->id,
                 'transaction_code' => $transaction_code,
-                'portal' => $request->extended_method === 'online' ? 'vnpay' : 'cash',
+                'portal' => $request->extended_method === 'online' ? 'vnpay' : null,
                 'loan_order_id' => $order->id,
                 'expired_at' => now(),
                 'transaction_type' => 'extend',
-                'transaction_method' => $request->extended_method,
+                'transaction_method' => $request->extended_method === 'online' ? 'online' : 'offline',
                 'amount' => ExtensionDetails::where('extension_id', $extensionCreate->id)->sum('extension_fee'),
                 'description' => 'Thanh toán gia hạn ' . $order->order_code,
             ]);
@@ -1660,11 +1660,11 @@ class OrderController extends Controller
             $transaction = Transaction::create([
                 'user_id' => auth()->user()->id,
                 'transaction_code' => $transaction_code,
-                'portal' => $request->extended_method === 'online' ? 'vnpay' : 'cash',
+                'portal' => $request->extended_method === 'online' ? 'vnpay' : null,
                 'loan_order_id' => $order->id,
                 'expired_at' => now(),
                 'transaction_type' => 'extend',
-                'transaction_method' => $request->extended_method,
+                'transaction_method' => $request->extended_method === 'online' ? 'online' : 'offline',
                 'amount' => ExtensionDetails::where('extension_id', $extension->id)->sum('extension_fee'),
                 'description' => 'Thanh toán gia hạn ' . $order->order_code,
             ]);
