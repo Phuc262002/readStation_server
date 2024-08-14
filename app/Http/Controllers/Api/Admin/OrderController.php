@@ -724,6 +724,7 @@ class OrderController extends Controller
                 'loanOrderDetails.bookDetails.book.shelve.bookcase',
                 'transactions',
                 'extensions',
+                'extensions.approvedBy',
                 'extensions.extensionDetails',
                 'extensions.extensionDetails.loanOrderDetail',
                 'extensions.extensionDetails.loanOrderDetail.bookDetails',
@@ -819,6 +820,15 @@ class OrderController extends Controller
             $order->update([
                 'status' => 'approved'
             ]);
+
+            $transaction = Transaction::where('loan_order_id', $order->id)->first();
+            
+            if ($transaction) {
+                $transaction->update([
+                    'status' => 'completed',
+                    'completed_at' => now()
+                ]);
+            }
 
             return response()->json([
                 'status' => true,
@@ -1126,7 +1136,7 @@ class OrderController extends Controller
             $request->all(),
             ['loan_order_details_id' => $id]
         ), [
-            'loan_order_details_id' => 'required|integer|exists:loan_order_details,id',
+            'loan_order_details_id' => 'required|exists:loan_order_details,id',
             'condition' => 'nullable|string',
             'actual_return_condition' => 'required|string|in:excellent,good,fair,poor,damaged,lost',
             'fine_amount' => 'required_if:actual_return_condition,poor,damaged,lost|numeric|min:0',
@@ -1172,8 +1182,37 @@ class OrderController extends Controller
                 'status' => 'completed',
                 'actual_return_condition' => $request->actual_return_condition,
                 'fine_amount' => $request->fine_amount ?? 0,
-                'return_date' => now()
+                'return_date' => now(),
             ]);
+
+            if (in_array($request->actual_return_condition, ['good', 'excellent'])) {
+                $orderDetail->bookDetails->update([
+                    'stock' => $orderDetail->bookDetails->stock + 1,
+                ]);
+            } else {
+                $orderDetail->bookDetails->update([
+                    'stock_broken' => $orderDetail->bookDetails->stock_broken + 1,
+                ]);
+            }            
+
+            $order = LoanOrders::find($orderDetail->loan_order_id);
+
+            if ($order->loanOrderDetails->filter(function ($detail) {
+                return $detail->status === 'active' || $detail->status === 'extended';
+            })->count() == 0) {
+                $order->update([
+                    'status' => 'completed',
+                    'completed_date' => now(),
+                ]);
+            }
+
+
+            $order->update([
+                'total_fine_fee' => $order->loanOrderDetails->sum('fine_amount'),
+                'total_return_fee' => $order->total_deposit_fee - $order->loanOrderDetails->sum('fine_amount')
+            ]);
+
+
 
             return response()->json([
                 'status' => true,
@@ -1256,7 +1295,8 @@ class OrderController extends Controller
                 'loan_order_id' => $order->id,
                 'extension_date' => now(),
                 'extension_fee' => 0,
-                'status' => 'approved'
+                'status' => 'approved',
+                'approved_by' => auth()->id(),
             ]);
 
             $extensionDetails = [];
@@ -1413,7 +1453,8 @@ class OrderController extends Controller
                 'extension_date' => now(),
                 'new_due_date' => date('Y-m-d', strtotime($order->current_due_date . ' + ' . $request->number_of_days . ' days')),
                 'extension_fee' => 0,
-                'status' => 'approved'
+                'status' => 'approved',
+                'approved_by' => auth()->id(),
             ]);
 
             $extension->extensionDetails()->create([

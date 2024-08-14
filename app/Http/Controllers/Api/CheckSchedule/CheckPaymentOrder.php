@@ -13,9 +13,9 @@ class CheckPaymentOrder extends Controller
     {
         try {
             $transactions = Transaction::where('transaction_method', 'online')
-                                        ->where('status', 'pending')
-                                        ->where('expired_at', '<=', now()->subMinutes(30))
-                                        ->get();
+                ->where('status', 'pending')
+                ->where('expired_at', '<=', now())
+                ->get();
 
             foreach ($transactions as $transaction) {
                 if ($transaction->transaction_type == 'payment') {

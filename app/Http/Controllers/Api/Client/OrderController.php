@@ -1349,6 +1349,10 @@ class OrderController extends Controller
                         $orderDetail->update([
                             'status' => 'canceled'
                         ]);
+
+                        $orderDetail->bookDetails->update([
+                            'stock' => $orderDetail->bookDetails->stock + 1
+                        ]);
                     }
                 }
             } else {
