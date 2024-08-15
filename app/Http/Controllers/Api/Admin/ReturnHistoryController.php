@@ -354,17 +354,19 @@ class ReturnHistoryController extends Controller
             }
 
             $loanOrderDetail = LoanOrderDetails::find($returnHistory->loan_order_details_id);
-            $allActiveOrExtended = true;
+            $flag = true;
 
-            foreach ($order->loanOrderDetails as $orderDetail) {
-                if ($orderDetail->status != 'active' && $orderDetail->status != 'extended') {
-                    $allActiveOrExtended = false;
+            foreach ($order->loanOrderDetails as $item) {
+                if ($item->status != 'completed') {
+                    $flag = false;
                     break;
                 }
             }
 
-            if (!$allActiveOrExtended) {
-                $order->update(['status' => 'completed']);
+            if ($flag) {
+                $order->update([
+                    'status' => 'completed'
+                ]);
             }
 
 

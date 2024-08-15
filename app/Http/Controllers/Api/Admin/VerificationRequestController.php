@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\ApprovedVerification;
+use App\Mail\RejectVerification;
 use App\Models\User;
 use App\Models\VerificationRequest;
 use App\Models\Wallet;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use OpenApi\Attributes as OA;
 
@@ -307,6 +310,7 @@ class VerificationRequestController extends Controller
                             'place_of_study' => $verification_request->verification_card_info['place_of_study'],
                         ],
                     ]);
+                    Mail::to($user->email)->send(new ApprovedVerification($verification_request));
                 } else {
                     $verification_request->update([
                         'status' => $request->status,
@@ -314,6 +318,8 @@ class VerificationRequestController extends Controller
                         'user_handle_id' => auth()->user()->id,
                         'verification_date' => now()
                     ]);
+
+                    Mail::to($user->email)->send(new RejectVerification($verification_request));
                 }
             } else {
                 if ($request->status === 'approved') {
@@ -333,6 +339,7 @@ class VerificationRequestController extends Controller
                             'place_of_issue' => $verification_request->verification_card_info['place_of_issue']
                         ],
                     ]);
+                    Mail::to($user->email)->send(new ApprovedVerification($verification_request));
                 } else {
                     $verification_request->update([
                         'status' => $request->status,
@@ -340,6 +347,7 @@ class VerificationRequestController extends Controller
                         'user_handle_id' => auth()->user()->id,
                         'verification_date' => now()
                     ]);
+                    Mail::to($user->email)->send(new RejectVerification($verification_request));
                 }
             }
 
@@ -353,7 +361,7 @@ class VerificationRequestController extends Controller
                 'status' => false,
                 'message' => 'Update verification_request failed',
                 'errors' => $th->getMessage(),
-            ]);
+            ], 500);
         }
     }
 }
