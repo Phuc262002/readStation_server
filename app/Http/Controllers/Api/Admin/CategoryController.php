@@ -424,11 +424,10 @@ class CategoryController extends Controller
         }
 
 
-        if ($validator->fails()) {
+        if ($request->status == 'inactive' && $category->is_featured == true) {
             return response()->json([
-                "staus" => false,
-                "message" => "Dữ liệu không hợp lệ",
-                "errors" => $validator->errors()
+                "status" => false,
+                "message" => "Không thể ẩn danh mục nổi bật!"
             ], 400);
         }
 
