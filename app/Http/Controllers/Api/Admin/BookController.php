@@ -671,8 +671,8 @@ class BookController extends Controller
             'shelve_id' => "nullable",
             'book_detail' => "required|array",
             'book_detail.*.sku_origin' => "nullable|string",
-            // 'book_detail.*.poster' => "required",
-            // 'book_detail.*.images' => "required|array",
+            'book_detail.*.poster' => "required",
+            'book_detail.*.images' => "required|array",
             'book_detail.*.book_version' => "required",
             'book_detail.*.price' => "required",
             'book_detail.*.hire_percent' => "required",
@@ -735,7 +735,8 @@ class BookController extends Controller
                     $validatedData,
                     [
                         'is_featured' => true,
-                        'status' => 'active'
+                        'status' => 'active',
+
                     ]
                 ));
             } else {
@@ -750,6 +751,8 @@ class BookController extends Controller
             $bookDetails = $validatedData['book_detail'];
             foreach ($bookDetails as $detail) {
                 $detail['book_id'] = $book->id;
+                $detail['poster'] = "xxx";
+                $detail['images'] = ["xxx"];
             }
 
             $book->bookDetail()->createMany($bookDetails);
