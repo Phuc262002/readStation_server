@@ -427,7 +427,8 @@ class ShelveController extends Controller
         ], 200);
     }
 
-    public function bookOfShelve(Request $request, $id) {
+    public function bookOfShelve(Request $request, $id)
+    {
         $validator = Validator::make(['id' => $id], [
             'id' => 'required|exists:shelves,id',
             'page' => 'integer|min:1',
@@ -456,12 +457,18 @@ class ShelveController extends Controller
         $pageSize = $request->input('pageSize', 10);
         $search = $request->input('search');
 
-        $query = Book::query()->with(['bookDetail', 'author', 'category'])->where('shelve_id', $id);
+        $query = Book::query()->with(['bookDetail', 'author', 'category'])
+            ->where('shelve_id', $id);
+
         $totalItems = $query->count();
 
         if ($search) {
-            $query = $query->where('title', 'like', "%$search%")->orWhere('original_title', 'like', "%$search%");
+            $query->where(function ($query) use ($search) {
+                $query->where('title', 'like', "%$search%")
+                    ->orWhere('original_title', 'like', "%$search%");
+            });
         }
+
 
         $books = $query->orderBy('created_at', 'desc')->paginate($pageSize, ['*'], 'page', $page);
 
