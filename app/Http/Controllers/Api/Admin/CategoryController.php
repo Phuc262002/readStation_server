@@ -279,12 +279,11 @@ class CategoryController extends Controller
         $categories = $query->orderBy('created_at', 'desc')->paginate($pageSize, ['*'], 'page', $page);
 
         $categories->getCollection()->transform(function ($category) {
-            return [
-                array_merge($category->toArray(), [
-                    'total_books' => Book::where('category_id', $category->id)->count()
-                ])
-            ];
-        });
+            $categoryArray = $category->toArray();
+            $categoryArray['total_books'] = Book::where('category_id', $category->id)->count();
+            
+            return $categoryArray;
+        });        
 
         return response()->json([
             "status" => true,
