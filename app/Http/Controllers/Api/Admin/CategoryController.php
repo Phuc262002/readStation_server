@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Book;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -276,6 +277,14 @@ class CategoryController extends Controller
 
         // Thực hiện phân trang
         $categories = $query->orderBy('created_at', 'desc')->paginate($pageSize, ['*'], 'page', $page);
+
+        $categories->getCollection()->transform(function ($category) {
+            return [
+                array_merge($category->toArray(), [
+                    'total_books' => Book::where('category_id', $category->id)->count()
+                ])
+            ];
+        });
 
         return response()->json([
             "status" => true,
