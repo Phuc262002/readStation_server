@@ -1056,6 +1056,15 @@ class OrderController extends Controller
                 'total_return_fee' => $order->total_deposit_fee
             ]);
 
+            $transaction = Transaction::where('loan_order_id', $order->id)->first();
+
+            if ($transaction) {
+                $transaction->update([
+                    'status' => 'completed',
+                    'completed_at' => now()
+                ]);
+            }
+
             return response()->json([
                 'status' => true,
                 'message' => 'Đơn hàng đang mượn',

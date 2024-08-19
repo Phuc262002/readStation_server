@@ -179,19 +179,9 @@ use OpenApi\Attributes as OA;
                     items: new OA\Items(
                         type: 'object',
                         required: [
-                            'sku_origin',
-                            'poster',
-                            'images',
-                            'book_version',
-                            'price',
-                            'hire_percent',
-                            'stock',
-                            'publish_date',
-                            'publishing_company_id',
-                            'issuing_company',
-                            'cardboard',
-                            'total_page',
-                            'language'
+                            'sku_origin', 'poster', 'images', 'book_version', 'price', 'hire_percent', 'stock',
+                            'publish_date', 'publishing_company_id', 'issuing_company', 'cardboard',
+                            'total_page', 'language'
                         ],
                         properties: [
                             new OA\Property(property: 'sku_origin', type: 'string'),
@@ -502,7 +492,7 @@ class BookController extends Controller
         }
 
         $bookdetail = Book::with([
-            'bookDetail' => function ($query) {
+            'bookDetail' => function($query) {
                 $query->where('status', '!=', 'deleted');
             },
             'bookDetail.publishingCompany',
@@ -511,7 +501,7 @@ class BookController extends Controller
             'shelve',
             'shelve.bookcase',
             'shelve.category'
-        ])->find($id);
+        ])->find($id);        
         if (!$bookdetail) {
             return response()->json([
                 "status" => false,
@@ -681,8 +671,8 @@ class BookController extends Controller
             'shelve_id' => "nullable",
             'book_detail' => "required|array",
             'book_detail.*.sku_origin' => "nullable|string",
-            // 'book_detail.*.poster' => "required",
-            // 'book_detail.*.images' => "required|array",
+            'book_detail.*.poster' => "required",
+            'book_detail.*.images' => "nullable|array",
             'book_detail.*.book_version' => "required",
             'book_detail.*.price' => "required",
             'book_detail.*.hire_percent' => "required",
@@ -745,8 +735,7 @@ class BookController extends Controller
                     $validatedData,
                     [
                         'is_featured' => true,
-                        'status' => 'active',
-
+                        'status' => 'active'
                     ]
                 ));
             } else {
@@ -759,11 +748,8 @@ class BookController extends Controller
             }
 
             $bookDetails = $validatedData['book_detail'];
-            foreach ($bookDetails as $key => $detail) {
+            foreach ($bookDetails as $detail) {
                 $detail['book_id'] = $book->id;
-                $detail['poster'] = "xxx";
-                $detail['images'] = ["xxx"];
-                $bookDetails[$key] = $detail; // Update the original array
             }
 
             $book->bookDetail()->createMany($bookDetails);
