@@ -770,13 +770,13 @@ class OrderController extends Controller
 
             return response()->json([
                 'status' => true,
-                'message' => 'Create order successfully',
+                'message' => 'Tạo đơn hàng thành công',
                 'data' => $order
             ]);
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
-                'message' => 'Create order failed',
+                'message' => 'Tạo đơn hàng thất bại',
                 'errors' => $th->getMessage()
             ]);
         }
