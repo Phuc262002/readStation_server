@@ -35,10 +35,6 @@ class Post extends Model
         static::creating(function ($model) {
             $model->slug = Str::slug($model->title . '-' . Str::random(5));
         });
-
-        static::updating(function ($model) {
-            $model->slug = Str::slug($model->title . '-' . Str::random(5));
-        });
     }
 
     public function scopeSearch($query, $search)

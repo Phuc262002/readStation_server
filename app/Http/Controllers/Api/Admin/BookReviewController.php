@@ -54,6 +54,13 @@ use OpenApi\Attributes as OA;
             description: 'Sắp xếp',
             schema: new OA\Schema(type: 'string', enum: ['asc', 'desc'], default: 'desc')
         ),
+        new OA\Parameter(
+            name: 'search',
+            in: 'query',
+            required: false,
+            description: 'Tìm kiếm',
+            schema: new OA\Schema(type: 'string')
+        ),
     ],
     responses: [
         new OA\Response(

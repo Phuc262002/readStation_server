@@ -1197,6 +1197,15 @@
                                 "desc"
                             ]
                         }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Tìm kiếm",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
@@ -4452,7 +4461,7 @@
                             "enum": [
                                 "pending",
                                 "completed",
-                                "cancelled"
+                                "canceled"
                             ]
                         }
                     },

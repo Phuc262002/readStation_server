@@ -68,6 +68,11 @@ class BookDetail extends Model
         return $this->hasMany(LoanOrderDetails::class, 'book_details_id');
     }
 
+    public function bookReviews()
+    {
+        return $this->hasMany(BookReview::class, 'book_details_id');
+    }
+
     public function publishingCompany()
     {
         return $this->belongsTo(PublishingCompany::class, 'publishing_company_id');

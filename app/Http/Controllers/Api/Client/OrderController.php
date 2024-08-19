@@ -1255,6 +1255,14 @@ class OrderController extends Controller
                     'status' => 'returning',
                 ]);
 
+                $orderCheck = LoanOrderDetails::where('loan_order_id', $orderDetail->loan_order_id)->whereIn('status', ['active', 'extended'])->get();
+
+                if ($orderCheck->count() == 0) {
+                    $order->update([
+                        'status' => 'returning'
+                    ]);
+                }
+
                 return response()->json([
                     'status' => true,
                     'message' => 'Trả sách thành công',
@@ -1272,6 +1280,18 @@ class OrderController extends Controller
                 $orderDetail->update([
                     'status' => 'returning',
                 ]);
+
+                $order->update([
+                    'status' => 'returning'
+                ]);
+
+                $orderCheck = LoanOrderDetails::where('loan_order_id', $orderDetail->loan_order_id)->whereIn('status', ['active', 'extended'])->get();
+
+                if ($orderCheck->count() == 0) {
+                    $order->update([
+                        'status' => 'returning'
+                    ]);
+                }
 
                 return response()->json([
                     'status' => true,
