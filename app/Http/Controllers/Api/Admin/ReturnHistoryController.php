@@ -353,22 +353,26 @@ class ReturnHistoryController extends Controller
                 ]);
             }
 
-            $loanOrderDetail = LoanOrderDetails::find($returnHistory->loan_order_details_id);
+            // Tìm tất cả các chi tiết đơn hàng liên quan đến đơn hàng
+            $loanOrderDetails = LoanOrderDetails::where('loan_order_id', $order->id)->get();
 
             $flag = true;
 
-            foreach ($loanOrderDetail as $item) {
+            foreach ($loanOrderDetails as $item) {
+                // Kiểm tra nếu có bất kỳ sách nào chưa hoàn thành
                 if ($item->status != 'completed') {
                     $flag = false;
                     break;
                 }
             }
 
+            // Nếu tất cả các sách đều hoàn thành, cập nhật trạng thái đơn hàng
             if ($flag) {
                 $order->update([
                     'status' => 'completed'
                 ]);
             }
+
 
 
             return response()->json([
