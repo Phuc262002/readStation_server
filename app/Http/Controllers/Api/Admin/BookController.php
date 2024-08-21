@@ -510,8 +510,10 @@ class BookController extends Controller
             'author',
             'shelve',
             'shelve.bookcase',
-            'shelve.category'
+            'shelve.category',
+            'bookDetail.bookReviews'
         ])->find($id);
+
         if (!$bookdetail) {
             return response()->json([
                 "status" => false,
@@ -519,10 +521,34 @@ class BookController extends Controller
             ], 404);
         }
 
+        foreach ($bookdetail->bookDetail as $detail) {
+            $bookDetails[] = [
+                'id' => $detail->id,
+                'sku_origin' => $detail->sku_origin,
+                'poster' => $detail->poster,
+                'images' => $detail->images,
+                'book_version' => $detail->book_version,
+                'price' => $detail->price,
+                'hire_percent' => $detail->hire_percent,
+                'stock' => $detail->stock,
+                'publish_date' => $detail->publish_date,
+                'publishing_company_id' => $detail->publishing_company_id,
+                'issuing_company' => $detail->issuing_company,
+                'cardboard' => $detail->cardboard,
+                'total_page' => $detail->total_page,
+                'translator' => $detail->translator,
+                'language' => $detail->language,
+                'book_size' => $detail->book_size,
+                'status' => $detail->status,
+                'reviews_count' => $detail->bookReviews->count(),
+                'reviews_avg' => round($detail->bookReviews->avg('rating'), 1)
+            ];
+        }
+
         return response()->json([
             "status" => true,
             "message" => "Get book detail successfully!",
-            "data" => $bookdetail
+            "data" => $bookDetails
         ], 200);
     }
 
