@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\BookDetail;
 use App\Models\PublishingCompany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -262,6 +263,12 @@ class PublishingCompanyController extends Controller
 
         // Thực hiện phân trang
         $publishingCompany = $query->orderBy('created_at', 'desc')->paginate($pageSize, ['*'], 'page', $page);
+
+        $publishingCompany->getCollection()->transform(function ($item) {
+            return array_merge($item->toArray(), [
+                'total_books' => BookDetail::where('publishing_company_id', $item->id)->count()
+            ]);
+        });
 
         return response()->json([
             "status" => true,
