@@ -375,7 +375,7 @@ class UserController extends Controller
             'district_id' => 'nullable',
             'ward_id' => 'nullable',
             'address_detail' => 'nullable|string',
-            'phone' => 'required|regex:/^(0[35789])[0-9]{8}$/',
+            'phone' => 'required|regex:/^(0[35789])[0-9]{8}$/|unique:users,phone',
             'status' => 'nullable|string|in:active,inactive,banned,deleted',
         ], [
             'role_id.required' => 'Role id không được để trống.',
@@ -389,6 +389,7 @@ class UserController extends Controller
             'email.unique' => 'Email đã tồn tại.',
             'phone.required' => 'Số điện thoại không được để trống.',
             'phone.regex' => 'Số điện thoại không đúng định dạng.',
+            'phone.unique' => 'Số điện thoại đã tồn tại.',
         ]);
 
         if ($validator->fails()) {
@@ -589,7 +590,7 @@ class UserController extends Controller
             'district_id' => 'nullable',
             'ward_id' => 'nullable',
             'address_detail' => 'nullable|string',
-            'phone' => 'nullable|regex:/^(0[35789])[0-9]{8}$/',
+            'phone' => 'nullable|regex:/^(0[35789])[0-9]{8}$/|unique:users,phone,' . $id,
             'status' => 'nullable|string|in:active,banned',
             'banned_reason' => 'required_if:status,banned|string',
         ], [
@@ -603,6 +604,7 @@ class UserController extends Controller
             'status.in' => 'Status phải là active, hoặc banned.',
             'phone.required' => 'Số điện thoại không được để trống.',
             'phone.regex' => 'Số điện thoại không đúng định dạng.',
+            'phone.unique' => 'Số điện thoại đã tồn tại.',
             'banned_reason.required_if' => 'Lý do banned không được để trống.',
         ]);
 
