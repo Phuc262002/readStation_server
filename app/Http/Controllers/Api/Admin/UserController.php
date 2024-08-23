@@ -565,7 +565,7 @@ class UserController extends Controller
             "message" => "Get user successfully!",
             "data" => array_merge($user->toArray(), [
                 'id' => $user->id,
-                'balance_holding' => Transaction::where('user_id', $user->id)->where('status', 'holding')->sum('amount'),
+                'balance_holding' => LoanOrders::where('user_id', $user->id)->whereIn('status', ['approved', 'ready_for_pickup', 'preparing_shipment', 'in_transit', 'active', 'extended', 'returning'])->sum('total_deposit_fee'),
             ]),
         ], 200);
     }

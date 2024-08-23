@@ -90,5 +90,10 @@ class Post extends Model
     {
         $this->status = 'deleted';
         $this->save();
+
+        $comments = $this->comments;
+        $comments->each(function ($comment) {
+            $comment->delete();
+        });
     }
 }

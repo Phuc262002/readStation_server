@@ -307,7 +307,7 @@ class ReturnHistoryController extends Controller
             $bookDetails = BookDetail::find($loanOrderDetail->book_details_id);
             $order = LoanOrders::with('loanOrderDetails')->find($loanOrderDetail->loan_order_id);
 
-            if ($request->actual_return_condition == 'lost' || $request->actual_return_condition == 'damaged' || $request->actual_return_condition == 'poor') {
+            if ($request->actual_return_condition == 'lost') {
                 $returnHistory->update([
                     'condition' => $request->condition,
                     'fine_amount' => $request->fine_amount,
@@ -330,7 +330,7 @@ class ReturnHistoryController extends Controller
                 ]);
             }
 
-            if ($request->actual_return_condition == 'excellent' || $request->actual_return_condition == 'good' || $request->actual_return_condition == 'fair') {
+            if ($request->actual_return_condition == 'excellent' || $request->actual_return_condition == 'good' || $request->actual_return_condition == 'fair' || $request->actual_return_condition == 'damaged' || $request->actual_return_condition == 'poor') {
                 $returnHistory->update([
                     'condition' => $request->condition,
                     'fine_amount' => $request->fine_amount,
