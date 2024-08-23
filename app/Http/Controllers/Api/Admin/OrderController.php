@@ -976,7 +976,8 @@ class OrderController extends Controller
             }
 
             $order->update([
-                'status' => 'preparing_shipment'
+                'status' => 'preparing_shipment',
+                'pickup_date' => now(),
             ]);
 
             return response()->json([
@@ -1051,7 +1052,6 @@ class OrderController extends Controller
             $order->update([
                 'status' => 'active',
                 'loan_date' => now(),
-                'pickup_date' => now(),
                 'delivered_date' => now(),
                 'total_return_fee' => $order->total_deposit_fee
             ]);

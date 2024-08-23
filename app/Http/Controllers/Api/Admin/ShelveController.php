@@ -324,7 +324,9 @@ class ShelveController extends Controller
         $status = $request->input('status');
 
         // Tạo query ban đầu
-        $query = Shelve::query()->with(['category', 'bookcase', 'books']);
+        $query = Shelve::query()->with(['category', 'bookcase' => function ($query) {
+            $query->where('status', 'active');
+        }, 'books']);
 
         // Lấy tổng số mục trong DB trước khi áp dụng bộ lọc tìm kiếm
 
@@ -457,7 +459,9 @@ class ShelveController extends Controller
         $pageSize = $request->input('pageSize', 10);
         $search = $request->input('search');
 
-        $query = Book::query()->with(['bookDetail', 'author', 'category'])
+        $query = Book::query()->with(['bookDetail' => function ($query) {
+            $query->where('status', 'active');
+        }, 'author', 'category'])
             ->where('shelve_id', $id);
 
         $totalItems = $query->count();

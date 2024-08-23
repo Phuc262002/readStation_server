@@ -385,7 +385,14 @@ class BookcaseController extends Controller
             ], 400);
         }
 
-        $bookcase = Bookcase::with(['shelves', 'shelves.books', 'books'])->find($id);
+        $bookcase = Bookcase::with([
+            'shelves' => function ($query) {
+                $query->where('status', 'active');
+            },
+            'shelves.books',
+            'books'
+        ])->find($id);
+
 
         if (!$bookcase) {
             return response()->json([
@@ -401,7 +408,8 @@ class BookcaseController extends Controller
         ], 200);
     }
 
-    public function shelveOfBookcase(Request $request, $id) {
+    public function shelveOfBookcase(Request $request, $id)
+    {
         $validator = Validator::make(['id' => $id], [
             'id' => 'required|exists:bookcases,id',
             'page' => 'integer|min:1',
@@ -430,7 +438,7 @@ class BookcaseController extends Controller
         $pageSize = $request->input('pageSize', 10);
         $search = $request->input('search');
 
-        $query = Shelve::query()->with(['books'])->where('bookcase_id', $id);
+        $query = Shelve::query()->with(['books'])->where('status', 'active')->where('bookcase_id', $id);
         $totalItems = $query->count();
 
         if ($search) {
