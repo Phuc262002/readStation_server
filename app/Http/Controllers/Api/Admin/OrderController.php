@@ -940,7 +940,8 @@ class OrderController extends Controller
             }
 
             $order->update([
-                'status' => 'ready_for_pickup'
+                'status' => 'ready_for_pickup',
+                'pickup_date' => now(),
             ]);
 
             return response()->json([
@@ -1006,7 +1007,8 @@ class OrderController extends Controller
             }
 
             $order->update([
-                'status' => 'in_transit'
+                'status' => 'in_transit',
+                'pickup_date' => now(),
             ]);
 
             return response()->json([
