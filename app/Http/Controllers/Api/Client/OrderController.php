@@ -1107,7 +1107,7 @@ class OrderController extends Controller
 
                 $order->update([
                     'status' => 'returning',
-                    'total_shipping_fee' => $order->total_shipping_fee + $shipping_fee
+                    'total_shipping_fee' => LoanOrderDetails::where('loan_order_id', $orderDetail->loan_order_id)->sum('shipping_fee')
                 ]);
 
                 return response()->json([
@@ -1257,7 +1257,7 @@ class OrderController extends Controller
                 if ($orderCheck->count() == 0) {
                     $order->update([
                         'status' => 'returning',
-                        'total_shipping_fee' => $order->total_shipping_fee + $shipping_fee
+                        'total_shipping_fee' => LoanOrderDetails::where('loan_order_id', $orderDetail->loan_order_id)->sum('shipping_fee')
                     ]);
                 }
 

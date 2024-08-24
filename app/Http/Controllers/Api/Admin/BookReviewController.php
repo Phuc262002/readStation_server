@@ -248,7 +248,7 @@ class BookReviewController extends Controller
 
         if ($search) {
             $query->where(function ($q) use ($search) {
-                $q->where('content', 'like', "%$search%")
+                $q->where('review_text', 'like', "%$search%")
                     ->orWhereHas('bookDetail', function ($q) use ($search) {
                         $q->whereHas('book', function ($q) use ($search) {
                             $q->where('title', 'like', "%$search%");
