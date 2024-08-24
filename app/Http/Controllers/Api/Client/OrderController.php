@@ -1094,10 +1094,6 @@ class OrderController extends Controller
                     'extra_info' => $response
                 ]);
 
-                $order->update([
-                    'status' => 'returning'
-                ]);
-
                 foreach ($orderDetails as $orderDetail) {
                     $orderDetail->update([
                         'status' => 'returning'
@@ -1110,7 +1106,8 @@ class OrderController extends Controller
                 }
 
                 $order->update([
-                    'status' => 'returning'
+                    'status' => 'returning',
+                    'total_shipping_fee' => $order->total_shipping_fee + $shipping_fee
                 ]);
 
                 return response()->json([
@@ -1120,7 +1117,7 @@ class OrderController extends Controller
                 ]);
             } else {
                 $order->update([
-                    'status' => 'returning'
+                    'status' => 'returning',
                 ]);
 
                 foreach ($orderDetails as $orderDetail) {
@@ -1259,7 +1256,8 @@ class OrderController extends Controller
 
                 if ($orderCheck->count() == 0) {
                     $order->update([
-                        'status' => 'returning'
+                        'status' => 'returning',
+                        'total_shipping_fee' => $order->total_shipping_fee + $shipping_fee
                     ]);
                 }
 

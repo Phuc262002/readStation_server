@@ -375,7 +375,6 @@ class ReturnHistoryController extends Controller
             // Nếu tất cả các sách đều hoàn thành, cập nhật trạng thái đơn hàng
             if ($flag) {
                 $order->update([
-                    'total_deposit_fee' => 0,
                     'status' => 'completed',
                     'completed_date' => now(),
                     'total_fine_fee' => LoanOrderDetails::where('loan_order_id', $order->id)->sum('fine_amount'),
