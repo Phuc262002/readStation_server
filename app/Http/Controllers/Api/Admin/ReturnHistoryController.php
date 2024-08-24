@@ -353,6 +353,12 @@ class ReturnHistoryController extends Controller
                 ]);
             }
 
+            $order->update([
+                'total_deposit_fee' => $order->total_deposit_fee - $request->fine_amount,
+                'total_fine_fee' => $order->total_fine_fee + $request->fine_amount,
+                'total_return_fee' => $order->total_deposit_fee - $request->fine_amount,
+            ]);
+
             // Tìm tất cả các chi tiết đơn hàng liên quan đến đơn hàng
             $loanOrderDetails = LoanOrderDetails::where('loan_order_id', $order->id)->get();
 
@@ -369,7 +375,11 @@ class ReturnHistoryController extends Controller
             // Nếu tất cả các sách đều hoàn thành, cập nhật trạng thái đơn hàng
             if ($flag) {
                 $order->update([
-                    'status' => 'completed'
+                    'total_deposit_fee' => 0,
+                    'status' => 'completed',
+                    'completed_date' => now(),
+                    'total_fine_fee' => LoanOrderDetails::where('loan_order_id', $order->id)->sum('fine_amount'),
+                    'total_return_fee' => $order->total_deposit_fee - LoanOrderDetails::where('loan_order_id', $order->id)->sum('fine_amount') > 0 ? $order->total_deposit_fee - LoanOrderDetails::where('loan_order_id', $order->id)->sum('fine_amount') : 0,
                 ]);
             }
 
