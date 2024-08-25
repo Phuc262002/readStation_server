@@ -95,6 +95,17 @@ class BookDetail extends Model
         return $query;
     }
 
+    public function scopeRating($query, $rating)
+    {
+        if ($rating) {
+            $query->whereHas('bookReviews', function ($query) use ($rating) {
+                $query->where('rating', $rating);
+            });
+        }
+
+        return $query;
+    }
+
     public function scopeFilter($query, $category_id, $author_id, $publishing_company_id)
     {
         if ($category_id) {

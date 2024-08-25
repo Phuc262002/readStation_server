@@ -186,7 +186,7 @@ class BookController extends Controller
             'book.shelve',
             'book.shelve.bookcase',
             'book.shelve.category',
-            'book'
+            'book',
         ])
             ->whereHas('book', function ($query) {
                 $query->where('status', 'active');
@@ -207,28 +207,25 @@ class BookController extends Controller
         // Áp dụng bộ lọc tìm kiếm nếu có tham số tìm kiếm
         $query = $query->search($search);
 
+        // Áp dụng bộ lọc đánh giá nếu có tham số đánh giá
+        if ($rating) {
+            $query = $query->rating($rating);
+        }
+
         // Thực hiện phân trang
         $books = $query->orderBy('created_at', 'desc')->paginate($pageSize, ['*'], 'page', $page);
 
-        $filteredBooks = $books->getCollection()->filter(function ($book) use ($rating) {
+        $books->getCollection()->transform(function ($book) use ($rating) {
+            $bookArray = $book->toArray();
             $bookReviews = BookReviews::where('book_details_id', $book->id);;
             $averageRateRounded = round($bookReviews->avg('rating'), 1);
 
-            $book->average_rate = $averageRateRounded;
-            $book->rating_total = $bookReviews->count();
-            $book->hire_count = $book->order_details->count();
+            $bookArray['average_rate'] = $averageRateRounded;
+            $bookArray['rating_total'] = $bookReviews->count();
+            $bookArray['hire_count'] = $book->order_details->count();
             unset($book->order_details);
-
-            if ($rating) {
-                return $averageRateRounded >= $rating && $averageRateRounded <= $rating + 1;
-            }
-
-            return true; // Nếu không có rating, giữ lại tất cả các sách
+            return $bookArray;
         });
-
-        // Cập nhật lại bộ sưu tập với những sách đã lọc
-        $books->setCollection($filteredBooks);
-
 
         return response()->json([
             "status" => true,
