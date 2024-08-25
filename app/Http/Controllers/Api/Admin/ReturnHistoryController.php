@@ -7,6 +7,7 @@ use App\Models\BookDetail;
 use App\Models\LoanOrderDetails;
 use App\Models\LoanOrders;
 use App\Models\ReturnHistory;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use OpenApi\Attributes as OA;
@@ -354,9 +355,8 @@ class ReturnHistoryController extends Controller
             }
 
             $order->update([
-                'total_deposit_fee' => $order->total_deposit_fee - $request->fine_amount,
                 'total_fine_fee' => $order->total_fine_fee + $request->fine_amount,
-                'total_return_fee' => $order->total_deposit_fee - $request->fine_amount,
+                'total_return_fee' => $order->total_deposit_fee - LoanOrderDetails::where('loan_order_id', $order->id)->sum('fine_amount') > 0 ? $order->total_deposit_fee - LoanOrderDetails::where('loan_order_id', $order->id)->sum('fine_amount') : 0,
             ]);
 
             // Tìm tất cả các chi tiết đơn hàng liên quan đến đơn hàng
@@ -379,6 +379,20 @@ class ReturnHistoryController extends Controller
                     'completed_date' => now(),
                     'total_fine_fee' => LoanOrderDetails::where('loan_order_id', $order->id)->sum('fine_amount'),
                     'total_return_fee' => $order->total_deposit_fee - LoanOrderDetails::where('loan_order_id', $order->id)->sum('fine_amount') > 0 ? $order->total_deposit_fee - LoanOrderDetails::where('loan_order_id', $order->id)->sum('fine_amount') : 0,
+                ]);
+
+                Transaction::create([
+                    'user_id' => auth()->user()->id,
+                    'transaction_code' => intval(substr(strtotime(now()) . rand(1000, 9999), -9)),
+                    'portal' => null,
+                    'loan_order_id' => $order->id,
+                    'expired_at' => now(),
+                    'transaction_type' => 'refund',
+                    'transaction_method' => 'offline',
+                    'amount' => $order->total_deposit_fee - LoanOrderDetails::where('loan_order_id', $order->id)->sum('fine_amount') > 0 ? $order->total_deposit_fee - LoanOrderDetails::where('loan_order_id', $order->id)->sum('fine_amount') : 0,
+                    'description' => 'Hoàn tiền đơn hàng ' . $order->order_code,
+                    'status' => 'completed',
+                    'completed_at' => now(),
                 ]);
             }
 

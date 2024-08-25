@@ -13,6 +13,7 @@ use App\Models\LoanOrders;
 use App\Models\ReturnHistory;
 use App\Models\ShippingMethod;
 use App\Models\Transaction;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
@@ -1348,68 +1349,116 @@ class OrderController extends Controller
             }
             $order = LoanOrders::find($transaction->loan_order_id);
 
-            if ($request->status === 'canceled') {
-                $transaction->update([
-                    'status' => 'canceled',
-                    'extra_info' => [
-                        $transaction->extra_info,
-                        $request->body
-                    ]
-                ]);
-
-
-                if ($order) {
-                    $order->update([
-                        'status' => 'canceled'
+            if ($transaction->transaction_type == 'payment') {
+                if ($request->status === 'canceled') {
+                    $transaction->update([
+                        'status' => 'canceled',
+                        'extra_info' => [
+                            $transaction->extra_info,
+                            $request->body
+                        ]
                     ]);
 
-                    foreach ($order->loanOrderDetails as $orderDetail) {
-                        $orderDetail->update([
+
+                    if ($order) {
+                        $order->update([
                             'status' => 'canceled'
                         ]);
 
-                        $orderDetail->bookDetails->update([
-                            'stock' => $orderDetail->bookDetails->stock + 1
-                        ]);
+                        foreach ($order->loanOrderDetails as $orderDetail) {
+                            $orderDetail->update([
+                                'status' => 'canceled'
+                            ]);
+
+                            $orderDetail->bookDetails->update([
+                                'stock' => $orderDetail->bookDetails->stock + 1
+                            ]);
+                        }
+                    }
+                } else {
+                    $transaction->update([
+                        'status' => 'completed',
+                        'extra_info' => [
+                            $transaction->extra_info,
+                            $request->body
+                        ]
+                    ]);
+
+                    if ($order) {
+                        if ($request->isLibrary) {
+                            $order->update([
+                                'status' => 'active',
+                                'loan_date' => now(),
+                                'total_return_fee' => $order->total_deposit_fee,
+                            ]);
+
+                            foreach ($order->loanOrderDetails as $orderDetail) {
+                                $orderDetail->update([
+                                    'original_due_date' => now()->addDays($orderDetail->number_of_days),
+                                    'current_due_date' => now()->addDays($orderDetail->number_of_days),
+                                    'status' => 'active'
+                                ]);
+                            }
+                        } else {
+                            $order->update([
+                                'status' => 'approved'
+                            ]);
+
+                            foreach ($order->loanOrderDetails as $orderDetail) {
+                                $orderDetail->update([
+                                    'status' => 'pending'
+                                ]);
+                            }
+                        }
                     }
                 }
-            } else {
-                $transaction->update([
-                    'status' => 'completed',
-                    'extra_info' => [
-                        $transaction->extra_info,
-                        $request->body
-                    ]
-                ]);
+            } elseif ($transaction->transaction_type == 'extend') {
+                $extension = Extensions::with('extensionDetails')->where('loan_order_id', $order->id)->where('status', 'pending')->first();
+                if ($request->status === 'canceled') {
+                    $transaction->update([
+                        'status' => 'canceled',
+                        'extra_info' => [
+                            $transaction->extra_info,
+                            $request->body
+                        ]
+                    ]);
 
-                if ($order) {
-                    if ($request->isLibrary) {
-                        $order->update([
-                            'status' => 'active',
-                            'loan_date' => now(),
-                            'total_return_fee' => $order->total_deposit_fee,
-                        ]);
+                    $extension->update([
+                        'status' => 'rejected'
+                    ]);
+                } else {
+                    $transaction->update([
+                        'status' => 'completed',
+                        'completed_at' => now(),
+                        'extra_info' => [
+                            $transaction->extra_info,
+                            $request->body
+                        ]
+                    ]);
 
-                        foreach ($order->loanOrderDetails as $orderDetail) {
+                    $extension->update([
+                        'status' => 'approved'
+                    ]);
+
+                    if ($order) {
+                        foreach ($extension->extensionDetails as $extensionDetail) {
+                            $orderDetail = LoanOrderDetails::find($extensionDetail->loan_order_detail_id);
+
                             $orderDetail->update([
-                                'original_due_date' => now()->addDays($orderDetail->number_of_days),
-                                'current_due_date' => now()->addDays($orderDetail->number_of_days),
-                                'status' => 'active'
+                                'current_due_date' => Carbon::parse($orderDetail->current_due_date)->addDays($extensionDetail->number_of_days),
+                                'status' => 'extended'
                             ]);
                         }
-                    } else {
+
                         $order->update([
-                            'status' => 'approved'
+                            'status' => 'extended',
+                            'current_extensions' => $order->current_extensions + 1,
                         ]);
-    
-                        foreach ($order->loanOrderDetails as $orderDetail) {
-                            $orderDetail->update([
-                                'status' => 'pending'
-                            ]);
-                        }
                     }
                 }
             }
+
+
 
             return response()->json([
                 'status' => true,
@@ -1493,7 +1542,6 @@ class OrderController extends Controller
                 'loan_order_id' => $order->id,
                 'extension_date' => now(),
                 'extension_fee' => 0,
-                'status' => 'approved'
             ]);
 
             $extensionDetails = [];
@@ -1558,20 +1606,6 @@ class OrderController extends Controller
                     ]
                 ]);
             }
-
-            foreach ($request->extension as $extension) {
-                $orderDetail = LoanOrderDetails::find($extension['loan_order_details_id']);
-
-                $orderDetail->update([
-                    'current_due_date' => date('Y-m-d', strtotime($orderDetail->current_due_date . ' + ' . $extension['number_of_days'] . ' days')),
-                    'status' => 'extended'
-                ]);
-            }
-
-            $order->update([
-                'status' => 'extended',
-                'current_extensions' => $order->current_extensions + 1,
-            ]);
 
             return response()->json([
                 'status' => true,
@@ -1666,7 +1700,6 @@ class OrderController extends Controller
                 'extension_date' => now(),
                 'new_due_date' => date('Y-m-d', strtotime($order->current_due_date . ' + ' . $request->number_of_days . ' days')),
                 'extension_fee' => 0,
-                'status' => 'approved'
             ]);
 
             $extension->extensionDetails()->create([
@@ -1709,16 +1742,6 @@ class OrderController extends Controller
                     ]
                 ]);
             }
-
-            $orderDetail->update([
-                'current_due_date' => date('Y-m-d', strtotime($orderDetail->current_due_date . ' + ' . $request->number_of_days . ' days')),
-                'status' => 'extended'
-            ]);
-
-            $order->update([
-                'status' => 'extended',
-                'current_extensions' => $order->current_extensions + 1,
-            ]);
 
             return response()->json([
                 'status' => true,

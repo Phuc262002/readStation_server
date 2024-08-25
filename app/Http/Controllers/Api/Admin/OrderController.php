@@ -1215,6 +1215,20 @@ class OrderController extends Controller
                     'status' => 'completed',
                     'completed_date' => now(),
                 ]);
+
+                Transaction::create([
+                    'user_id' => auth()->user()->id,
+                    'transaction_code' => intval(substr(strtotime(now()) . rand(1000, 9999), -9)),
+                    'portal' => null,
+                    'loan_order_id' => $order->id,
+                    'expired_at' => now(),
+                    'transaction_type' => 'refund',
+                    'transaction_method' => 'offline',
+                    'amount' => $order->total_deposit_fee - LoanOrderDetails::where('loan_order_id', $order->id)->sum('fine_amount') > 0 ? $order->total_deposit_fee - LoanOrderDetails::where('loan_order_id', $order->id)->sum('fine_amount') : 0,
+                    'description' => 'Hoàn tiền đơn hàng ' . $order->order_code,
+                    'status' => 'completed',
+                    'completed_at' => now(),
+                ]);
             }
 
 
