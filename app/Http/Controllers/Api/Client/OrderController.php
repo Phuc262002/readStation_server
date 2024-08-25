@@ -816,7 +816,7 @@ class OrderController extends Controller
                 'loanOrderDetails.bookDetails.book.shelve.bookcase',
                 'transactions',
                 'extensions',
-                'extensions',
+                'extensions.feeTransaction',
                 'extensions.extensionDetails',
                 'extensions.extensionDetails.loanOrderDetail',
                 'extensions.extensionDetails.loanOrderDetail.bookDetails',
