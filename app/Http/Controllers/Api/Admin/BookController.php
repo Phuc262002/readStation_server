@@ -361,12 +361,12 @@ class BookController extends Controller
     {
         $validator = Validator::make(array_merge(['id' => $id], $request->all()), [
             'id' => 'required|integer|min:1|exists:books,id',
-            'author_id' => "string",
+            'author_id' => "nullable|exists:authors,id",
             'title' => "string",
             'original_title' => "string",
             'description_summary' => "string",
             'description' => "string",
-            'category_id' => "string",
+            'category_id' => "nullable|exists:categories,id",
             'shelve_id' => "nullable",
             'is_featured' => 'nullable|boolean',
             "status" => "string|in:active,inactive,deleted",
