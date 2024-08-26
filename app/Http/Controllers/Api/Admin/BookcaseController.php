@@ -386,9 +386,7 @@ class BookcaseController extends Controller
         }
 
         $bookcase = Bookcase::with([
-            'shelves' => function ($query) {
-                $query->where('status', 'active');
-            },
+            'shelves',
             'shelves.books',
             'books'
         ])->find($id);
