@@ -24,6 +24,7 @@ use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Auth\PasswordController;
 use App\Http\Controllers\Api\Auth\VerifyEmailController;
 use App\Http\Controllers\Api\BotTelegram\GithubActionController;
+use App\Http\Controllers\Api\CheckSchedule\CheckOrderPending;
 use App\Http\Controllers\Api\CheckSchedule\CheckPaymentOrder;
 use App\Http\Controllers\Api\CheckSchedule\FeeOverdueOrder;
 use App\Http\Controllers\Api\CheckSchedule\RemindReturnBookController;
@@ -44,6 +45,7 @@ use App\Http\Controllers\Api\Public\PostController as PublicPostController;
 use App\Http\Controllers\Api\Public\PublishingCompanyController;
 use App\Http\Controllers\Api\Public\ShippingMethodController as PublicShippingMethodController;
 use App\Http\Controllers\Api\Shiip\ShiipController;
+use App\Http\Controllers\Api\Test\TestController;
 use App\Http\Controllers\Api\Upload\CloudinaryController;
 use App\Http\Controllers\Api\VNPay\VnpayCreatePayment;
 use Illuminate\Support\Facades\Route;
@@ -433,5 +435,9 @@ Route::group([
         Route::get('/check-overdue-book', [RemindReturnBookController::class, 'remindReturnBook']);
         Route::get('/fine-fee-overdue', [FeeOverdueOrder::class, 'IncreaseFineFeeOverdue']);
         Route::get('/check-payment', [CheckPaymentOrder::class, 'checkPaymentOrder']);
+        Route::get('/check-order-pending', [CheckOrderPending::class, 'checkOrderPending']);
     });
+
+    // Route::get('/test', [TestController::class, 'test']);
+    // Route::get('/test2', [TestController::class, 'test2']);
 });
