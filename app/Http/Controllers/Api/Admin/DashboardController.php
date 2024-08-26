@@ -244,8 +244,9 @@ class DashboardController extends Controller
 
         $serviceFeeSum = LoanOrderDetails::where('status', 'completed')->sum('service_fee');
         $fineFeeSum = LoanOrderDetails::where('status', 'completed')->sum('fine_amount');
+        $shippingFeeSum = LoanOrders::where('status', 'completed')->sum('total_shipping_fee');
 
-        $revenue = $serviceFeeSum + $fineFeeSum;
+        $revenue = $serviceFeeSum + $fineFeeSum + $shippingFeeSum;
         $returnHistoy = ReturnHistory::where('status', 'completed')->count();
 
 
