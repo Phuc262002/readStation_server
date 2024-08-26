@@ -1027,7 +1027,7 @@ class OrderController extends Controller
             $order = LoanOrders::find($order_id);
             $orderDetails = LoanOrderDetails::where('loan_order_id', $order_id)->get();
 
-            if ($order->status != 'active' && $order->status != 'extended') {
+            if ($order->status != 'active' && $order->status != 'extended' && $order->status != 'overdue') {
                 return response()->json([
                     'status' => false,
                     'message' => 'Đơn hàng không ở trạng thái đang mượn',
@@ -1171,7 +1171,7 @@ class OrderController extends Controller
         $orderDetail = LoanOrderDetails::find($id);
         $order = LoanOrders::find($orderDetail->loan_order_id);
 
-        if ($orderDetail->status != 'active' && $orderDetail->status != 'extended') {
+        if ($orderDetail->status != 'active' && $orderDetail->status != 'extended' && $orderDetail->status != 'overdue') {
             return response()->json([
                 'status' => false,
                 'message' => 'Chi tiết đơn hàng không ở trạng thái đang mượn',
