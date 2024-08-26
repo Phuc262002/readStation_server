@@ -282,9 +282,7 @@ class DashboardController extends Controller
             'book.author',
             'book.shelve',
             'book.shelve.bookcase',
-            'book' => function ($query) {
-                $query->where('status', 'active');
-            }
+            'book',
         ])
             ->whereIn('id', $orderDetails)
             ->get();

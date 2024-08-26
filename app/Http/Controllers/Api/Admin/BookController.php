@@ -548,7 +548,7 @@ class BookController extends Controller
         return response()->json([
             "status" => true,
             "message" => "Get book detail successfully!",
-            "data" => array_merge($bookdetail->toArray(), ['book_detail' => $bookDetails])
+            "data" => array_merge($bookdetail->toArray(), ['book_detail' => $bookDetails ?? []])
         ], 200);
     }
 
