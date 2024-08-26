@@ -1187,6 +1187,7 @@ class OrderController extends Controller
                 'return_date' => now(),
                 'return_method' => 'library',
                 'received_at_library_date' => now(),
+                'status' => 'completed',
             ]));
 
             $orderDetail->update([
