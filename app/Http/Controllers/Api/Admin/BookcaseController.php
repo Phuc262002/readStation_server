@@ -436,7 +436,7 @@ class BookcaseController extends Controller
         $pageSize = $request->input('pageSize', 10);
         $search = $request->input('search');
 
-        $query = Shelve::query()->with(['books'])->where('status', 'active')->where('bookcase_id', $id);
+        $query = Shelve::query()->with(['books'])->where('bookcase_id', $id);
         $totalItems = $query->count();
 
         if ($search) {
