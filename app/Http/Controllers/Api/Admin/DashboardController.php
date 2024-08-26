@@ -194,7 +194,8 @@ class DashboardController extends Controller
             $orderIds = $orders->pluck('id');
             $serviceFeeSum = LoanOrderDetails::whereIn('loan_order_id', $orderIds)->where('status', 'completed')->sum('service_fee');
             $fineFeeSum = LoanOrderDetails::whereIn('loan_order_id', $orderIds)->where('status', 'completed')->sum('fine_amount');
-            $revenue = ($serviceFeeSum + $fineFeeSum);
+            $shippingFeeSum = LoanOrders::whereIn('id', $orderIds)->where('status', 'completed')->sum('total_shipping_fee');
+            $revenue = ($serviceFeeSum + $fineFeeSum + $shippingFeeSum);
         
             $result[] = [
                 'date' => $formattedDate,
