@@ -354,13 +354,15 @@ class ReturnHistoryController extends Controller
                 ]);
             }
 
-            $transaction = Transaction::where('loan_oder_details_id', $loanOrderDetail->id)->where('transaction_type', 'payment')->first();
+            $transaction = Transaction::where('loan_order_id', $order->id)->where('transaction_type', 'payment')->where('status', 'pending')->get();
 
             if ($transaction) {
-                $transaction->update([
-                    'status' => 'completed',
-                    'completed_at' => now(),
-                ]);
+                foreach ($transaction as $item) {
+                    $item->update([
+                        'status' => 'completed',
+                        'completed_at' => now(),
+                    ]);
+                }
             }
 
             $order->update([
