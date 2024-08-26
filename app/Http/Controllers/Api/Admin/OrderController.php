@@ -520,16 +520,16 @@ class OrderController extends Controller
 
         try {
 
-            // $allOrder = LoanOrders::where('user_id', $request->user_id)->get();
+            $allOrder = LoanOrders::where('user_id', $request->user_id)->get();
 
-            // foreach ($allOrder as $order) {
-            //     if (in_array($order->status, ['wating_payment', 'pending', 'approved', 'ready_for_pickup', 'preparing_shipment', 'in_transit', 'active', 'extended', 'returning', 'overdue'])) {
-            //         return response()->json([
-            //             'status' => false,
-            //             'message' => 'Bạn hiện đang có đơn hàng đang chờ xử lý, vui lòng chờ đơn hàng hiện tại được xử lý xong',
-            //         ]);
-            //     }
-            // }
+            foreach ($allOrder as $order) {
+                if (in_array($order->status, ['wating_payment', 'pending', 'approved', 'ready_for_pickup', 'preparing_shipment', 'in_transit', 'active', 'extended', 'returning', 'overdue'])) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Bạn hiện đang có đơn hàng đang chờ xử lý, vui lòng chờ đơn hàng hiện tại được xử lý xong',
+                    ]);
+                }
+            }
 
             $bookDetailsIds = collect($request->order_details)->pluck('book_details_id')->toArray();
 
