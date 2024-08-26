@@ -24,13 +24,15 @@ class CheckPaymentOrder extends Controller
                     $transaction->save();
 
                     $order = LoanOrders::with('loanOrderDetails')->where('id', $transaction->loan_order_id)->first();
-                    foreach ($order->loanOrderDetails as $orderDetail) {
-                        if ($orderDetail->status == 'canceled') {
-                            $orderDetail->save();
+                    if ($order->status == 'pending') {
+                        foreach ($order->loanOrderDetails as $orderDetail) {
+                            if ($orderDetail->status == 'canceled') {
+                                $orderDetail->save();
+                            }
                         }
+                        $order->status = 'canceled';
+                        $order->save();
                     }
-                    $order->status = 'canceled';
-                    $order->save();
                 } else if ($transaction->transaction_type == 'extend') {
                     $transaction->status = 'canceled';
                     $transaction->save();
