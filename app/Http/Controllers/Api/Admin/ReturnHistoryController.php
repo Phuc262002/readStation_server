@@ -354,6 +354,15 @@ class ReturnHistoryController extends Controller
                 ]);
             }
 
+            $transaction = Transaction::where('loan_oder_details_id', $loanOrderDetail->id)->where('transaction_type', 'payment')->first();
+
+            if ($transaction) {
+                $transaction->update([
+                    'status' => 'completed',
+                    'completed_at' => now(),
+                ]);
+            }
+
             $order->update([
                 'total_fine_fee' => $order->total_fine_fee + $request->fine_amount,
                 'total_return_fee' => $order->total_deposit_fee - LoanOrderDetails::where('loan_order_id', $order->id)->sum('fine_amount') > 0 ? $order->total_deposit_fee - LoanOrderDetails::where('loan_order_id', $order->id)->sum('fine_amount') : 0,
