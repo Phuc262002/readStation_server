@@ -711,6 +711,7 @@ class OrderController extends Controller
         try {
             $order = LoanOrders::with([
                 'user',
+                'user.role',
                 'shippingMethod',
                 'loanOrderDetails',
                 'loanOrderDetails.bookDetails',
