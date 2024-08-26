@@ -25,11 +25,15 @@ class CheckOrderPending extends Controller
                     $orderDetail->update(['status' => 'canceled']);
                 }
 
-                $transaction = $order->transaction;
-                if ($transaction) {
-                    $transaction->update(['status' => 'canceled']);
+                $transactions = $order->transactions;
+                if ($transactions) {
+                    foreach ($transactions as $transaction) {
+                        if ($transaction->status == 'pending') {
+                            $transaction->update(['status' => 'canceled']);
+                        }
+                    }
                 }
-
+                
                 Mail::to($order->user->email)->send(new MailCheckOrderPending($order));
             }
         }
