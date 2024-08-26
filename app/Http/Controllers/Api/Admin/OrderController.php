@@ -711,10 +711,11 @@ class OrderController extends Controller
         try {
             $order = LoanOrders::with([
                 'user',
-                'user.role',
                 'shippingMethod',
                 'loanOrderDetails',
                 'loanOrderDetails.bookDetails',
+                'loanOrderDetails.bookReviews',
+                'loanOrderDetails.returnHistories',
                 'loanOrderDetails.extensionsDetails',
                 'loanOrderDetails.bookDetails.publishingCompany',
                 'loanOrderDetails.bookDetails.book',
@@ -725,6 +726,7 @@ class OrderController extends Controller
                 'transactions',
                 'extensions',
                 'extensions.approvedBy',
+                'extensions.feeTransaction',
                 'extensions.extensionDetails',
                 'extensions.extensionDetails.loanOrderDetail',
                 'extensions.extensionDetails.loanOrderDetail.bookDetails',

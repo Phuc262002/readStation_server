@@ -1359,7 +1359,6 @@ class OrderController extends Controller
                         ]
                     ]);
 
-
                     if ($order) {
                         $order->update([
                             'status' => 'canceled'
